@@ -14,7 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => response()->json(['message' => 'Unauthenticated.'], 401));
-        $middleware->alias(['custom.domain' => \App\Http\Middleware\CustomDomainMiddleware::class]);
+        $middleware->alias([
+            'custom.domain' => \App\Http\Middleware\CustomDomainMiddleware::class,
+            'abilities'     => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability'       => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+        ]);
+        $middleware->appendToGroup('api', \App\Http\Middleware\SecureHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -16,7 +16,8 @@
     @mouseenter="hovered=true" @mouseleave="hovered=false"
   >
     <span :style="{flexShrink:0, color: active ? '#6D4EE8' : (hovered ? (dark ? 'rgba(255,255,255,0.8)' : '#374151') : (dark ? 'rgba(255,255,255,0.4)' : '#6B7280')), display:'flex', alignItems:'center', fontSize:'16px', lineHeight:1}">
-      <i v-if="icon==='links'"    class="bi bi-grid"></i>
+      <i v-if="icon==='dashboard'" class="bi bi-bar-chart-line"></i>
+      <i v-else-if="icon==='links'" class="bi bi-link-45deg"></i>
       <i v-else-if="icon==='analytics'" class="bi bi-graph-up"></i>
       <i v-else-if="icon==='profile'"   class="bi bi-person"></i>
       <i v-else-if="icon==='billing'"   class="bi bi-credit-card"></i>
@@ -24,6 +25,10 @@
       <i v-else-if="icon==='settings'"  class="bi bi-gear"></i>
       <i v-else-if="icon==='support'"   class="bi bi-chat-dots"></i>
       <i v-else-if="icon==='guide'"     class="bi bi-shield-fill-check"></i>
+      <i v-else-if="icon==='api'"       class="bi bi-code-slash"></i>
+      <i v-else-if="icon==='affiliates'" class="bi bi-people"></i>
+      <i v-else-if="icon==='help'"      class="bi bi-question-circle"></i>
+      <i v-else-if="icon==='legacy'"    class="bi bi-archive"></i>
       <i v-else                         class="bi bi-circle"></i>
     </span>
 

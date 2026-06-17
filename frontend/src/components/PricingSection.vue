@@ -14,6 +14,8 @@
       <div style="position:absolute;left:10%;right:10%;top:0;bottom:0;background:radial-gradient(circle at 50% 25%, #5940D1 0%, transparent 60%);opacity:0.18;mix-blend-mode:screen"></div>
       <!-- Soft ambient bottom -->
       <div style="position:absolute;left:20%;right:20%;bottom:0;height:300px;background:radial-gradient(circle at 50% 100%, rgba(109,78,232,0.12) 0%, transparent 70%)"></div>
+      <!-- Bottom fade — bridge to FAQ -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to bottom,transparent,#0a0814);pointer-events:none;z-index:3"></div>
       <!-- Sparkles canvas -->
       <canvas ref="sparklesCanvas" style="position:absolute;inset:0;width:100%;height:100%;mask-image:radial-gradient(50% 50% at 50% 0%, white, transparent 85%);opacity:0.5"></canvas>
     </div>
@@ -91,12 +93,12 @@
         <!-- Price -->
         <div style="display:flex;align-items:baseline;gap:2px;margin-bottom:4px">
           <span style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.04em">
-            <NumberFlow :value="isYearly ? plan.yearlyPrice : plan.price" :format="{style:'decimal'}" style="display:inline" />€
+            $<NumberFlow :value="isYearly ? plan.yearlyPrice : plan.price" :format="{style:'decimal'}" style="display:inline" />
           </span>
           <span style="font-size:13px;color:rgba(255,255,255,0.3);margin-left:4px">/{{ isYearly ? 'an' : 'mois' }}</span>
         </div>
         <p v-if="isYearly && plan.price > 0" style="font-size:11px;color:rgba(167,139,250,0.8);margin:0 0 24px;font-weight:600">
-          Économisez {{ plan.price * 12 - plan.yearlyPrice }}€/an
+          Économisez ${{ plan.price * 12 - plan.yearlyPrice }}/an
         </p>
         <div v-else style="margin-bottom:24px"></div>
 
@@ -184,7 +186,7 @@ const plans = [
     buttonText: 'Commencer',
     includes: [
       'Tout ce qui est en Pro, +',
-      'VSL Pages illimitées',
+      '25 VSL Pages + 25 liens (extensible)',
       'Analytics avancées',
       'Paywall intégré',
       'Accès API',

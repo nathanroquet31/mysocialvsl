@@ -22,7 +22,7 @@
     <!-- 6 Reasons -->
     <div :style="{background:card,border:`1px solid ${border}`,borderRadius:'16px',marginBottom:'24px',overflow:'hidden'}">
       <div :style="{padding:'20px 24px',borderBottom:`1px solid ${divider}`}">
-        <h3 :style="{fontSize:'14px',fontWeight:700,color:text,margin:'0 0 2px'}">⚠️ 6 ban & limit reasons</h3>
+        <h3 :style="{fontSize:'14px',fontWeight:700,color:text,margin:'0 0 2px'}"><i class="bi bi-exclamation-triangle-fill" style="color:#fbbf24;margin-right:6px"></i>6 ban & limit reasons</h3>
         <p :style="{fontSize:'12px',color:sub,margin:0}">Linked to your link activity on Instagram</p>
       </div>
       <div>
@@ -45,7 +45,7 @@
             <div style="display:flex;align-items:center;gap:'8px';flex-wrap:wrap;gap:8px;margin-bottom:4px">
               <p :style="{fontSize:'13px',fontWeight:600,color:text,margin:0}">{{ reason.title }}</p>
               <span v-if="reason.fixed" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:600">
-                ✓ Protected by MySocialVSL
+                <i class="bi bi-check"></i> Protected by MySocialVSL
               </span>
             </div>
             <p :style="{fontSize:'12px',color:sub,margin:0,lineHeight:1.6}">{{ reason.desc }}</p>
@@ -72,7 +72,7 @@
           </div>
         </div>
         <a href="/dashboard/domains" style="display:inline-flex;align-items:center;gap:6px;padding:'8px 16px';padding:8px 16px;background:#6D4EE8;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none">
-          <i class="bi bi-globe2"></i> Setup custom domain →
+          <i class="bi bi-globe2"></i> Setup custom domain <i class="bi bi-arrow-right"></i>
         </a>
       </div>
 
@@ -95,7 +95,7 @@
         </div>
         <p :style="{fontSize:'11px',color:sub,margin:0,padding:'10px 12px',background:theme.dark?'rgba(255,255,255,0.04)':'#F9FAFB',borderRadius:'8px',lineHeight:1.5}">
           <i class="bi bi-info-circle" style="margin-right:4px"></i>
-          Activate <strong>Shield Protection</strong> in your page settings → Advanced → Features.
+          Activate <strong>Shield Protection</strong> in your page settings <i class="bi bi-arrow-right"></i> Advanced <i class="bi bi-arrow-right"></i> Features.
         </p>
       </div>
     </div>

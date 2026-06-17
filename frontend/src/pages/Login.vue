@@ -85,7 +85,7 @@
                 boxShadow: loading ? 'none' : '0 4px 20px rgba(109,78,232,0.4)',
                 transition:'all 0.2s', opacity: loading ? 0.7 : 1
               }">
-              {{ loading ? 'Signing in...' : 'Sign in →' }}
+              {{ loading ? 'Signing in...' : 'Sign in' }}<i v-if="!loading" class="bi bi-arrow-right" style="margin-left:6px"></i>
             </button>
           </form>
         </div>

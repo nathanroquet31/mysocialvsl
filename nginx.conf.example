@@ -1,0 +1,63 @@
+server {
+    listen 80;
+    server_name api.tondomain.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name api.tondomain.com;
+
+    ssl_certificate     /etc/letsencrypt/live/api.tondomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.tondomain.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    root /var/www/ofm-vsl-saas/public;
+    index index.php;
+
+    # Masquer la version Nginx
+    server_tokens off;
+
+    # Limite la taille des uploads (vidéos jusqu'à 310MB)
+    client_max_body_size 310M;
+
+    # Timeout généreux pour les gros uploads
+    client_body_timeout 300s;
+
+    # Bloquer l'exécution de PHP dans storage — critique pour la sécurité uploads
+    location ~* ^/storage/.*\.php$ {
+        deny all;
+        return 403;
+    }
+
+    # Bloquer l'accès aux fichiers sensibles
+    location ~* \.(env|log|gitignore|htaccess)$ {
+        deny all;
+        return 403;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_read_timeout 300;
+    }
+
+    # Ne pas logger les health checks
+    location = /up {
+        access_log off;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    access_log /var/log/nginx/mysocialvsl_access.log;
+    error_log  /var/log/nginx/mysocialvsl_error.log;
+}

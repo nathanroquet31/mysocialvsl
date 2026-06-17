@@ -2,207 +2,415 @@
   <DashboardLayout
     title="My Pages"
     :pagesCount="pages.length"
-    :pagesLimit="auth.user?.plan === 'agency' ? 999 : auth.user?.plan === 'pro' ? 5 : 1"
+    :pagesLimit="auth.user?.page_limit ?? 1"
   >
     <template #header-actions>
-      <div style="display:flex;align-items:center;gap:10px">
-        <!-- View toggle -->
-        <div :style="{display:'flex',gap:'2px',background:theme.dark?'rgba(255,255,255,0.07)':'#F3F4F6',borderRadius:'8px',padding:'3px'}">
-          <button @click="viewMode='grid'"
-            :style="{
-              padding:'5px 8px', borderRadius:'6px', border:'none', cursor:'pointer',
-              background: viewMode==='grid' ? (theme.dark?'rgba(255,255,255,0.12)':'#fff') : 'transparent',
-              color: viewMode==='grid' ? (theme.dark?'#fff':'#111827') : (theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF'),
-              boxShadow: viewMode==='grid' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-              display:'flex', alignItems:'center', transition:'all 0.12s', fontSize:'14px'
-            }">
-            <i class="bi bi-grid"></i>
-          </button>
-          <button @click="viewMode='list'"
-            :style="{
-              padding:'5px 8px', borderRadius:'6px', border:'none', cursor:'pointer',
-              background: viewMode==='list' ? (theme.dark?'rgba(255,255,255,0.12)':'#fff') : 'transparent',
-              color: viewMode==='list' ? (theme.dark?'#fff':'#111827') : (theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF'),
-              boxShadow: viewMode==='list' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-              display:'flex', alignItems:'center', transition:'all 0.12s', fontSize:'14px'
-            }">
-            <i class="bi bi-list-ul"></i>
-          </button>
-        </div>
-        <!-- Period toggle -->
-        <div :style="{display:'flex',gap:'2px',background:theme.dark?'rgba(255,255,255,0.07)':'#F3F4F6',borderRadius:'8px',padding:'3px'}">
-          <button v-for="p in [7,30,90]" :key="p" @click="setPeriod(p)"
-            :style="{
-              padding:'4px 12px', borderRadius:'6px', border:'none', fontSize:'12px',
-              fontWeight:600, cursor:'pointer', transition:'all 0.12s',
-              background: period===p ? (theme.dark?'rgba(255,255,255,0.12)':'#fff') : 'transparent',
-              color: period===p ? (theme.dark?'#fff':'#111827') : (theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF'),
-              boxShadow: period===p ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-              fontFamily:'Inter,sans-serif'
-            }">
-            {{ p }}d
-          </button>
-        </div>
-        <RouterLink to="/pages/new" class="btn-create">
-          <i class="bi bi-plus-lg" style="font-size:14px"></i>
-          New page
-        </RouterLink>
-      </div>
+      <RouterLink to="/pages/new" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#6D4EE8;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='#5d3ed4'" onmouseout="this.style.background='#6D4EE8'">
+        <i class="bi bi-plus-lg" style="font-size:13px"></i> New page
+      </RouterLink>
     </template>
 
     <!-- Loading -->
     <div v-if="loading" style="display:flex;align-items:center;justify-content:center;padding:80px;color:#9CA3AF;font-size:13px">
-      <div style="width:20px;height:20px;border:2px solid #E5E7EB;border-top-color:#6D4EE8;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:10px"></div>
+      <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.1);border-top-color:#6D4EE8;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:10px"></div>
       Loading...
     </div>
 
     <template v-else>
-      <!-- Stats row -->
+      <!-- Stats summary row -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
-        <StatCard label="VSL Pages" :value="pages.length" />
-        <StatCard label="Page views" :value="totalViews" trend="+0" />
-        <StatCard label="Total clicks" :value="totalClicks" trend="+0" />
-        <StatCard label="Avg. CTR" :value="avgCtr + '%'" accent />
-      </div>
-
-      <!-- Section header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <h2 :style="{fontSize:'14px',fontWeight:600,color:theme.dark?'#fff':'#111827',margin:0}">Your pages</h2>
-      </div>
-
-      <!-- Empty state -->
-      <div v-if="pages.length === 0"
-        :style="{background:theme.dark?'rgba(255,255,255,0.03)':'#fff',border:`1.5px dashed ${theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'}`,borderRadius:'16px',padding:'72px 32px',textAlign:'center'}">
-        <div style="width:56px;height:56px;background:#EEE9FF;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6D4EE8" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        </div>
-        <h3 :style="{fontSize:'17px',fontWeight:700,color:theme.dark?'#fff':'#111827',margin:'0 0 10px'}">Your digital footprint starts here</h3>
-        <p :style="{fontSize:'13px',color:theme.dark?'rgba(255,255,255,0.5)':'#6B7280',margin:'0 auto 24px',maxWidth:'380px',lineHeight:1.65}">
-          Create your first smart link to unlock real-time analytics, audience retargeting, and organized growth.
-        </p>
-        <RouterLink to="/pages/new" class="btn-create">
-          <i class="bi bi-plus-lg" style="font-size:14px"></i>
-          Create your first page
-        </RouterLink>
-        <p :style="{fontSize:'12px',color:theme.dark?'rgba(255,255,255,0.3)':'#9CA3AF',margin:'12px 0 0'}">Takes less than 30s</p>
-        <!-- Feature highlights -->
-        <div style="display:flex;justify-content:center;gap:24px;margin-top:32px">
-          <div v-for="f in emptyFeatures" :key="f.label" style="text-align:center">
-            <div :style="{width:'36px',height:'36px',background:theme.dark?'rgba(255,255,255,0.07)':'#F3F4F6',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 8px'}" v-html="f.icon"></div>
-            <p :style="{fontSize:'12px',fontWeight:600,color:theme.dark?'rgba(255,255,255,0.8)':'#374151',margin:'0 0 2px'}">{{ f.label }}</p>
-            <p :style="{fontSize:'11px',color:theme.dark?'rgba(255,255,255,0.35)':'#9CA3AF',margin:0}">{{ f.sub }}</p>
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <span class="kpi-card-label">VSL Pages</span>
+            <div class="kpi-card-icon" style="background:rgba(109,78,232,0.15)"><i class="bi bi-grid-1x2-fill" style="color:#A78BFA"></i></div>
           </div>
+          <p class="kpi-card-value">{{ pages.length }}</p>
+          <p class="kpi-card-sub">Limit {{ (auth.user?.page_limit ?? 1) > 100000 ? '∞' : (auth.user?.page_limit ?? 1) }}</p>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <span class="kpi-card-label">Page views</span>
+            <div class="kpi-card-icon" style="background:rgba(8,145,178,0.15)"><i class="bi bi-eye-fill" style="color:#22d3ee"></i></div>
+          </div>
+          <p class="kpi-card-value">{{ totalViews.toLocaleString() }}</p>
+          <p class="kpi-card-sub">Last {{ period }} days</p>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <span class="kpi-card-label">Total clicks</span>
+            <div class="kpi-card-icon" style="background:rgba(234,88,12,0.15)"><i class="bi bi-lightning-charge-fill" style="color:#fb923c"></i></div>
+          </div>
+          <p class="kpi-card-value">{{ totalClicks.toLocaleString() }}</p>
+          <p class="kpi-card-sub">Last {{ period }} days</p>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <span class="kpi-card-label">Avg. CTR</span>
+            <div class="kpi-card-icon" style="background:rgba(22,163,74,0.15)"><i class="bi bi-graph-up-arrow" style="color:#4ade80"></i></div>
+          </div>
+          <p class="kpi-card-value">{{ avgCtr }}%</p>
+          <p class="kpi-card-sub">Last {{ period }} days</p>
         </div>
       </div>
 
-      <!-- Pages list -->
-      <div v-else style="display:flex;flex-direction:column;gap:8px">
-        <div v-for="page in pages" :key="page.id"
-          :style="{background:theme.dark?'rgba(255,255,255,0.04)':'#fff',border:`1px solid ${theme.dark?'rgba(255,255,255,0.08)':'#E5E7EB'}`,borderRadius:'14px',overflow:'hidden',transition:'box-shadow 0.15s,border-color 0.15s,transform 0.15s'}"
-          @mouseenter="e => { e.currentTarget.style.boxShadow=theme.dark?'0 4px 20px rgba(0,0,0,0.3)':'0 4px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor=theme.dark?'rgba(109,78,232,0.4)':'#D1D5DB'; e.currentTarget.style.transform='translateY(-1px)' }"
-          @mouseleave="e => { e.currentTarget.style.boxShadow='none'; e.currentTarget.style.borderColor=theme.dark?'rgba(255,255,255,0.08)':'#E5E7EB'; e.currentTarget.style.transform='translateY(0)' }">
+      <!-- Period selector -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="font-size:14px;font-weight:600;color:#fff;margin:0">Your pages</h2>
+        <div style="display:flex;gap:2px;background:rgba(255,255,255,0.07);border-radius:8px;padding:3px">
+          <button v-for="p in [7,30,90]" :key="p" @click="setPeriod(p)"
+            :style="{padding:'4px 12px',borderRadius:'6px',border:'none',fontSize:'12px',fontWeight:600,cursor:'pointer',transition:'all 0.12s',background:period===p?'rgba(255,255,255,0.12)':'transparent',color:period===p?'#fff':'rgba(255,255,255,0.4)',fontFamily:'Inter,sans-serif'}">
+            {{ p }}d
+          </button>
+        </div>
+      </div>
 
-          <div style="display:flex;align-items:center;gap:14px;padding:16px 20px">
-            <!-- Thumb -->
-            <div :style="{
-              width:'44px', height:'44px', borderRadius:'10px', flexShrink:0,
-              background: page.bg_color || '#0F0A3C',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              overflow:'hidden'
-            }">
-              <img v-if="page.avatar_url" :src="page.avatar_url" style="width:100%;height:100%;object-fit:cover" />
-              <i v-else class="bi bi-play-btn" style="font-size:18px;color:rgba(255,255,255,0.5)"></i>
+      <!-- Groups list -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+
+        <div v-for="(group, gi) in groups" :key="group.id"
+          style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden">
+
+          <!-- Group header -->
+          <div @click="group.open = !group.open"
+            style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;transition:background 0.12s"
+            onmouseover="this.style.background='rgba(255,255,255,0.03)'"
+            onmouseout="this.style.background='transparent'">
+            <div style="display:flex;align-items:center;gap:10px">
+              <i class="bi bi-folder2" style="font-size:14px;color:rgba(255,255,255,0.4)"></i>
+              <span style="font-size:13px;font-weight:700;color:#fff">{{ group.name }}</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);border-radius:999px;padding:1px 8px">{{ pagesInGroup(group.id).length }} page{{ pagesInGroup(group.id).length !== 1 ? 's' : '' }}</span>
             </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button v-if="gi > 0" @click.stop="removeGroup(gi)"
+                style="background:none;border:none;cursor:pointer;padding:4px 6px;color:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;transition:all 0.15s;font-size:13px"
+                onmouseover="this.style.color='#f87171';this.style.background='rgba(248,113,113,0.08)'"
+                onmouseout="this.style.color='rgba(255,255,255,0.2)';this.style.background='none'">
+                <i class="bi bi-trash3"></i>
+              </button>
+              <i :class="group.open ? 'bi bi-chevron-up' : 'bi bi-chevron-down'" style="font-size:12px;color:rgba(255,255,255,0.3)"></i>
+            </div>
+          </div>
 
-            <!-- Info -->
-            <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap">
-                <p :style="{fontSize:'14px',fontWeight:600,color:theme.dark?'#fff':'#111827',margin:0}">{{ page.model_name }}</p>
-                <span v-if="page.is_active" class="badge-active">
-                  <span class="badge-active-dot"></span>
-                  <span style="font-size:10px;color:#16A34A;font-weight:600">Active</span>
-                </span>
-                <span v-else :style="{display:'inline-flex',alignItems:'center',gap:'3px',background:theme.dark?'rgba(255,255,255,0.06)':'#F9FAFB',border:`1px solid ${theme.dark?'rgba(255,255,255,0.1)':'#E5E7EB'}`,borderRadius:'999px',padding:'1px 8px'}">
-                  <span :style="{fontSize:'10px',color:theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF',fontWeight:600}">Inactive</span>
-                </span>
-                <span v-if="page.video_url"
-                  style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:999px;padding:1px 8px;font-size:10px;color:#EA580C;font-weight:600">
-                  VSL
-                </span>
-                <span v-if="page.deep_link_enabled"
-                  style="background:#EEE9FF;border:1px solid #C7BBFF;border-radius:999px;padding:1px 8px;font-size:10px;color:#6D4EE8;font-weight:600">
-                  Deep link
-                </span>
+          <div v-if="group.open">
+            <!-- Empty state (only for ungrouped / first group) -->
+            <div v-if="pagesInGroup(group.id).length === 0 && gi === 0 && pages.length === 0"
+              style="padding:48px 32px;text-align:center;border-top:1px solid rgba(255,255,255,0.05)">
+              <div style="width:48px;height:48px;background:rgba(109,78,232,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+                <i class="bi bi-plus-lg" style="font-size:20px;color:#6D4EE8"></i>
               </div>
-              <p :style="{fontSize:'12px',color:theme.dark?'rgba(255,255,255,0.35)':'#9CA3AF',margin:0}">mysocialvsl.com/{{ page.slug }}</p>
-            </div>
-
-            <!-- Actions -->
-            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-              <a :href="`/p/${page.slug}`" target="_blank"
-                :style="{display:'inline-flex',alignItems:'center',gap:'4px',padding:'6px 12px',border:`1px solid ${theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'}`,borderRadius:'7px',fontSize:'12px',fontWeight:500,color:theme.dark?'rgba(255,255,255,0.6)':'#4B5563',textDecoration:'none',background:theme.dark?'rgba(255,255,255,0.05)':'#fff',transition:'all 0.12s'}"
-                @mouseenter="e => { e.currentTarget.style.borderColor='#6D4EE8'; e.currentTarget.style.color='#6D4EE8' }"
-                @mouseleave="e => { e.currentTarget.style.borderColor=theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'; e.currentTarget.style.color=theme.dark?'rgba(255,255,255,0.6)':'#4B5563' }">
-                <i class="bi bi-box-arrow-up-right" style="font-size:12px"></i>
-                View
-              </a>
-              <button @click="duplicatePage(page)"
-                :style="{padding:'6px 12px',border:`1px solid ${theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'}`,borderRadius:'7px',fontSize:'12px',fontWeight:500,color:theme.dark?'rgba(255,255,255,0.6)':'#4B5563',background:theme.dark?'rgba(255,255,255,0.05)':'#fff',cursor:'pointer',transition:'all 0.12s',fontFamily:'Inter,sans-serif'}"
-                @mouseenter="e => { e.currentTarget.style.borderColor='#6D4EE8'; e.currentTarget.style.color='#6D4EE8' }"
-                @mouseleave="e => { e.currentTarget.style.borderColor=theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'; e.currentTarget.style.color=theme.dark?'rgba(255,255,255,0.6)':'#4B5563' }">
-                Duplicate
-              </button>
-              <RouterLink :to="`/pages/${page.id}/edit`" class="btn-edit">
-                Edit
+              <p style="font-size:14px;font-weight:600;color:#fff;margin:0 0 6px">No pages yet</p>
+              <p style="font-size:13px;color:rgba(255,255,255,0.35);margin:0 0 16px">Create your first VSL page to get started</p>
+              <RouterLink to="/pages/new" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#6D4EE8;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
+                <i class="bi bi-plus-lg"></i> Create page
               </RouterLink>
-              <button @click="deletePage(page.id)"
-                :style="{padding:'6px 8px',border:`1px solid ${theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'}`,borderRadius:'7px',fontSize:'12px',color:theme.dark?'rgba(255,255,255,0.35)':'#9CA3AF',background:theme.dark?'rgba(255,255,255,0.05)':'#fff',cursor:'pointer',display:'flex',alignItems:'center',transition:'all 0.12s',fontFamily:'Inter,sans-serif'}"
-                @mouseenter="e => { e.currentTarget.style.borderColor='#FCA5A5'; e.currentTarget.style.color='#EF4444' }"
-                @mouseleave="e => { e.currentTarget.style.borderColor=theme.dark?'rgba(255,255,255,0.12)':'#E5E7EB'; e.currentTarget.style.color=theme.dark?'rgba(255,255,255,0.35)':'#9CA3AF' }">
-                <i class="bi bi-trash" style="font-size:13px"></i>
-              </button>
             </div>
-          </div>
+            <!-- Empty group (not ungrouped) -->
+            <div v-else-if="pagesInGroup(group.id).length === 0"
+              style="padding:28px 20px;text-align:center;border-top:1px solid rgba(255,255,255,0.05)">
+              <p style="font-size:13px;color:rgba(255,255,255,0.2);margin:0">Empty group — drag pages here</p>
+            </div>
 
-          <!-- Stats bar -->
-          <div :style="{display:'grid',gridTemplateColumns:'repeat(4,1fr)',borderTop:`1px solid ${theme.dark?'rgba(255,255,255,0.06)':'#F3F4F6'}`,background:theme.dark?'rgba(255,255,255,0.02)':'#FAFAFA'}">
-            <div v-for="(stat, i) in getPageStats(page.id)" :key="i"
-              :style="{
-                padding:'10px 16px', textAlign:'center',
-                borderRight: i < 3 ? `1px solid ${theme.dark?'rgba(255,255,255,0.06)':'#F3F4F6'}` : 'none',
-              }">
-              <p :style="{fontSize:'10px',color:theme.dark?'rgba(255,255,255,0.35)':'#9CA3AF',fontWeight:500,margin:'0 0 3px',textTransform:'uppercase',letterSpacing:'0.06em'}">{{ stat.label }}</p>
-              <p :style="{fontSize:'16px',fontWeight:700,letterSpacing:'-0.02em',color:stat.highlight?'#6D4EE8':(theme.dark?'#fff':'#111827'),margin:0}">{{ stat.value }}</p>
+            <!-- Pages list -->
+            <div v-else>
+              <div v-for="page in pagesInGroup(group.id)" :key="page.id"
+                @click="openModal(page)"
+                style="display:flex;align-items:center;gap:12px;padding:13px 20px;border-top:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.12s"
+                onmouseover="this.style.background='rgba(109,78,232,0.05)'"
+                onmouseout="this.style.background='transparent'">
+
+                <!-- Avatar -->
+                <div :style="{width:'38px',height:'38px',borderRadius:'10px',background:page.bg_color||'#1a1438',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',flexShrink:0,border:'1px solid rgba(255,255,255,0.08)'}">
+                  <img v-if="page.avatar_url" :src="page.avatar_url" style="width:100%;height:100%;object-fit:cover" />
+                  <i v-else class="bi bi-play-btn-fill" style="font-size:14px;color:rgba(255,255,255,0.2)"></i>
+                </div>
+
+                <!-- Info -->
+                <div style="flex:1;min-width:0">
+                  <p style="font-size:13px;font-weight:600;color:#fff;margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ page.model_name }}</p>
+                  <p style="font-size:11px;color:rgba(255,255,255,0.3);margin:0">mysocialvsl.com/{{ page.slug }}</p>
+                </div>
+
+                <!-- Badges -->
+                <span v-if="page.video_url" style="font-size:10px;font-weight:700;color:#fb923c;background:#1c1207;border:1px solid #7c3312;border-radius:999px;padding:1px 8px;flex-shrink:0">VSL</span>
+                <span v-if="page.deep_link_enabled" style="font-size:10px;font-weight:700;color:#a78bfa;background:#1a1238;border:1px solid #4c1d95;border-radius:999px;padding:1px 8px;flex-shrink:0">Deep link</span>
+
+                <!-- Stats inline -->
+                <div style="display:flex;gap:16px;flex-shrink:0">
+                  <div style="text-align:center">
+                    <p style="font-size:12px;font-weight:700;color:#fff;margin:0">{{ getPageStat(page.id, 'page_views') }}</p>
+                    <p style="font-size:9px;color:rgba(255,255,255,0.3);margin:0;text-transform:uppercase;letter-spacing:0.05em">Views</p>
+                  </div>
+                  <div style="text-align:center">
+                    <p style="font-size:12px;font-weight:700;color:#fff;margin:0">{{ getPageStat(page.id, 'link_clicks') }}</p>
+                    <p style="font-size:9px;color:rgba(255,255,255,0.3);margin:0;text-transform:uppercase;letter-spacing:0.05em">Clicks</p>
+                  </div>
+                  <div style="text-align:center">
+                    <p :style="{fontSize:'12px',fontWeight:700,margin:0,color:getPageStat(page.id,'ctr')>10?'#4ade80':'#fff'}">{{ getPageStat(page.id, 'ctr') }}%</p>
+                    <p style="font-size:9px;color:rgba(255,255,255,0.3);margin:0;text-transform:uppercase;letter-spacing:0.05em">CTR</p>
+                  </div>
+                </div>
+
+                <!-- Active toggle -->
+                <button @click.stop="toggleActive(page)"
+                  :style="{display:'inline-flex',alignItems:'center',gap:'5px',padding:'5px 11px',borderRadius:'999px',border:'none',cursor:'pointer',fontSize:'11px',fontWeight:600,transition:'all 0.15s',flexShrink:0,fontFamily:'Inter,sans-serif',background:page.is_active?'rgba(16,185,129,0.15)':'rgba(255,255,255,0.06)',color:page.is_active?'#10b981':'rgba(255,255,255,0.35)'}">
+                  <i class="bi bi-power" style="font-size:12px"></i>
+                  {{ page.is_active ? 'Active' : 'Off' }}
+                </button>
+
+                <!-- 3-dot -->
+                <button @click.stop="openModal(page)"
+                  style="background:none;border:none;cursor:pointer;padding:6px;color:rgba(255,255,255,0.25);border-radius:6px;display:flex;align-items:center;flex-shrink:0;transition:all 0.15s"
+                  onmouseover="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.7)'"
+                  onmouseout="this.style.background='none';this.style.color='rgba(255,255,255,0.25)'">
+                  <i class="bi bi-three-dots" style="font-size:15px"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Add New Group -->
+        <div v-if="!addingGroup"
+          @click="addingGroup = true"
+          style="display:flex;align-items:center;gap:8px;padding:12px 20px;border:1px dashed rgba(255,255,255,0.1);border-radius:12px;cursor:pointer;transition:all 0.15s"
+          onmouseover="this.style.borderColor='rgba(109,78,232,0.4)';this.style.background='rgba(109,78,232,0.05)'"
+          onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='transparent'">
+          <i class="bi bi-folder-plus" style="font-size:14px;color:rgba(255,255,255,0.3)"></i>
+          <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.3)">Add a new group</span>
+        </div>
+
+        <!-- New group inline input -->
+        <div v-else style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid rgba(109,78,232,0.5);border-radius:12px;background:rgba(109,78,232,0.06)">
+          <i class="bi bi-folder2" style="font-size:14px;color:#6D4EE8;flex-shrink:0"></i>
+          <input ref="newGroupInput" v-model="newGroupName"
+            @keydown.enter="confirmAddGroup"
+            @keydown.esc="addingGroup = false; newGroupName = ''"
+            placeholder="Group name…"
+            style="flex:1;background:none;border:none;outline:none;font-size:13px;font-weight:600;color:#fff;font-family:inherit;min-width:0"
+          />
+          <button @click="confirmAddGroup"
+            :disabled="!newGroupName.trim()"
+            style="padding:5px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;background:#6D4EE8;color:#fff;flex-shrink:0;opacity:1;transition:opacity 0.15s"
+            :style="{opacity: newGroupName.trim() ? 1 : 0.4, cursor: newGroupName.trim() ? 'pointer' : 'default'}">
+            Add
+          </button>
+          <button @click="addingGroup = false; newGroupName = ''"
+            style="background:none;border:none;cursor:pointer;padding:4px;color:rgba(255,255,255,0.3);font-size:14px;flex-shrink:0">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
       </div>
     </template>
+
+    <!-- ─── Quick View Modal ─── -->
+    <Teleport to="body">
+      <div v-if="selectedPage"
+        style="position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)"
+        @click.self="selectedPage=null">
+        <div style="background:#13112b;border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:100%;max-width:820px;max-height:88vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.6)">
+
+          <!-- Modal header -->
+          <div style="display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.07)">
+            <div :style="{width:'52px',height:'52px',borderRadius:'12px',background:selectedPage.bg_color||'#1a1438',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',flexShrink:0,border:'1px solid rgba(255,255,255,0.1)'}">
+              <img v-if="selectedPage.avatar_url" :src="selectedPage.avatar_url" style="width:100%;height:100%;object-fit:cover" />
+              <i v-else class="bi bi-play-btn-fill" style="font-size:22px;color:rgba(255,255,255,0.2)"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <p style="font-size:16px;font-weight:700;color:#fff;margin:0 0 3px">{{ selectedPage.model_name }}</p>
+              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin:0 0 2px">mysocialvsl.com/{{ selectedPage.slug }}</p>
+              <p style="font-size:11px;color:rgba(255,255,255,0.2);margin:0">Group: <span style="color:rgba(255,255,255,0.35)">Ungrouped</span></p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <button @click="toggleActive(selectedPage)"
+                :style="{display:'inline-flex',alignItems:'center',gap:'6px',padding:'7px 14px',borderRadius:'999px',border:selectedPage.is_active?'1px solid rgba(16,185,129,0.4)':'1px solid rgba(255,255,255,0.1)',cursor:'pointer',fontSize:'12px',fontWeight:700,transition:'all 0.15s',fontFamily:'Inter,sans-serif',background:selectedPage.is_active?'rgba(16,185,129,0.12)':'rgba(255,255,255,0.06)',color:selectedPage.is_active?'#10b981':'rgba(255,255,255,0.4)'}">
+                <i class="bi bi-power" style="font-size:12px"></i>
+                {{ selectedPage.is_active ? 'Active' : 'Inactive' }}
+              </button>
+              <button @click="selectedPage=null"
+                style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 9px;cursor:pointer;color:rgba(255,255,255,0.45);display:flex;align-items:center;transition:all 0.15s"
+                onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                <i class="bi bi-x-lg" style="font-size:13px"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal body -->
+          <div style="display:grid;grid-template-columns:1fr 260px;gap:12px;padding:16px 24px 24px">
+
+            <!-- Left column -->
+            <div style="display:flex;flex-direction:column;gap:10px">
+
+              <!-- Today stat -->
+              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <p style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;display:flex;align-items:center;gap:5px">
+                    <i class="bi bi-clock" style="font-size:11px"></i> Today
+                  </p>
+                  <p style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-0.04em;margin:0;line-height:1">
+                    {{ getPageStat(selectedPage.id, 'page_views') }}
+                  </p>
+                </div>
+                <i class="bi bi-graph-up-arrow" style="font-size:24px;color:rgba(109,78,232,0.35)"></i>
+              </div>
+
+              <!-- Stats row -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px">
+                  <p style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 5px;font-weight:600">Views</p>
+                  <p style="font-size:22px;font-weight:800;color:#fff;margin:0;letter-spacing:-0.03em">{{ getPageStat(selectedPage.id, 'page_views') }}</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px">
+                  <p style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 5px;font-weight:600">Clicks</p>
+                  <p style="font-size:22px;font-weight:800;color:#fff;margin:0;letter-spacing:-0.03em">{{ getPageStat(selectedPage.id, 'link_clicks') }}</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px">
+                  <p style="font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.07em;margin:0 0 5px;font-weight:600">CTR</p>
+                  <p :style="{fontSize:'22px',fontWeight:800,margin:0,letterSpacing:'-0.03em',color:getPageStat(selectedPage.id,'ctr')>10?'#4ade80':'#fff'}">{{ getPageStat(selectedPage.id, 'ctr') }}%</p>
+                </div>
+              </div>
+
+              <!-- Clicks trend -->
+              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 20px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                  <p style="font-size:13px;font-weight:600;color:#fff;margin:0">Clicks Trend</p>
+                  <span style="font-size:11px;color:rgba(255,255,255,0.3)">Last 7 days</span>
+                </div>
+                <svg viewBox="0 0 300 50" style="width:100%;height:44px">
+                  <defs>
+                    <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#6D4EE8" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#6D4EE8" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,40 L50,40 L100,38 L150,40 L200,37 L250,40 L300,38" fill="none" stroke="#6D4EE8" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M0,40 L50,40 L100,38 L150,40 L200,37 L250,40 L300,38 L300,50 L0,50Z" fill="url(#sparkGrad)"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Right column -->
+            <div style="display:flex;flex-direction:column;gap:10px">
+
+              <!-- Quick Actions -->
+              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden">
+                <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0">Quick Actions</p>
+                <RouterLink :to="`/dashboard?link_id=${selectedPage.id}`" class="modal-action-btn" @click="selectedPage=null">
+                  <i class="bi bi-graph-up-arrow" style="font-size:13px"></i> View Analytics
+                </RouterLink>
+                <button @click="copyLink(selectedPage.slug)" class="modal-action-btn">
+                  <i class="bi bi-link-45deg" style="font-size:14px"></i>
+                  {{ copiedLink === selectedPage.slug ? 'Copied!' : 'Copy Link' }}
+                </button>
+                <button @click="openPage(selectedPage.slug)" class="modal-action-btn">
+                  <i class="bi bi-box-arrow-up-right" style="font-size:13px"></i> View Page
+                </button>
+                <RouterLink :to="`/pages/${selectedPage.id}/edit`" class="modal-action-btn" @click="selectedPage=null">
+                  <i class="bi bi-pencil" style="font-size:13px"></i> Edit Link
+                </RouterLink>
+              </div>
+
+              <!-- Management -->
+              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden">
+                <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);margin:0">Management</p>
+                <button @click="duplicatePage(selectedPage);selectedPage=null" class="modal-action-btn">
+                  <i class="bi bi-copy" style="font-size:13px"></i> Duplicate
+                </button>
+                <RouterLink to="/dashboard/domains" class="modal-action-btn" @click="selectedPage=null">
+                  <i class="bi bi-globe" style="font-size:13px"></i> Custom Domain
+                </RouterLink>
+              </div>
+
+              <!-- Delete -->
+              <button @click="deletePage(selectedPage.id);selectedPage=null" class="modal-delete-btn">
+                <i class="bi bi-trash" style="font-size:13px"></i> Delete Link
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
   </DashboardLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import api from '@/lib/axios'
 import DashboardLayout from '@/components/DashboardLayout.vue'
-import StatCard from '@/components/StatCard.vue'
 
+const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const theme = useThemeStore()
 const pages = ref([])
 const stats = ref({})
 const loading = ref(true)
 const period = ref(30)
-const viewMode = ref('list')
+const groups = ref([{ id: 'ungrouped', name: 'Ungrouped', open: true }])
+const addingGroup = ref(false)
+const newGroupName = ref('')
+const newGroupInput = ref(null)
+const selectedPage = ref(null)
+const copiedLink = ref('')
 
-const emptyFeatures = [
-  { label: 'Click Tracking', sub: 'Every click logged',  icon: '<i class="bi bi-cursor" style="font-size:16px;color:#6B7280"></i>' },
-  { label: 'Deep Analytics', sub: 'Audience insights',   icon: '<i class="bi bi-graph-up" style="font-size:16px;color:#6B7280"></i>' },
-  { label: 'Custom Domains', sub: 'Your brand URL',       icon: '<i class="bi bi-globe" style="font-size:16px;color:#6B7280"></i>' },
-]
+function openModal(page) {
+  selectedPage.value = page
+}
+
+function pagesInGroup(groupId) {
+  if (groupId === 'ungrouped') {
+    const customIds = new Set(groups.value.slice(1).map(g => g.id))
+    return pages.value.filter(p => !p.group_id || !customIds.has(p.group_id))
+  }
+  return pages.value.filter(p => p.group_id === groupId)
+}
+
+watch(addingGroup, async (val) => {
+  if (val) { await nextTick(); newGroupInput.value?.focus() }
+})
+
+function confirmAddGroup() {
+  const name = newGroupName.value.trim()
+  if (!name) return
+  groups.value.push({ id: `group_${Date.now()}`, name, open: true })
+  newGroupName.value = ''
+  addingGroup.value = false
+}
+
+function removeGroup(index) {
+  const g = groups.value[index]
+  pages.value.forEach(p => { if (p.group_id === g.id) p.group_id = null })
+  groups.value.splice(index, 1)
+}
+
+function getPageStat(pageId, key) {
+  return stats.value[pageId]?.[key] ?? 0
+}
+
+async function toggleActive(page) {
+  try {
+    await api.patch(`/pages/${page.id}`, { is_active: !page.is_active })
+    page.is_active = !page.is_active
+    if (selectedPage.value?.id === page.id) {
+      selectedPage.value = { ...page }
+    }
+  } catch {}
+}
+
+function copyLink(slug) {
+  navigator.clipboard.writeText(`https://mysocialvsl.com/${slug}`)
+  copiedLink.value = slug
+  setTimeout(() => { copiedLink.value = '' }, 2000)
+}
+
+function openPage(slug) {
+  window.open(`/p/${slug}`, '_blank')
+}
 
 async function setPeriod(p) {
   period.value = p
@@ -224,18 +432,12 @@ const avgCtr = computed(() => {
   return Math.round(values.reduce((s, v) => s + v, 0) / values.length * 10) / 10
 })
 
-function getPageStats(pageId) {
-  const s = stats.value[pageId] || {}
-  const ctr = s.ctr || 0
-  return [
-    { label: 'Views',      value: s.page_views   ?? '—', highlight: false },
-    { label: 'Clicks',     value: s.link_clicks  ?? '—', highlight: false },
-    { label: 'Conversions', value: s.age_confirmed ?? '—', highlight: false },
-    { label: 'CTR',        value: ctr ? ctr + '%' : '—', highlight: ctr > 30 },
-  ]
-}
-
 onMounted(async () => {
+  // Returning from Stripe checkout: refresh the cached user so the new plan shows
+  if (route.query.upgraded) {
+    await auth.fetchMe()
+    router.replace({ query: {} })
+  }
   try {
     const { data } = await api.get('/pages')
     pages.value = data
@@ -277,94 +479,65 @@ async function duplicatePage(page) {
 }
 </script>
 
-<style>
+<style scoped>
 @keyframes spin { to { transform: rotate(360deg) } }
 
-@keyframes shimmer-btn {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+.kpi-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
 }
-
-@keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0 rgba(109,78,232,0.4); }
-  70%  { box-shadow: 0 0 0 8px rgba(109,78,232,0); }
-  100% { box-shadow: 0 0 0 0 rgba(109,78,232,0); }
+.kpi-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.055);
+  border-color: rgba(109,78,232,0.35);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
 }
+.kpi-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.kpi-card-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.4); }
+.kpi-card-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+.kpi-card-value { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin: 0; }
+.kpi-card-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin: 6px 0 0; }
 
-@keyframes float-icon {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-2px); }
-}
-
-.btn-create {
-  display: inline-flex;
+.modal-action-btn {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 8px;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  text-align: left;
+  font-family: Inter, sans-serif;
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s;
+}
+.modal-action-btn:last-child { border-bottom: none; }
+.modal-action-btn:hover { background: rgba(109,78,232,0.12); color: #A78BFA; }
+
+.modal-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 14px;
+  cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  text-decoration: none;
-  color: #fff;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(90deg, #6D4EE8, #A78BFA, #6D4EE8);
-  background-size: 200% auto;
-  animation: shimmer-btn 3s linear infinite;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.btn-create:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 20px rgba(109,78,232,0.45);
-  animation: shimmer-btn 1.5s linear infinite;
-}
-.btn-create svg {
-  animation: float-icon 2s ease-in-out infinite;
-}
-
-.btn-edit {
-  padding: 6px 14px;
-  background: #6D4EE8;
-  color: #fff;
-  border-radius: 7px;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
+  color: #f87171;
+  font-family: Inter, sans-serif;
   transition: all 0.15s;
-  position: relative;
-  overflow: hidden;
 }
-.btn-edit::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
-  transform: translateX(-100%);
-  transition: transform 0.4s;
-}
-.btn-edit:hover::after {
-  transform: translateX(100%);
-}
-.btn-edit:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(109,78,232,0.4);
-}
-
-.badge-active {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: #F0FDF4;
-  border: 1px solid #BBF7D0;
-  border-radius: 999px;
-  padding: 1px 8px;
-}
-.badge-active-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #16A34A;
-  display: inline-block;
-  animation: pulse-ring 2s ease-out infinite;
-}
+.modal-delete-btn:hover { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); }
 </style>

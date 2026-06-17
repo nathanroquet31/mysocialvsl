@@ -36,7 +36,7 @@
           </div>
           <div v-if="!collapsed" style="flex:1;min-width:0">
             <p :style="{fontSize:'12px',fontWeight:600,color:textPrimary,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',margin:0}">{{ auth.user?.name || 'Creator' }}</p>
-            <span v-if="auth.user?.is_admin" style="font-size:10px;font-weight:700;background:linear-gradient(135deg,#6D4EE8,#A78BFA);color:#fff;border-radius:999px;padding:1px 8px;display:inline-block;margin-top:2px">⚡ Admin</span>
+            <span v-if="auth.user?.is_admin" style="font-size:10px;font-weight:700;background:linear-gradient(135deg,#6D4EE8,#A78BFA);color:#fff;border-radius:999px;padding:1px 8px;display:inline-block;margin-top:2px"><i class="bi bi-lightning-charge-fill" style="margin-right:3px"></i>Admin</span>
             <RouterLink v-else to="/billing" style="text-decoration:none">
               <span :style="{fontSize:'10px',fontWeight:600,background:auth.user?.plan==='pro'?'#FEF3C7':auth.user?.plan==='agency'?'#ECFDF5':'#EEE9FF',color:auth.user?.plan==='pro'?'#D97706':auth.user?.plan==='agency'?'#059669':'#6D4EE8',borderRadius:'999px',padding:'1px 8px',display:'inline-block',marginTop:'2px'}">{{ auth.user?.plan === 'pro' ? 'Pro' : auth.user?.plan === 'agency' ? 'Agency' : 'Free plan' }}</span>
             </RouterLink>
@@ -47,8 +47,11 @@
       <!-- Nav -->
       <nav style="padding:8px;flex:1;overflow-y:auto;overflow-x:hidden">
 
-        <!-- Pages -->
-        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard" :active="route.path==='/dashboard'" label="Pages" icon="links" />
+        <!-- Dashboard (analytics overview) -->
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard" :active="route.path==='/dashboard'" label="Dashboard" icon="dashboard" />
+
+        <!-- Links (pages list) -->
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/links" :active="route.path==='/dashboard/links'" label="Links" icon="links" />
 
         <!-- Analytics (expandable) -->
         <div>
@@ -75,9 +78,16 @@
           </div>
           <!-- Sub-items -->
           <div v-if="analyticsOpen && !collapsed" style="padding-left:16px;margin-bottom:2px">
-            <div v-for="sub in analyticsSubItems" :key="sub.label"
-              :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 10px',borderRadius:'8px',fontSize:'12px',color:textMuted,cursor:'default'}">
-              <span>{{ sub.label }}</span>
+            <RouterLink to="/dashboard/analytics/instagram"
+              :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 10px',borderRadius:'8px',fontSize:'12px',textDecoration:'none',
+                color: route.path==='/dashboard/analytics/instagram' ? '#6D4EE8' : textSecondary,
+                background: route.path==='/dashboard/analytics/instagram' ? '#EEE9FF' : 'transparent'}"
+              @mouseenter="e => { if(route.path!=='/dashboard/analytics/instagram') e.currentTarget.style.background=hoverBg }"
+              @mouseleave="e => { if(route.path!=='/dashboard/analytics/instagram') e.currentTarget.style.background='transparent' }">
+              <span><i class="bi bi-instagram" style="font-size:11px;margin-right:6px"></i>Instagram</span>
+            </RouterLink>
+            <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 10px',borderRadius:'8px',fontSize:'12px',color:textMuted,cursor:'default'}">
+              <span><i class="bi bi-tiktok" style="font-size:11px;margin-right:6px"></i>TikTok</span>
               <span :style="{fontSize:'10px',fontWeight:600,background:hoverBg,color:textMuted,borderRadius:'999px',padding:'1px 7px',border:`1px solid ${border}`}">Soon</span>
             </div>
           </div>
@@ -90,41 +100,11 @@
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/profile" :active="route.path==='/dashboard/profile'" label="Profile" icon="profile" />
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/billing" :active="route.path==='/billing'" label="Billing" icon="billing" />
 
-        <!-- Affiliates (coming soon) -->
-        <a href="#" @click.prevent
-          :style="{
-            display:'flex', alignItems:'center', gap:'10px',
-            padding: collapsed ? '10px' : '8px 10px',
-            borderRadius:'8px', fontSize:'13px', fontWeight:'500',
-            textDecoration:'none', color:textSecondary, background:'transparent',
-            marginBottom:'2px', transition:'all 0.12s',
-            justifyContent: collapsed ? 'center' : 'flex-start', position:'relative'
-          }"
-          @mouseenter="e => e.currentTarget.style.background=hoverBg"
-          @mouseleave="e => e.currentTarget.style.background='transparent'">
-          <span :style="{flexShrink:0,display:'flex',alignItems:'center',color:textMuted,fontSize:'16px',lineHeight:1}">
-            <i class="bi bi-people"></i>
-          </span>
-          <span v-if="!collapsed" style="flex:1">Affiliates</span>
-          <span v-if="!collapsed" :style="{fontSize:'10px',fontWeight:600,background:hoverBg,color:textMuted,borderRadius:'999px',padding:'1px 7px',border:`1px solid ${border}`}">Soon</span>
-        </a>
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/affiliates" :active="route.path==='/dashboard/affiliates'" label="Affiliates" icon="affiliates" />
 
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/domains" :active="route.path==='/dashboard/domains'" label="Domains" icon="domains" />
 
-        <!-- API (soon) -->
-        <div :style="{
-          display:'flex', alignItems:'center', gap:'10px',
-          padding: collapsed ? '10px' : '8px 10px',
-          borderRadius:'8px', fontSize:'13px', fontWeight:'500',
-          color:textMuted, cursor:'default', marginBottom:'2px',
-          justifyContent: collapsed ? 'center' : 'flex-start'
-        }">
-          <span :style="{flexShrink:0,display:'flex',alignItems:'center',color:textMuted,fontSize:'16px',lineHeight:1}">
-            <i class="bi bi-code-slash"></i>
-          </span>
-          <span v-if="!collapsed" style="flex:1">API</span>
-          <span v-if="!collapsed" :style="{fontSize:'10px',fontWeight:600,background:hoverBg,color:textMuted,borderRadius:'999px',padding:'1px 7px',border:`1px solid ${border}`}">Soon</span>
-        </div>
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/api" :active="route.path==='/dashboard/api'" label="API" icon="api" />
 
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/settings" :active="route.path==='/dashboard/settings'" label="Settings" icon="settings" />
 
@@ -132,26 +112,10 @@
         <div :style="{height:'1px',background:border,margin:'8px 2px'}"></div>
         <p v-if="!collapsed" :style="{fontSize:'10px',fontWeight:600,color:textMuted,textTransform:'uppercase',letterSpacing:'0.1em',padding:'0 8px',margin:'8px 0 4px',whiteSpace:'nowrap'}">Help</p>
 
-        <!-- Help Center -->
-        <a href="https://help.mysocialvsl.com" target="_blank" rel="noopener"
-          :style="{
-            display:'flex', alignItems:'center', gap:'10px',
-            padding: collapsed ? '10px' : '8px 10px',
-            borderRadius:'8px', fontSize:'13px', fontWeight:'500',
-            textDecoration:'none', color:textSecondary, background:'transparent',
-            marginBottom:'2px', transition:'all 0.12s',
-            justifyContent: collapsed ? 'center' : 'flex-start'
-          }"
-          @mouseenter="e => e.currentTarget.style.background=hoverBg"
-          @mouseleave="e => e.currentTarget.style.background='transparent'">
-          <span :style="{flexShrink:0,display:'flex',alignItems:'center',color:textMuted,fontSize:'16px',lineHeight:1}">
-            <i class="bi bi-question-circle"></i>
-          </span>
-          <span v-if="!collapsed">Help Center</span>
-        </a>
-
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/help" :active="route.path==='/dashboard/help'" label="Help Center" icon="help" />
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/guide" :active="route.path==='/dashboard/guide'" label="Creator Guide" icon="guide" />
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/support" :active="route.path==='/dashboard/support'" label="Support" icon="support" />
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/legacy" :active="route.path==='/dashboard/legacy'" label="Legacy" icon="legacy" />
       </nav>
 
       <!-- Usage quotas -->
@@ -159,19 +123,19 @@
         <div style="margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
             <span :style="{fontSize:'11px',color:textMuted,fontWeight:500}">VSL Pages</span>
-            <span :style="{fontSize:'11px',color:textMuted}">{{ props.pagesCount }} / {{ props.pagesLimit }}</span>
+            <span :style="{fontSize:'11px',color:textMuted}">{{ usagePagesCount }} / {{ fmtLimit(usagePagesLimit) }}</span>
           </div>
           <div :style="{height:'4px',background:hoverBg,borderRadius:'999px',overflow:'hidden'}">
-            <div :style="{height:'100%',borderRadius:'999px',background:'#6D4EE8',width:quotaPct(props.pagesCount,props.pagesLimit)+'%',transition:'width 0.3s'}"></div>
+            <div :style="{height:'100%',borderRadius:'999px',background:'#6D4EE8',width:quotaPct(usagePagesCount,usagePagesLimit)+'%',transition:'width 0.3s'}"></div>
           </div>
         </div>
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
             <span :style="{fontSize:'11px',color:textMuted,fontWeight:500}">Direct links</span>
-            <span :style="{fontSize:'11px',color:textMuted}">{{ props.directCount }} / {{ props.directLimit }}</span>
+            <span :style="{fontSize:'11px',color:textMuted}">{{ usageDirectCount }} / {{ fmtLimit(usageDirectLimit) }}</span>
           </div>
           <div :style="{height:'4px',background:hoverBg,borderRadius:'999px',overflow:'hidden'}">
-            <div :style="{height:'100%',borderRadius:'999px',background:'#6D4EE8',width:quotaPct(props.directCount,props.directLimit)+'%',transition:'width 0.3s'}"></div>
+            <div :style="{height:'100%',borderRadius:'999px',background:'#6D4EE8',width:quotaPct(usageDirectCount,usageDirectLimit)+'%',transition:'width 0.3s'}"></div>
           </div>
         </div>
       </div>
@@ -207,21 +171,19 @@
             <i class="bi bi-credit-card" style="font-size:14px"></i>
             Billing
           </RouterLink>
-          <div :style="{height:'1px',background:border}"></div>
-          <!-- Dark mode toggle row -->
+          <div v-if="false" :style="{height:'1px',background:border}"></div>
+          <!-- Dark mode toggle row — hidden for V1 (dark-only). Remove v-if when light mode is finished. -->
           <div
+            v-if="false"
             :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 14px',cursor:'pointer'}"
             @click="theme.toggle()"
             @mouseenter="e => e.currentTarget.style.background=hoverBg"
             @mouseleave="e => e.currentTarget.style.background='transparent'">
             <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
-              <span style="font-size:14px;line-height:1">{{ theme.dark ? '🌙' : '☀️' }}</span>
+              <i :class="theme.dark ? 'bi bi-moon-fill' : 'bi bi-sun-fill'" style="font-size:14px;line-height:1"></i>
               <span :style="{fontSize:'13px',color:textSecondary}">{{ theme.dark ? 'Dark mode' : 'Light mode' }}</span>
             </div>
-            <!-- Toggle pill -->
-            <div :style="{width:'32px',height:'18px',borderRadius:'999px',position:'relative',transition:'background 0.2s',background:theme.dark?'#6D4EE8':'#D1D5DB',flexShrink:0}">
-              <div :style="{width:'12px',height:'12px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:theme.dark?'17px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.2)'}"></div>
-            </div>
+            <ThemeToggle />
           </div>
           <div :style="{height:'1px',background:border}"></div>
           <button @click="handleLogout"
@@ -240,7 +202,9 @@
 
       <!-- Top header -->
       <header :style="{height:'60px',background:theme.dark?'#100e22':'#fff',borderBottom:theme.dark?'1px solid rgba(255,255,255,0.06)':'1px solid #E5E7EB',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',position:'sticky',top:0,zIndex:10,flexShrink:0}">
-        <h1 :style="{fontSize:'15px',fontWeight:600,color:theme.dark?'#fff':'#111827',letterSpacing:'-0.01em',margin:0}">{{ title }}</h1>
+        <slot name="header-left">
+          <h1 :style="{fontSize:'15px',fontWeight:600,color:theme.dark?'#fff':'#111827',letterSpacing:'-0.01em',margin:0}">{{ title }}</h1>
+        </slot>
         <slot name="header-actions" />
       </header>
 
@@ -259,6 +223,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import NavItem from '@/components/NavItem.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const props = defineProps({
   title: { type: String, default: 'Dashboard' },
@@ -276,6 +241,13 @@ const router = useRouter()
 const collapsed = ref(false)
 const userMenuOpen = ref(false)
 const analyticsOpen = ref(false)
+
+// Real usage quotas come from /me (auth.user); fall back to props if a page passes them.
+const fmtLimit = (n) => (n == null || n > 100000 ? '∞' : n)
+const usagePagesCount = computed(() => auth.user?.pages_count ?? props.pagesCount)
+const usagePagesLimit = computed(() => auth.user?.page_limit ?? props.pagesLimit)
+const usageDirectCount = computed(() => auth.user?.direct_count ?? props.directCount)
+const usageDirectLimit = computed(() => auth.user?.link_limit ?? props.directLimit)
 
 const analyticsSubItems = [
   { label: 'Instagram' },

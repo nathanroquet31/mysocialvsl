@@ -45,11 +45,11 @@
                   </div>
                   <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px">
                     <span :style="{fontSize:'9px',fontWeight:800,color:t.textColor,letterSpacing:'-0.02em'}">{{ t.name }}</span>
-                    <span style="color:#60a5fa;font-size:8px">✓</span>
+                    <i class="bi bi-patch-check-fill" style="color:#60a5fa;font-size:8px"></i>
                   </div>
                   <span :style="{fontSize:'7px',color:'rgba(255,255,255,0.4)',marginBottom:'4px'}">{{ t.handle }}</span>
                   <div style="display:flex;gap:3px;margin-bottom:8px">
-                    <span v-for="ic in t.icons" :key="ic" style="font-size:8px">{{ ic }}</span>
+                    <i v-for="ic in t.icons" :key="ic" :class="`bi bi-${ic}`" style="font-size:8px;color:rgba(255,255,255,0.6)"></i>
                   </div>
                   <!-- Links -->
                   <div style="width:100%;display:flex;flex-direction:column;gap:4px">
@@ -69,7 +69,7 @@
                 <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,transparent 30%,rgba(0,0,0,0.85) 100%)"></div>
                 <!-- VSL badge -->
                 <div style="position:absolute;top:7px;left:7px;background:rgba(0,0,0,0.6);border-radius:999px;padding:2px 6px;display:flex;align-items:center;gap:3px">
-                  <span style="font-size:6px;font-weight:800;color:#fff">▶ VSL</span>
+                  <i class="bi bi-play-fill" style="font-size:5px;color:#fff"></i><span style="font-size:6px;font-weight:800;color:#fff">VSL</span>
                 </div>
                 <!-- Online badge -->
                 <div style="position:absolute;top:7px;right:7px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:999px;padding:2px 5px;display:flex;align-items:center;gap:2px">
@@ -108,6 +108,63 @@
                     :style="{borderRadius:'6px',padding:'5px 8px',fontSize:'7px',fontWeight:700,color:t.btnColor,background:'transparent',textAlign:'center',border:`1.5px solid ${t.btnColor}`,boxShadow:`0 0 8px ${t.btnColor}33`}">
                     {{ l }}
                   </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- CARD template preview -->
+            <template v-else-if="t.id==='card'">
+              <div style="position:relative;height:200px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px 16px">
+                <!-- Navy gradient bg + purple glow -->
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#060c18 0%,#080f1d 60%,#060810 100%)">
+                  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 42% 38%,rgba(109,78,232,0.14),transparent 62%)"></div>
+                </div>
+                <!-- VSL badge solid purple -->
+                <div style="position:absolute;top:8px;left:8px;background:#6D4EE8;border-radius:999px;padding:3px 8px;display:flex;align-items:center;gap:3px;box-shadow:0 2px 8px rgba(109,78,232,0.5)">
+                  <i class="bi bi-play-fill" style="font-size:5px;color:#fff"></i><span style="font-size:5.5px;font-weight:800;color:#fff">VSL</span>
+                </div>
+                <!-- Video player centered -->
+                <div style="position:relative;z-index:1;width:88px;border-radius:11px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.07);margin-bottom:11px;margin-top:10px">
+                  <img :src="t.avatar" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" />
+                  <!-- Play button overlay -->
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25)">
+                    <div style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.18);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center">
+                      <div style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid rgba(255,255,255,0.9);margin-left:2px"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Name + handle -->
+                <div style="position:relative;z-index:1;width:100%;margin-bottom:9px">
+                  <p :style="{fontSize:'8px',fontWeight:800,color:'#fff',margin:0,lineHeight:1.2,letterSpacing:'-0.02em'}">{{ t.name }}</p>
+                  <p :style="{fontSize:'6px',color:'rgba(255,255,255,0.4)',margin:'2px 0 0'}">{{ t.handle }}</p>
+                </div>
+                <!-- CTA button -->
+                <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;gap:4px">
+                  <div v-for="(l,i) in t.links" :key="i"
+                    :style="{borderRadius:'7px',padding:'5px 8px',fontSize:'6.5px',fontWeight:700,color:'#fff',background:t.btnColor,textAlign:'center',boxShadow:`0 2px 10px ${t.btnColor}55`}">
+                    <i class="bi bi-arrow-right"></i> {{ l }}
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- VSL-BANDEAU template preview -->
+            <template v-else-if="t.id==='vsl-bandeau'">
+              <div style="position:relative;height:100%;background:#0d0d0d;display:flex;flex-direction:column;justify-content:flex-end;padding:8px">
+                <div style="font-size:8px;font-weight:700;color:#fff;margin-bottom:4px">{{ t.name }}</div>
+                <div style="width:100%;height:22px;background:rgba(255,255,255,0.06);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <span style="font-size:6px;color:rgba(255,255,255,0.5)">▲ Voir plus</span>
+                </div>
+              </div>
+            </template>
+
+            <!-- VSL-POPUP template preview -->
+            <template v-else-if="t.id==='vsl-popup'">
+              <div style="position:relative;height:100%;background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px">
+                <div style="background:#13101f;border-radius:10px;padding:8px;width:100%;border:1px solid rgba(255,255,255,0.1);text-align:center">
+                  <div style="width:100%;height:28px;background:rgba(255,255,255,0.06);border-radius:5px;margin-bottom:5px"></div>
+                  <div style="font-size:6px;color:rgba(255,255,255,0.4);margin-bottom:5px">Rejoins-moi !</div>
+                  <div :style="{background:t.btnColor,borderRadius:'5px',padding:'4px',fontSize:'6px',fontWeight:700,color:'#fff'}">S'abonner</div>
                 </div>
               </div>
             </template>
@@ -159,7 +216,7 @@ const templates = [
     avatar: 'https://i.pravatar.cc/150?img=47',
     name: 'Sofia',
     handle: '@sofiamodel',
-    icons: ['📸','🎵','✕','✈️'],
+    icons: ['camera','music-note-beamed','x-lg','send'],
     links: ['Subscribe on OnlyFans', 'My Instagram'],
   },
   {
@@ -197,6 +254,40 @@ const templates = [
     name: 'Ambre',
     handle: '@ambrefashion',
     links: ['Subscribe on MYM', 'My Instagram'],
+  },
+  {
+    id: 'vsl-bandeau',
+    label: 'Tiroir',
+    desc: 'Liens dans un drawer',
+    bg: '#0d0d0d',
+    btnColor: '#6D4EE8',
+    textColor: '#fff',
+    name: 'Sofia',
+    handle: '@sofiamodel',
+    links: ['My OnlyFans'],
+  },
+  {
+    id: 'vsl-popup',
+    label: 'Popup',
+    desc: 'Popup central avec image',
+    bg: '#0d0d0d',
+    btnColor: '#6D4EE8',
+    textColor: '#fff',
+    name: 'Sofia',
+    handle: '@sofiamodel',
+    links: ['Rejoindre'],
+  },
+  {
+    id: 'card',
+    label: 'Card',
+    desc: 'VSL + glass card',
+    bg: '#050508',
+    btnColor: '#6D4EE8',
+    textColor: '#fff',
+    avatar: 'https://i.pravatar.cc/150?img=36',
+    name: 'Léa',
+    handle: '@leavip',
+    links: ['Subscribe on OnlyFans'],
   },
 ]
 </script>

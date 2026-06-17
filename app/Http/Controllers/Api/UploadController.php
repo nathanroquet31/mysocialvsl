@@ -9,6 +9,14 @@ use Illuminate\Support\Str;
 
 class UploadController extends Controller
 {
+    private string $disk;
+
+    public function __construct()
+    {
+        // Bascule automatiquement sur R2 si configuré, sinon disk public local
+        $this->disk = config('filesystems.disks.r2.key') ? 'r2' : 'public';
+    }
+
     // POST /api/upload/image — avatar ou bg_image
     public function image(Request $request)
     {
@@ -17,34 +25,36 @@ class UploadController extends Controller
             'type' => 'required|in:avatar,background',
         ]);
 
-        $file = $request->file('file');
-        $userId = $request->user()->id;
-        $folder = 'uploads/' . $userId . '/' . $request->type;
+        $file     = $request->file('file');
+        $userId   = $request->user()->id;
+        $folder   = 'uploads/' . $userId . '/' . $request->type;
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
 
-        $path = $file->storeAs($folder, $filename, 'public');
+        $path = $file->storeAs($folder, $filename, $this->disk);
 
         return response()->json([
-            'url' => Storage::disk('public')->url($path),
+            'url' => Storage::disk($this->disk)->url($path),
         ]);
     }
 
     // POST /api/upload/video — vidéo VSL
     public function video(Request $request)
     {
+        set_time_limit(300); // 5 min — R2 upload peut être lent sur gros fichiers
+
         $request->validate([
-            'file' => 'required|file|mimes:mp4,mov,webm,avi|max:307200', // 300MB max
+            'file' => 'required|file|mimes:mp4,mov,webm|max:102400', // 100MB max
         ]);
 
-        $file = $request->file('file');
-        $userId = $request->user()->id;
-        $folder = 'uploads/' . $userId . '/videos';
+        $file     = $request->file('file');
+        $userId   = $request->user()->id;
+        $folder   = 'uploads/' . $userId . '/videos';
         $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
 
-        $path = $file->storeAs($folder, $filename, 'public');
+        $path = $file->storeAs($folder, $filename, $this->disk);
 
         return response()->json([
-            'url'      => Storage::disk('public')->url($path),
+            'url'      => Storage::disk($this->disk)->url($path),
             'filename' => $filename,
             'size'     => $file->getSize(),
         ]);

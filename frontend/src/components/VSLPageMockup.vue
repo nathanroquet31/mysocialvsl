@@ -50,7 +50,7 @@
     </div>
     <p :style="{fontSize:'10px',fontWeight:800,color:textColor,margin:'0 0 1px',letterSpacing:'-0.01em'}">{{ name }}</p>
     <p style="font-size:7px;color:rgba(255,255,255,0.4);margin:0 0 8px;display:flex;align-items:center;gap:2px">
-      <span style="color:#60a5fa;font-size:8px">✓</span> Verified creator
+      <i class="bi bi-patch-check-fill" style="color:#60a5fa;font-size:8px"></i> Verified creator
     </p>
 
     <!-- Links -->
@@ -86,7 +86,7 @@ const props = defineProps({
   bg:        { type: String,  default: '#0d0d0d' },
   btn:       { type: String,  default: '#00aff0' },
   videoUrl:  { type: String,  default: 'https://streamable.com/e/0ed1q5' },
-  links:     { type: Array,   default: () => ['Subscribe on OnlyFans', 'My Telegram', 'More content ↗'] },
+  links:     { type: Array,   default: () => ['Subscribe on OnlyFans', 'My Telegram', 'More content'] },
 })
 
 // Streamable video ID → thumbnail

@@ -221,7 +221,7 @@
             cursor:'pointer',fontFamily:'Inter,sans-serif',
             boxShadow:'0 4px 14px rgba(109,78,232,0.4)',
           }">
-          Subscribe Now
+          {{ ctaLabel }}
         </button>
         <p :style="{fontSize:'11px',color:props.dark?'rgba(255,255,255,0.3)':'#9CA3AF',textAlign:'center',margin:'8px 0 0',display:'flex',alignItems:'center',justifyContent:'center',gap:'4px'}">
           <i class="bi bi-shield-check"></i>
@@ -240,8 +240,12 @@ import { ref, computed } from 'vue'
 const props = defineProps({
   dark: { type: Boolean, default: false },
   billing: { type: String, default: 'monthly' },
+  currentPlan: { type: String, default: 'free' },
 })
 defineEmits(['checkout'])
+
+// Existing Agency subscribers update their plan in place (no Stripe redirect, proration applies).
+const ctaLabel = computed(() => (props.currentPlan === 'agency' ? 'Mettre à jour le plan' : 'Subscribe Now'))
 
 const PAGE_STEPS  = [25, 50, 100, 200, 400, 600, 800, Infinity]
 const LINK_STEPS  = [25, 50, 100, 200, 400, 600, 800, Infinity]
@@ -293,15 +297,11 @@ function setSlider(key, val) {
   selectedPreset.value = null
 }
 
-// Pricing formula: base $49 + extra pages at $0.15 + extra links at $0.10
-const price = computed(() => {
-  const p = values.value.pages === Infinity ? 1000 : values.value.pages
-  const l = values.value.links  === Infinity ? 500  : values.value.links
-  const base = 49
-  const extraPages = Math.max(0, p - 50) * 0.15
-  const extraLinks = Math.max(0, l - 50) * 0.10
-  const raw = base + extraPages + extraLinks
-  // Round to nearest $5
-  return Math.round(raw / 5) * 5
-})
+// Pricing: base $49 includes 25 pages + 25 links. Each tier above 25 adds a flat
+// amount per dimension (every +25 ≈ +$10). ∞ is a flat unlimited add-on.
+// Must stay in sync with config/services.php → stripe.agency_tier_amounts.
+const TIER_EXTRA = { 25: 0, 50: 10, 100: 30, 200: 70, 400: 150, 600: 230, 800: 310 }
+const tierExtra = (v) => (v === Infinity ? 400 : (TIER_EXTRA[v] ?? 0))
+
+const price = computed(() => 49 + tierExtra(values.value.pages) + tierExtra(values.value.links))
 </script>

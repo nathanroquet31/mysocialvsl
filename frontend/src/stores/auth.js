@@ -21,7 +21,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    await api.post('/logout')
+    // Best-effort server revoke — never block local sign-out if the token is already invalid.
+    try {
+      await api.post('/logout')
+    } catch {
+      // ignore (e.g. 401 when the token was already revoked)
+    }
     token.value = null
     user.value  = null
     localStorage.removeItem('token')

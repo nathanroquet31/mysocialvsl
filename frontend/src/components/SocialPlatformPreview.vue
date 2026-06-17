@@ -47,7 +47,7 @@
                 </div>
               </div>
               <p style="font-size:9px;font-weight:700;color:#fff;margin:0 0 1px">{{ displayName }}</p>
-              <p style="font-size:8px;color:rgba(255,255,255,0.5);margin:0 0 3px">✨ Content creator · 🔞 18+</p>
+              <p style="font-size:8px;color:rgba(255,255,255,0.5);margin:0 0 3px"><i class="bi bi-stars" style="font-size:7px"></i> Content creator · 18+</p>
               <!-- BIO LINK — highlighted -->
               <div :style="{
                 display:'flex',alignItems:'center',gap:'4px',
@@ -172,7 +172,7 @@
             <div style="padding:28px 10px 10px">
               <p style="font-size:11px;font-weight:800;color:#fff;margin:0 0 1px">{{ displayName }}</p>
               <p style="font-size:9px;color:rgba(255,255,255,0.4);margin:0 0 6px">@{{ handle }}</p>
-              <p style="font-size:9px;color:rgba(255,255,255,0.7);margin:0 0 4px">✨ Content creator · 18+ 🔞</p>
+              <p style="font-size:9px;color:rgba(255,255,255,0.7);margin:0 0 4px"><i class="bi bi-stars" style="font-size:8px"></i> Content creator · 18+</p>
               <div style="display:flex;align-items:center;gap:3px;margin-bottom:8px">
                 <i class="bi bi-link-45deg" style="color:rgba(255,255,255,0.4);font-size:9px"></i>
                 <span style="font-size:8px;color:#1d9bf0">mysocialvsl.com/{{ slug }}</span>

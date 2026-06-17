@@ -13,6 +13,11 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'verified_badge', 'show_avatar', 'age_gate', 'is_active',
     'online_status', 'location', 'response_time', 'countdown_end', 'promo_text',
     'bot_protection', 'deep_link_enabled', 'strict_deep_link', 'link_preview_enabled', 'custom_domain',
+    'video_fit', 'overlay_opacity', 'card_position',
+    'vsl_enabled', 'vsl_position', 'cta_reveal_at',
+    'fomo_enabled', 'fomo_title', 'fomo_message', 'fomo_cta_label', 'fomo_delay_seconds',
+    'popup_delay_seconds', 'popup_image_url', 'popup_text',
+    'meta_title', 'meta_description', 'og_image_url', 'utm_passthrough',
 ])]
 class Page extends Model
 {

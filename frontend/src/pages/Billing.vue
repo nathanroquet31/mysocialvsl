@@ -94,7 +94,7 @@
             {{ checkoutLoading==='pro' ? 'Redirecting…' : currentPlan==='agency' ? 'Downgrade' : 'Upgrade to Pro' }}
           </button>
           <div v-else style="width:100%;padding:9px;border-radius:8px;background:#EEE9FF;border:1px solid #C7BBFF;color:#6D4EE8;font-size:13px;font-weight:600;text-align:center">
-            Current Plan ✓
+            <i class="bi bi-check-circle-fill" style="margin-right:4px"></i>Current Plan
           </div>
         </div>
 
@@ -117,7 +117,7 @@
             {{ checkoutLoading==='agency' ? 'Redirecting…' : 'Upgrade to Agency' }}
           </button>
           <div v-else style="width:100%;padding:9px;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;color:#16A34A;font-size:13px;font-weight:600;text-align:center">
-            Current Plan ✓
+            <i class="bi bi-check-circle-fill" style="margin-right:4px"></i>Current Plan
           </div>
         </div>
       </div>
@@ -129,7 +129,7 @@
           <span :style="{fontSize:'11px',fontWeight:600,color:muted,letterSpacing:'0.1em'}">AGENCY PLAN CONFIGURATOR</span>
           <div style="height:1px;flex:1" :style="{background:divider}"></div>
         </div>
-        <AgencyConfigurator :dark="theme.dark" :billing="billing" @checkout="checkoutAgency" />
+        <AgencyConfigurator :dark="theme.dark" :billing="billing" :current-plan="currentPlan" @checkout="checkoutAgency" />
       </div>
       <button v-if="!showAgencyConfig" @click="showAgencyConfig=true"
         :style="{width:'100%',padding:'10px',borderRadius:'8px',border:`1px dashed ${border}`,background:'transparent',color:sub,fontSize:'13px',fontWeight:500,cursor:'pointer',fontFamily:'Inter,sans-serif',marginBottom:'20px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}">
@@ -146,6 +146,98 @@
       </div>
     </div>
 
+    <!-- Extra Packs (Pro only) -->
+    <div v-if="currentPlan === 'pro'"
+      :style="{background:card,border:`1px solid ${border}`,borderRadius:'12px',padding:'24px',marginBottom:'24px'}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <p :style="{fontSize:'14px',fontWeight:600,color:text,margin:0}">Extra packs</p>
+        <span style="background:#EEE9FF;border:1px solid #C7BBFF;color:#6D4EE8;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600">Pro add-on</span>
+      </div>
+      <p :style="{fontSize:'13px',color:sub,margin:'0 0 24px'}">Ajoute des packs de 100 pages ou 100 liens directs supplémentaires, facturés en complément de ton abonnement Pro. La différence est prélevée au prorata immédiatement.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+
+        <!-- Pages packs -->
+        <div :style="{border:`1px solid ${border}`,borderRadius:'12px',padding:'18px',background:subtleBg}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="width:32px;height:32px;border-radius:8px;background:#EEE9FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi bi-file-earmark-richtext" style="color:#6D4EE8;font-size:14px"></i>
+            </div>
+            <div>
+              <p :style="{fontSize:'13px',fontWeight:600,color:text,margin:0}">VSL Pages</p>
+              <p :style="{fontSize:'11px',color:muted,margin:0}">+100 pages / pack — $9/mois</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span :style="{fontSize:'12px',color:sub}">Packs actifs</span>
+            <div style="display:flex;align-items:center;gap:0;border-radius:8px;overflow:hidden;border:'1px solid #E5E7EB'" :style="{border:`1px solid ${border}`}">
+              <button @click="pagesPacks = Math.max(0, pagesPacks - 1)"
+                :style="{width:'32px',height:'32px',border:'none',background:theme.dark?'rgba(255,255,255,0.08)':'#F3F4F6',color:text,fontWeight:700,cursor:'pointer',fontSize:'16px',fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center'}">
+                −
+              </button>
+              <span :style="{padding:'0 14px',fontSize:'15px',fontWeight:700,color:text,minWidth:'48px',textAlign:'center',background:inputBg}">{{ pagesPacks }}</span>
+              <button @click="pagesPacks++"
+                :style="{width:'32px',height:'32px',border:'none',background:theme.dark?'rgba(255,255,255,0.08)':'#F3F4F6',color:text,fontWeight:700,cursor:'pointer',fontSize:'16px',fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center'}">
+                +
+              </button>
+            </div>
+          </div>
+          <div :style="{background:theme.dark?'rgba(109,78,232,0.12)':'#F3F0FF',borderRadius:'8px',padding:'10px 12px',display:'flex',alignItems:'center',justifyContent:'space-between'}">
+            <span :style="{fontSize:'12px',color:'#6D4EE8',fontWeight:500}">Limite après</span>
+            <span :style="{fontSize:'14px',fontWeight:700,color:'#6D4EE8'}">{{ pagesPacks === 0 ? '5' : newPageLimit }} pages</span>
+          </div>
+        </div>
+
+        <!-- Links packs -->
+        <div :style="{border:`1px solid ${border}`,borderRadius:'12px',padding:'18px',background:subtleBg}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <div style="width:32px;height:32px;border-radius:8px;background:#EEE9FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi bi-link-45deg" style="color:#6D4EE8;font-size:14px"></i>
+            </div>
+            <div>
+              <p :style="{fontSize:'13px',fontWeight:600,color:text,margin:0}">Direct Links</p>
+              <p :style="{fontSize:'11px',color:muted,margin:0}">+100 liens / pack — $9/mois</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span :style="{fontSize:'12px',color:sub}">Packs actifs</span>
+            <div style="display:flex;align-items:center;gap:0;border-radius:8px;overflow:hidden" :style="{border:`1px solid ${border}`}">
+              <button @click="linksPacks = Math.max(0, linksPacks - 1)"
+                :style="{width:'32px',height:'32px',border:'none',background:theme.dark?'rgba(255,255,255,0.08)':'#F3F4F6',color:text,fontWeight:700,cursor:'pointer',fontSize:'16px',fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center'}">
+                −
+              </button>
+              <span :style="{padding:'0 14px',fontSize:'15px',fontWeight:700,color:text,minWidth:'48px',textAlign:'center',background:inputBg}">{{ linksPacks }}</span>
+              <button @click="linksPacks++"
+                :style="{width:'32px',height:'32px',border:'none',background:theme.dark?'rgba(255,255,255,0.08)':'#F3F4F6',color:text,fontWeight:700,cursor:'pointer',fontSize:'16px',fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center'}">
+                +
+              </button>
+            </div>
+          </div>
+          <div :style="{background:theme.dark?'rgba(109,78,232,0.12)':'#F3F0FF',borderRadius:'8px',padding:'10px 12px',display:'flex',alignItems:'center',justifyContent:'space-between'}">
+            <span :style="{fontSize:'12px',color:'#6D4EE8',fontWeight:500}">Limite après</span>
+            <span :style="{fontSize:'14px',fontWeight:700,color:'#6D4EE8'}">{{ linksPacks === 0 ? '2' : newLinkLimit }} liens</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Total + confirm -->
+      <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px',background:theme.dark?'rgba(255,255,255,0.04)':'#F9FAFB',borderRadius:'12px',border:`1px solid ${border}`}">
+        <div>
+          <p :style="{fontSize:'12px',color:muted,margin:'0 0 2px'}">Add-on mensuel</p>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <span :style="{fontSize:'22px',fontWeight:800,color:text}">+${{ addonTotal }}</span>
+            <span :style="{fontSize:'13px',color:muted}">/mois</span>
+          </div>
+          <p :style="{fontSize:'11px',color:muted,margin:'2px 0 0'}">En plus de tes $19 Pro <i class="bi bi-arrow-right" style="font-size:10px"></i> <strong :style="{color:text}">${{ 19 + addonTotal }}/mois total</strong></p>
+        </div>
+        <button @click="saveAddons" :disabled="addonsLoading"
+          :style="{background:addonsSaved?'#16A34A':'#6D4EE8',color:'#fff',border:'none',borderRadius:'10px',padding:'11px 24px',fontSize:'13px',fontWeight:600,cursor:addonsLoading?'wait':'pointer',fontFamily:'Inter,sans-serif',opacity:addonsLoading?0.7:1,transition:'background 0.2s',minWidth:'160px'}">
+          <i v-if="addonsSaved" class="bi bi-check" style="margin-right:4px"></i>{{ addonsSaved ? 'Sauvegardé' : addonsLoading ? 'En cours…' : 'Confirmer les packs' }}
+        </button>
+      </div>
+    </div>
+
     <!-- Manage Subscription card -->
     <div :style="{background:card,border:`1px solid ${border}`,borderRadius:'12px',padding:'24px',marginBottom:'24px'}">
       <p :style="{fontSize:'14px',fontWeight:600,color:text,margin:'0 0 8px'}">Manage Subscription</p>
@@ -153,7 +245,7 @@
       <button @click="openPortal" :disabled="portalLoading"
         style="background:#6D4EE8;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif"
         :style="{opacity: portalLoading ? 0.7 : 1}">
-        {{ portalLoading ? 'Loading…' : 'Go to Billing Portal →' }}
+        {{ portalLoading ? 'Loading…' : 'Go to Billing Portal' }} <i v-if="!portalLoading" class="bi bi-arrow-right"></i>
       </button>
     </div>
 
@@ -230,6 +322,16 @@ const invoices = ref([])
 const faqOpen = ref(null)
 const showAgencyConfig = ref(false)
 
+const PACK_PRICE = 9
+const pagesPacks = ref(0)
+const linksPacks = ref(0)
+const addonsLoading = ref(false)
+const addonsSaved = ref(false)
+
+const addonTotal = computed(() => (pagesPacks.value + linksPacks.value) * PACK_PRICE)
+const newPageLimit = computed(() => 5 + pagesPacks.value * 100)
+const newLinkLimit = computed(() => 2 + linksPacks.value * 100)
+
 // Theme tokens
 const card      = computed(() => theme.dark ? 'rgba(255,255,255,0.04)' : '#fff')
 const border    = computed(() => theme.dark ? 'rgba(255,255,255,0.08)' : '#E5E7EB')
@@ -243,8 +345,13 @@ const inputBg   = computed(() => theme.dark ? 'rgba(255,255,255,0.06)' : '#fff')
 const inputBorder = computed(() => theme.dark ? 'rgba(255,255,255,0.12)' : '#E5E7EB')
 
 const currentPlan = computed(() => auth.user?.plan || 'free')
-const pageLimitLabel = computed(() => currentPlan.value === 'agency' ? '∞' : currentPlan.value === 'pro' ? '5' : '1')
-const directLimitLabel = computed(() => currentPlan.value === 'agency' ? '∞' : currentPlan.value === 'pro' ? '2' : '1')
+// Show the real cap from the API (agency = its chosen tier, e.g. 25); ∞ only when truly unlimited.
+const fmtLimit = (n, fallback) => {
+  const v = n ?? fallback
+  return v > 100000 ? '∞' : String(v)
+}
+const pageLimitLabel = computed(() => fmtLimit(auth.user?.page_limit, currentPlan.value === 'pro' ? 5 : 1))
+const directLimitLabel = computed(() => fmtLimit(auth.user?.link_limit, currentPlan.value === 'pro' ? 2 : 1))
 const renewalDate = computed(() => {
   if (!auth.user?.subscription_renews_at) return '—'
   return new Date(auth.user.subscription_renews_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -265,7 +372,14 @@ async function checkout(plan) {
   checkoutLoading.value = plan
   try {
     const { data } = await api.post('/billing/checkout', { plan, billing: billing.value })
-    window.location.href = data.url
+    if (data.url) {
+      window.location.href = data.url
+      return
+    }
+    // Updated in place (existing subscriber) — refresh instead of redirecting to undefined.
+    await auth.fetchMe()
+    checkoutLoading.value = null
+    alert('Plan mis à jour ✓')
   } catch {
     alert('Error creating checkout. Please try again.')
     checkoutLoading.value = null
@@ -273,16 +387,35 @@ async function checkout(plan) {
 }
 
 async function checkoutAgency({ pages, links, price, billing: b }) {
+  // Explicit consent before committing — avoids an accidental click charging the customer.
+  const pLabel = pages === Infinity ? '∞' : pages
+  const lLabel = links === Infinity ? '∞' : links
+  const isUpdate = currentPlan.value === 'agency'
+  const tail = isUpdate
+    ? 'La différence sera prélevée au prorata sur ta carte enregistrée.'
+    : 'Tu seras redirigé vers Stripe pour saisir ta carte et payer.'
+  const confirmed = window.confirm(
+    `Confirmer le plan Agency : ${pLabel} landing pages / ${lLabel} liens directs — $${price}/mois ?\n\n${tail}`
+  )
+  if (!confirmed) return
+
   checkoutLoading.value = 'agency-custom'
   try {
+    // Price is recomputed server-side from the chosen tiers — never sent by the client.
     const { data } = await api.post('/billing/checkout', {
       plan: 'agency',
       billing: b,
       custom_pages: pages === Infinity ? null : pages,
       custom_links: links === Infinity ? null : links,
-      custom_price: price,
     })
-    window.location.href = data.url
+    if (data.url) {
+      window.location.href = data.url
+      return
+    }
+    // Already subscribed → subscription updated in place (proration). Refresh and confirm.
+    await auth.fetchMe()
+    checkoutLoading.value = null
+    alert('Plan Agency mis à jour ✓')
   } catch {
     alert('Error creating checkout. Please try again.')
     checkoutLoading.value = null
@@ -300,7 +433,30 @@ async function openPortal() {
   }
 }
 
+async function saveAddons() {
+  addonsLoading.value = true
+  addonsSaved.value = false
+  try {
+    const { data } = await api.post('/billing/addons', {
+      pages_packs: pagesPacks.value,
+      links_packs: linksPacks.value,
+    })
+    auth.user.extra_pages = data.extra_pages
+    auth.user.extra_links = data.extra_links
+    auth.user.page_limit  = data.page_limit
+    auth.user.link_limit  = data.link_limit
+    addonsSaved.value = true
+    setTimeout(() => { addonsSaved.value = false }, 3000)
+  } catch {
+    alert('Erreur lors de la mise à jour. Réessaie.')
+  } finally {
+    addonsLoading.value = false
+  }
+}
+
 onMounted(async () => {
   await auth.fetchMe()
+  pagesPacks.value = Math.round((auth.user?.extra_pages ?? 0) / 100)
+  linksPacks.value = Math.round((auth.user?.extra_links ?? 0) / 100)
 })
 </script>

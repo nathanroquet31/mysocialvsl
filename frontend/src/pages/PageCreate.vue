@@ -1,1384 +1,1401 @@
 <template>
-  <DashboardLayout title="New Page" noPadding>
+  <DashboardLayout>
 
-    <!-- Step indicator in header -->
-    <template #header-actions>
-      <div style="display:flex;align-items:center;gap:0">
-        <template v-for="(step, i) in steps" :key="step.id">
-          <div v-if="i > 0" :style="{width:'20px',height:'2px',background:i <= currentStepIndex ? '#6D4EE8' : 'rgba(255,255,255,0.12)',flexShrink:0}"></div>
-          <div @click="goToStep(i)"
-            :style="{
-              width:'30px',height:'30px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
-              fontSize:'12px',fontWeight:700,flexShrink:0,cursor: 'pointer',
-              background: i < currentStepIndex ? '#6D4EE8' : i === currentStepIndex ? 'transparent' : 'rgba(255,255,255,0.06)',
-              border: i === currentStepIndex ? '2px solid #6D4EE8' : 'none',
-              color: i < currentStepIndex ? '#fff' : i === currentStepIndex ? '#6D4EE8' : 'rgba(255,255,255,0.3)',
-              transition:'all 0.15s',
-            }"
-            :title="step.label">
-            <span v-if="i < currentStepIndex">✓</span>
-            <span v-else>{{ step.id }}</span>
-          </div>
-        </template>
+    <!-- Success overlay -->
+    <div v-if="successMsg"
+      :style="{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Inter,sans-serif'}">
+      <div :style="{textAlign:'center'}">
+        <div :style="{fontSize:'48px',marginBottom:'12px'}">{{ isEditMode ? '✅' : '🚀' }}</div>
+        <p :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">{{ isEditMode ? 'Page mise à jour !' : 'Page publiée !' }}</p>
+        <p :style="{fontSize:'14px',color:'rgba(255,255,255,0.5)'}">Redirection en cours…</p>
       </div>
-      <span style="font-size:11px;color:rgba(255,255,255,0.35);margin-left:10px">{{ steps[currentStepIndex]?.label }} · {{ currentStepNumber }}/{{ steps.length }}</span>
-    </template>
+    </div>
 
-    <!-- ===== BODY ===== -->
-    <div :style="{display:'flex',flex:1,overflow:'hidden',height:'calc(100vh - 60px - 72px)',fontFamily:'Inter,-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif',color:'#fff',background:'#0d0b1e'}">
+    <div :style="{display:'flex',flexDirection:'column',height:'100vh',background:C.bg,fontFamily:'Inter,sans-serif',overflow:'hidden'}">
 
-      <!-- ===== LEFT FORM AREA ===== -->
-      <div :style="{flex:1,minHeight:0,overflowY:'auto',padding:'32px 40px 100px'}">
+      <!-- TOP BAR -->
+      <div :style="{height:'60px',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 32px',borderBottom:`1px solid ${C.borderLight}`,flexShrink:0}">
+        <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
+          <div :style="{width:'28px',height:'28px',background:'linear-gradient(135deg,#6D4EE8,#A78BFA)',borderRadius:'8px',flexShrink:0}"></div>
+          <span :style="{fontSize:'15px',fontWeight:700,color:C.text}">MySocialVSL</span>
+        </div>
 
-        <!-- Error banner -->
-        <div v-if="error" :style="{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'10px',padding:'12px 16px',marginBottom:'20px',color:'#F87171',fontSize:'13px'}">{{ error }}</div>
+        <!-- Step indicator with connecting line -->
+        <div :style="{position:'relative',display:'flex',alignItems:'center',gap:0}">
+          <!-- Background rail -->
+          <div :style="{position:'absolute',top:'50%',left:'14px',right:'14px',height:'2px',background:C.stepRail,transform:'translateY(-50%)',zIndex:0}"></div>
+          <!-- Progress fill -->
+          <div :style="{position:'absolute',top:'50%',left:'14px',height:'2px',background:'#6D4EE8',transform:'translateY(-50%)',zIndex:1,transition:'width 0.3s ease',width: steps.length > 1 ? (currentStepIndex / (steps.length - 1) * (100 - 28/steps.length)) + '%' : '0%'}"></div>
 
-        <!-- ===== STEP 1 — TYPE ===== -->
-        <div v-show="activeTab === 'basics'">
-          <p :style="{fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.12em',marginBottom:'20px'}">What do you want to create?</p>
-
-          <!-- Type cards -->
-          <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'24px'}">
-            <!-- Landing Page -->
-            <div @click="form.page_type='landing'"
-              :style="{border:'1.5px solid',borderRadius:'16px',padding:'24px',cursor:'pointer',transition:'all 0.2s',position:'relative',
-                borderColor:form.page_type==='landing'?'#6D4EE8':'rgba(255,255,255,0.08)',
-                background:form.page_type==='landing'?'rgba(109,78,232,0.08)':'rgba(255,255,255,0.04)'}">
-              <div v-if="form.page_type==='landing'" :style="{position:'absolute',top:'12px',right:'12px',width:'20px',height:'20px',borderRadius:'50%',background:'#6D4EE8',display:'flex',alignItems:'center',justifyContent:'center'}">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <!-- Mini mockup -->
-              <div :style="{width:'100%',height:'120px',borderRadius:'12px',background:'#0d0d1a',marginBottom:'16px',display:'flex',flexDirection:'column',alignItems:'center',padding:'10px 8px',gap:'5px',overflow:'hidden'}">
-                <div :style="{width:'26px',height:'26px',borderRadius:'50%',background:'rgba(255,255,255,0.2)',border:'1.5px solid rgba(255,255,255,0.3)',flexShrink:0}"></div>
-                <div :style="{width:'40px',height:'3px',borderRadius:'3px',background:'rgba(255,255,255,0.5)'}"></div>
-                <div :style="{width:'30px',height:'2px',borderRadius:'2px',background:'rgba(255,255,255,0.25)'}"></div>
-                <div :style="{width:'100%',height:'16px',borderRadius:'5px',background:'#818CF8',marginTop:'4px',flexShrink:0}"></div>
-                <div :style="{width:'100%',height:'16px',borderRadius:'5px',background:'rgba(129,140,248,0.4)',flexShrink:0}"></div>
-              </div>
-              <p :style="{fontSize:'16px',fontWeight:700,color:'#fff',marginBottom:'6px'}">Landing Page</p>
-              <p :style="{fontSize:'13px',color:'rgba(255,255,255,0.4)',lineHeight:1.5,marginBottom:'12px'}">Customizable page with video, bio, links and social profiles.</p>
-              <div :style="{display:'flex',flexDirection:'column',gap:'5px'}">
-                <div v-for="feat in ['VSL video auto-play','Profile + bio','Multiple links & socials','5 pages included']" :key="feat" :style="{display:'flex',alignItems:'center',gap:'7px'}">
-                  <div :style="{width:'14px',height:'14px',borderRadius:'50%',background:'rgba(109,78,232,0.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
-                    <svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3.5" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </div>
-                  <span :style="{fontSize:'12px',color:'rgba(255,255,255,0.55)'}">{{ feat }}</span>
-                </div>
-              </div>
+          <div v-for="(step, i) in steps" :key="step.id"
+            :style="{position:'relative',zIndex:2,display:'flex',flexDirection:'column',alignItems:'center',flex:i < steps.length - 1 ? 1 : 'none',cursor:'pointer'}"
+            @click="goToStep(i)">
+            <!-- Dot -->
+            <div :style="{
+              width:'38px',height:'38px',borderRadius:'50%',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              fontSize:'13px',fontWeight:700,transition:'all 0.25s',
+              background: i < currentStepIndex ? '#6D4EE8' : i === currentStepIndex ? '#6D4EE8' : C.stepInactiveBg,
+              color: i <= currentStepIndex ? '#fff' : C.stepInactiveText,
+              boxShadow: i === currentStepIndex ? '0 0 0 6px rgba(109,78,232,0.25)' : i < currentStepIndex ? '0 0 0 2px rgba(109,78,232,0.3)' : 'none',
+              border: i < currentStepIndex ? '2px solid #6D4EE8' : 'none',
+            }">
+              <svg v-if="i < currentStepIndex" width="13" height="13" viewBox="0 0 10 10" fill="none">
+                <path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <span v-else>{{ i + 1 }}</span>
             </div>
-
-            <!-- Direct Link -->
-            <div @click="form.page_type='direct'"
-              :style="{border:'1.5px solid',borderRadius:'16px',padding:'24px',cursor:'pointer',transition:'all 0.2s',position:'relative',
-                borderColor:form.page_type==='direct'?'#6D4EE8':'rgba(255,255,255,0.08)',
-                background:form.page_type==='direct'?'rgba(109,78,232,0.08)':'rgba(255,255,255,0.04)'}">
-              <div v-if="form.page_type==='direct'" :style="{position:'absolute',top:'12px',right:'12px',width:'20px',height:'20px',borderRadius:'50%',background:'#6D4EE8',display:'flex',alignItems:'center',justifyContent:'center'}">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <div :style="{width:'100%',height:'120px',borderRadius:'12px',background:'#0f172a',marginBottom:'16px',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}">
-                <div :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                  <div :style="{width:'56px',height:'2px',borderRadius:'2px',background:'rgba(255,255,255,0.15)'}"></div>
-                </div>
-              </div>
-              <p :style="{fontSize:'16px',fontWeight:700,color:'#fff',marginBottom:'6px'}">Direct Link</p>
-              <p :style="{fontSize:'13px',color:'rgba(255,255,255,0.4)',lineHeight:1.5,marginBottom:'12px'}">Instant redirect to a destination URL with optional protection.</p>
-              <div :style="{display:'flex',flexDirection:'column',gap:'5px'}">
-                <div v-for="feat in ['Instant redirect','Deeplink bypass','Bot protection','2 pages included']" :key="feat" :style="{display:'flex',alignItems:'center',gap:'7px'}">
-                  <div :style="{width:'14px',height:'14px',borderRadius:'50%',background:'rgba(109,78,232,0.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
-                    <svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3.5" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </div>
-                  <span :style="{fontSize:'12px',color:'rgba(255,255,255,0.55)'}">{{ feat }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Direct URL input -->
-          <div v-if="form.page_type==='direct'" :style="{marginBottom:'20px'}">
-            <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Destination URL</label>
-            <input v-model="form.direct_url" type="url" placeholder="https://example.com"
-              :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'12px 16px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-              @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8';($event.target as HTMLInputElement).style.boxShadow='0 0 0 3px rgba(109,78,232,0.18)'"
-              @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)';($event.target as HTMLInputElement).style.boxShadow='none'" />
-          </div>
-
-          <!-- Page name -->
-          <div :style="{marginBottom:'20px'}">
-            <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Page Name</label>
-            <input v-model="form.dashboard_name" placeholder="e.g. My Instagram Bio"
-              :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'12px',padding:'12px 16px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-              @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8';($event.target as HTMLInputElement).style.boxShadow='0 0 0 3px rgba(109,78,232,0.18)'"
-              @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)';($event.target as HTMLInputElement).style.boxShadow='none'" />
-          </div>
-
-          <!-- Advanced Settings accordion -->
-          <div :style="{marginBottom:'20px'}">
-            <button @click="showAdvancedSettings=!showAdvancedSettings"
-              :style="{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:showAdvancedSettings?'12px 12px 0 0':'12px',cursor:'pointer',fontFamily:'inherit',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)'}">
-              Advanced Settings
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" :style="{transform:showAdvancedSettings?'rotate(180deg)':'rotate(0)',transition:'transform 0.2s'}"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-            <div v-if="showAdvancedSettings" :style="{border:'1px solid rgba(255,255,255,0.08)',borderTop:'none',borderRadius:'0 0 12px 12px',padding:'12px 16px',background:'rgba(255,255,255,0.02)',display:'flex',flexDirection:'column',gap:'14px'}">
-              <div v-for="tog in [{key:'bot_protection',label:'Bot Protection',desc:'Blocks automated bots. Disables social link previews.'},{key:'deep_link_enabled',label:'Deeplink',desc:'Opens in native browser instead of in-app.'},{key:'strict_deep_link',label:'Strict Deeplink',desc:'Forces deeplink even when standard deeplink fails.'}]" :key="tog.key"
-                :style="{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'12px'}">
-                <div>
-                  <p :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.8)',marginBottom:'2px'}">{{ tog.label }}</p>
-                  <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.35)',lineHeight:1.5}">{{ tog.desc }}</p>
-                </div>
-                <div @click="(form as any)[tog.key]=!(form as any)[tog.key]"
-                  :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:(form as any)[tog.key]?'#6D4EE8':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0,marginTop:'2px'}">
-                  <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:(form as any)[tog.key]?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Configuration card -->
-          <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'16px',padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
-            <div>
-              <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Short Link</label>
-              <div :style="{display:'flex',alignItems:'center',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',overflow:'hidden',background:'rgba(255,255,255,0.04)'}">
-                <span :style="{padding:'10px 12px',background:'rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.3)',fontSize:'13px',borderRight:'1px solid rgba(255,255,255,0.08)',whiteSpace:'nowrap',flexShrink:0}">mysocialvsl.com/</span>
-                <input v-model="form.slug" placeholder="unique-alias"
-                  :style="{flex:1,padding:'10px 12px',fontSize:'13px',color:'#fff',border:'none',outline:'none',fontFamily:'inherit',minWidth:0,background:'transparent'}" />
-              </div>
-            </div>
-            <div>
-              <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Dashboard Name</label>
-              <input v-model="form.dashboard_name" placeholder="e.g. Instagram Bio Link"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',padding:'10px 14px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-            <div style="position:relative">
-              <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Group <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.25)">(optional)</span></label>
-              <input v-model="form.group_name" list="groups-list" placeholder="e.g. Instagram, OnlyFans..."
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',padding:'10px 14px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-              <datalist id="groups-list">
-                <option value="Instagram" />
-                <option value="OnlyFans" />
-                <option value="TikTok" />
-                <option value="MYM" />
-                <option value="Telegram" />
-              </datalist>
-            </div>
+            <!-- Label under dot -->
+            <span :style="{fontSize:'10px',fontWeight:700,marginTop:'5px',whiteSpace:'nowrap',color:i===currentStepIndex?C.stepLabelActive:i<currentStepIndex?C.stepLabelDone:C.stepLabelInactive,letterSpacing:'0.01em'}">
+              {{ step.label.split(' — ')[1] || step.label }}
+            </span>
           </div>
         </div>
 
-        <!-- ===== STEP 2 — THEME ===== -->
-        <div v-show="activeTab === 'theme'">
-          <h2 :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">Select a Theme</h2>
-          <p :style="{fontSize:'14px',color:'rgba(255,255,255,0.4)',marginBottom:'24px'}">Start with a beautiful foundation.</p>
+        <button @click="$router.push('/dashboard/links')"
+          :style="{padding:'6px 16px',border:`1px solid ${C.cancelBorder}`,borderRadius:'8px',background:'transparent',color:C.cancelColor,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}">
+          {{ isEditMode ? '← Retour' : 'Annuler' }}
+        </button>
+      </div>
 
-          <!-- Preset gallery -->
-          <PresetPicker :selected="selectedPreset" @select="applyPreset" />
+      <!-- Error banner -->
+      <div v-if="error"
+        :style="{background:theme.dark?'rgba(239,68,68,0.12)':'#FEF2F2',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'0',padding:'12px 32px',fontSize:'13px',color:'#EF4444',fontWeight:500}">
+        {{ error }}
+      </div>
 
-          <!-- Advanced Customization accordion (open by default) -->
-          <div>
-            <button @click="showThemeAdvanced=!showThemeAdvanced"
-              :style="{width:'100%',display:'flex',alignItems:'center',gap:'10px',padding:'16px 20px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:showThemeAdvanced?'16px 16px 0 0':'16px',cursor:'pointer',fontFamily:'inherit'}">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-              <div :style="{flex:1,textAlign:'left'}">
-                <div :style="{fontSize:'14px',fontWeight:700,color:'#fff'}">Advanced Customization</div>
-                <div :style="{fontSize:'12px',color:'rgba(255,255,255,0.4)'}">Fine-tune colors, fonts, and button styles</div>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" :style="{transform:showThemeAdvanced?'rotate(180deg)':'rotate(0)',transition:'transform 0.2s'}"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-            <div v-if="showThemeAdvanced" :style="{border:'1px solid rgba(255,255,255,0.08)',borderTop:'none',borderRadius:'0 0 16px 16px',padding:'24px',background:'rgba(255,255,255,0.03)'}">
-              <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'24px'}">
-                <!-- LEFT COLUMN -->
-                <div>
-                  <!-- Background -->
-                  <div :style="{marginBottom:'24px'}">
-                    <div :style="{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:'#fff'}">Background</span>
-                    </div>
-                    <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.35)',marginBottom:'10px'}">Customize your backdrop.</p>
-                    <div :style="{display:'flex',gap:'8px',flexWrap:'wrap',alignItems:'center'}">
-                      <div v-for="s in bgSwatches" :key="s.color" @click="form.bg_color=s.color"
-                        :style="{width:'36px',height:'36px',borderRadius:'50%',background:s.color,cursor:'pointer',border:form.bg_color===s.color?'3px solid #6D4EE8':'2px solid rgba(255,255,255,0.15)',boxSizing:'border-box',transition:'border 0.1s',position:'relative'}">
-                        <div v-if="form.bg_color===s.color" :style="{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}">
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- MAIN -->
+      <div :style="{flex:1,display:'flex',overflow:'hidden'}">
+
+        <!-- LEFT: Form steps -->
+        <div :style="{flex:1,overflowY:'auto',padding:'48px 56px'}">
+
+          <Transition :name="stepDir === 'forward' ? 'step-fwd' : 'step-back'" mode="out-in">
+
+          <!-- ===== STEP 1 — SETUP ===== -->
+          <div v-if="activeTab === 'setup'" key="setup">
+
+            <!-- Sub-step indicator -->
+            <div :style="{display:'flex',alignItems:'center',gap:'6px',marginBottom:'32px'}">
+              <div :style="{padding:'4px 14px',borderRadius:'999px',fontSize:'11px',fontWeight:700,transition:'all 0.2s',
+                background:setupSubStep===0?'#6D4EE8':C.pillBg,
+                color:setupSubStep===0?'#fff':C.pillText}">Type</div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="C.textVeryFaint" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+              <div :style="{padding:'4px 14px',borderRadius:'999px',fontSize:'11px',fontWeight:700,transition:'all 0.2s',
+                background:setupSubStep===1?'#6D4EE8':C.pillBg,
+                color:setupSubStep===1?'#fff':C.pillText}">Infos</div>
+            </div>
+
+            <!-- Sub-step 0 : Type de page -->
+            <div v-show="setupSubStep === 0">
+              <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Crée ta page de conversion</h2>
+              <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">Deux formats disponibles selon ton objectif.</p>
+
+              <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}">
+
+                <!-- Card Page VSL -->
+                <div @click="form.page_type='vsl'"
+                  :style="{borderRadius:'18px',padding:'20px 16px',cursor:'pointer',transition:'all 0.2s',border:'2px solid',position:'relative',
+                    borderColor:form.page_type==='vsl'?'#6D4EE8':C.border,
+                    background:form.page_type==='vsl'?'rgba(109,78,232,0.1)':C.surface}">
+
+                  <!-- Badge Recommandé -->
+                  <div :style="{position:'absolute',top:'12px',right:'12px',background:'linear-gradient(135deg,#6D4EE8,#A78BFA)',borderRadius:'999px',padding:'2px 8px',fontSize:'9px',fontWeight:700,color:'#fff'}">Recommandé</div>
+
+                  <!-- Phone mockup VSL -->
+                  <div :style="{width:'88px',margin:'0 auto 14px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 12px 32px rgba(0,0,0,0.6)'}">
+                    <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
+                      <div :style="{height:'9px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                        <div :style="{width:'18px',height:'3px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                      </div>
+                      <div :style="{aspectRatio:'9/16',position:'relative',background:'linear-gradient(180deg,#0a0814 0%,#1a0d30 100%)'}">
+                        <!-- Play icon centré -->
+                        <div :style="{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-60%)'}">
+                          <div :style="{width:'26px',height:'26px',borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1.5px solid rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center'}">
+                            <svg width="9" height="9" viewBox="0 0 9 9" fill="rgba(255,255,255,0.85)"><polygon points="3,2 8,4.5 3,7"/></svg>
+                          </div>
+                        </div>
+                        <!-- VSL badge -->
+                        <div :style="{position:'absolute',top:'5px',left:'5px',background:'rgba(109,78,232,0.92)',borderRadius:'4px',padding:'2px 4px',fontSize:'6px',fontWeight:800,color:'#fff',letterSpacing:'0.06em'}">VSL</div>
+                        <!-- Online badge -->
+                        <div :style="{position:'absolute',top:'5px',right:'5px',background:'rgba(16,185,129,0.15)',border:'1px solid rgba(16,185,129,0.35)',borderRadius:'4px',padding:'2px 4px',display:'flex',alignItems:'center',gap:'2px'}">
+                          <div :style="{width:'3px',height:'3px',borderRadius:'50%',background:'#10B981'}"></div>
+                          <span :style="{fontSize:'5px',fontWeight:600,color:'#10B981'}">Online</span>
+                        </div>
+                        <!-- Bottom overlay + CTA -->
+                        <div :style="{position:'absolute',bottom:0,left:0,right:0,padding:'28px 6px 8px',background:'linear-gradient(to top,rgba(0,0,0,0.92) 0%,transparent 100%)'}">
+                          <div :style="{height:'4px',background:'rgba(255,255,255,0.4)',borderRadius:'2px',marginBottom:'2px',width:'55%'}"></div>
+                          <div :style="{height:'3px',background:'rgba(255,255,255,0.18)',borderRadius:'2px',marginBottom:'7px',width:'38%'}"></div>
+                          <div :style="{height:'12px',background:'#00AFF0',borderRadius:'5px',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 10px rgba(0,175,240,0.5)'}">
+                            <div :style="{height:'2px',background:'rgba(255,255,255,0.9)',borderRadius:'2px',width:'55%'}"></div>
+                          </div>
                         </div>
                       </div>
-                      <label :style="{width:'36px',height:'36px',borderRadius:'50%',border:'2px dashed rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',overflow:'hidden',position:'relative'}">
-                        <input type="color" v-model="form.bg_color" :style="{opacity:0,position:'absolute',width:'1px',height:'1px'}" />
-                        <span :style="{fontSize:'16px',color:'rgba(255,255,255,0.4)'}">+</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- Text Color -->
-                  <div>
-                    <div :style="{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:'#fff'}">Text Color</span>
-                    </div>
-                    <div :style="{display:'flex',gap:'6px'}">
-                      <button v-for="tc in [{id:'light',label:'Light'},{id:'dark',label:'Dark'},{id:'custom',label:'Custom Text'}]" :key="tc.id"
-                        @click="form.text_color=tc.id"
-                        :style="{padding:'7px 14px',border:'1.5px solid',borderRadius:'8px',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
-                          borderColor:form.text_color===tc.id?'#6D4EE8':'rgba(255,255,255,0.12)',
-                          background:form.text_color===tc.id?'rgba(109,78,232,0.15)':'rgba(255,255,255,0.04)',
-                          color:form.text_color===tc.id?'#A78BFA':'rgba(255,255,255,0.5)'}">
-                        {{ tc.label }}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- RIGHT COLUMN -->
-                <div>
-                  <!-- Buttons -->
-                  <div :style="{marginBottom:'24px'}">
-                    <div :style="{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="3" y="8" width="18" height="8" rx="2"/></svg>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:'#fff'}">Buttons</span>
-                    </div>
-                    <div :style="{display:'flex',gap:'8px'}">
-                      <div v-for="bs in [{id:'rounded',label:'Rounded',r:'10px'},{id:'square',label:'Square',r:'3px'},{id:'pill',label:'Pill',r:'999px'}]" :key="bs.id"
-                        @click="form.btn_style=bs.id"
-                        :style="{flex:1,border:'1.5px solid',borderRadius:'10px',padding:'10px 8px',cursor:'pointer',textAlign:'center',
-                          borderColor:form.btn_style===bs.id?'#6D4EE8':'rgba(255,255,255,0.1)',
-                          background:form.btn_style===bs.id?'rgba(109,78,232,0.15)':'rgba(255,255,255,0.04)'}">
-                        <div :style="{width:'100%',height:'18px',borderRadius:bs.r,background:form.btn_style===bs.id?'#6D4EE8':'rgba(255,255,255,0.2)',marginBottom:'6px'}"></div>
-                        <span :style="{fontSize:'11px',color:form.btn_style===bs.id?'#A78BFA':'rgba(255,255,255,0.4)',fontWeight:600}">{{ bs.label }}</span>
+                      <div :style="{height:'9px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                        <div :style="{width:'28px',height:'2px',background:'#1a1a1a',borderRadius:'999px'}"></div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Typography -->
-                  <div>
-                    <div :style="{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:'#fff'}">Typography</span>
-                    </div>
-                    <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}">
-                      <button v-for="f in fontOptions" :key="f.id" @click="form.font=f.id"
-                        :style="{padding:'7px 10px',border:'1.5px solid',borderRadius:'8px',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:f.family,
-                          borderColor:form.font===f.id?'#6D4EE8':'rgba(255,255,255,0.1)',
-                          background:form.font===f.id?'rgba(109,78,232,0.15)':'rgba(255,255,255,0.04)',
-                          color:form.font===f.id?'#A78BFA':'rgba(255,255,255,0.45)'}">
-                        {{ f.label }}
-                      </button>
+                  <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">Page VSL</p>
+                  <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">Vidéo plein écran qui convainc<br/>avant même le clic.</p>
+                  <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
+                    <div v-for="f in ['🎬 Vidéo verticale 9:16','🔓 Bouton CTA configurable','⏱ Apparition du CTA différée']" :key="f"
+                      :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
+                  </div>
+                  <div v-if="form.page_type==='vsl'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
+                    <div :style="{background:'#6D4EE8',borderRadius:'999px',padding:'3px 12px',fontSize:'10px',fontWeight:700,color:'#fff',display:'inline-flex',alignItems:'center',gap:'4px'}">
+                      <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                      Sélectionné
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- ===== STEP 3 — PROFILE ===== -->
-        <div v-show="activeTab === 'profile'">
-          <h2 :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'24px'}">Profile</h2>
+                <!-- Card Lien direct -->
+                <div @click="form.page_type='direct'"
+                  :style="{borderRadius:'18px',padding:'20px 16px',cursor:'pointer',transition:'all 0.2s',border:'2px solid',
+                    borderColor:form.page_type==='direct'?'#6D4EE8':C.border,
+                    background:form.page_type==='direct'?'rgba(109,78,232,0.1)':C.surface}">
 
-          <!-- Background upload -->
-          <div :style="{marginBottom:'20px'}">
-            <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Background Image</label>
-            <div
-              @click="($refs.bgInput as HTMLInputElement).click()"
-              @dragover.prevent="dragOverBg=true"
-              @dragleave="dragOverBg=false"
-              @drop.prevent="onDrop($event,'background')"
-              :style="{border:'2px dashed',borderColor:dragOverBg?'#6D4EE8':'rgba(255,255,255,0.15)',borderRadius:'12px',height:'130px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer',transition:'all 0.2s',backgroundImage:form.bg_image_url?`url(${form.bg_image_url})`:'none',backgroundSize:'cover',backgroundPosition:'center',position:'relative',overflow:'hidden',background:dragOverBg?'rgba(109,78,232,0.06)':'rgba(255,255,255,0.03)'}">
-              <div v-if="!form.bg_image_url" :style="{textAlign:'center'}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" :style="{margin:'0 auto 6px',display:'block'}"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.4)',fontWeight:500}">Drag & drop or click to upload</p>
-                <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.2)'}">PNG, JPG, GIF up to 10MB</p>
-              </div>
-              <div v-if="form.bg_image_url" :style="{position:'absolute',inset:0,background:'rgba(0,0,0,0.4)',display:'flex',alignItems:'center',justifyContent:'center',opacity:0,transition:'opacity 0.2s'}"
-                @mouseover="($event.currentTarget as HTMLElement).style.opacity='1'"
-                @mouseout="($event.currentTarget as HTMLElement).style.opacity='0'">
-                <span :style="{color:'#fff',fontSize:'12px',fontWeight:600}">Change Image</span>
-              </div>
-            </div>
-            <input ref="bgInput" type="file" accept="image/*" :style="{display:'none'}" @change="uploadFile($event,'background')" />
-            <p v-if="uploadingBg" :style="{fontSize:'11px',color:'#A78BFA',marginTop:'4px'}">Uploading...</p>
-          </div>
+                  <!-- Redirect flow illustration -->
+                  <div :style="{height:'147px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:C.surface,borderRadius:'14px',marginBottom:'14px',position:'relative',overflow:'hidden'}">
+                    <div :style="{position:'absolute',inset:0,background:'radial-gradient(ellipse at 50% 60%,rgba(109,78,232,0.1) 0%,transparent 70%)'}"></div>
+                    <div :style="{display:'flex',alignItems:'center',gap:'7px',zIndex:1}">
+                      <!-- Instagram -->
+                      <div :style="{width:'40px',height:'40px',borderRadius:'12px',background:'linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(220,39,67,0.35)',flexShrink:0}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" width="20" height="20"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="white" stroke="none"/></svg>
+                      </div>
+                      <!-- Arrow -->
+                      <div :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'2px'}">
+                        <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><path d="M0 6h14" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/><path d="M8 1.5l8 4.5-8 4.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span :style="{fontSize:'6px',color:'rgba(255,255,255,0.2)',fontWeight:700,letterSpacing:'0.06em'}">BYPASS</span>
+                      </div>
+                      <!-- Safari -->
+                      <div :style="{width:'40px',height:'40px',borderRadius:'12px',background:'linear-gradient(135deg,#1a6fdd,#4fa8ff)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(26,111,221,0.35)',flexShrink:0}">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5"/><path d="M15.5 8.5l-3.5 3.5-3 1 1-3 3.5-3.5z" fill="white"/></svg>
+                      </div>
+                      <!-- Arrow -->
+                      <svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M0 6h10" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/><path d="M5 1.5l7 4.5-7 4.5" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <!-- OnlyFans -->
+                      <div :style="{width:'40px',height:'40px',borderRadius:'12px',background:'#00AFF0',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(0,175,240,0.35)',flexShrink:0}">
+                        <span :style="{fontSize:'10px',fontWeight:900,color:'white',letterSpacing:'-0.5px'}">OF</span>
+                      </div>
+                    </div>
+                    <p :style="{fontSize:'8px',color:'rgba(255,255,255,0.22)',marginTop:'10px',fontWeight:700,letterSpacing:'0.08em',zIndex:1}">INSTAGRAM → SAFARI → ONLYFANS</p>
+                  </div>
 
-          <!-- Avatar -->
-          <div :style="{display:'flex',alignItems:'flex-start',gap:'20px',marginBottom:'20px'}">
-            <div :style="{position:'relative',flexShrink:0}">
-              <div @click="($refs.avatarInput as HTMLInputElement).click()"
-                :style="{width:'80px',height:'80px',borderRadius:'50%',background:'#6D4EE8',border:'3px solid rgba(255,255,255,0.1)',cursor:'pointer',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}">
-                <img v-if="form.avatar_url" :src="form.avatar_url" :style="{width:'100%',height:'100%',objectFit:'cover'}" />
-                <svg v-else width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">Lien direct</p>
+                  <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">Redirection instantanée avec<br/>deeplink bypass inclus.</p>
+                  <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
+                    <div v-for="f in ['⚡ Redirection instantanée','🔗 Deeplink bypass automatique','📱 Compatible Instagram, TikTok…']" :key="f"
+                      :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
+                  </div>
+                  <div v-if="form.page_type==='direct'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
+                    <div :style="{background:'#6D4EE8',borderRadius:'999px',padding:'3px 12px',fontSize:'10px',fontWeight:700,color:'#fff',display:'inline-flex',alignItems:'center',gap:'4px'}">
+                      <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                      Sélectionné
+                    </div>
+                  </div>
+                </div>
+
               </div>
-              <div :style="{position:'absolute',bottom:0,right:'-4px',cursor:'pointer'}"
-                @click.stop="($refs.avatarInput as HTMLInputElement).click()">
-                <div :style="{width:'24px',height:'24px',background:'#6D4EE8',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',border:'2px solid #0d0b1e'}">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+
+              <!-- Advanced Options — tabbed -->
+              <div :style="{border:`1px solid ${C.border}`,borderRadius:'14px',overflow:'hidden'}">
+
+                <!-- Header -->
+                <div @click="showAdvanced = !showAdvanced"
+                  class="adv-toggle" :class="{'adv-toggle--attn': !showAdvanced}"
+                  :style="{padding:'14px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',userSelect:'none',
+                    background: showAdvanced ? C.surface : 'linear-gradient(135deg, rgba(109,78,232,0.16), rgba(167,139,250,0.04))'}">
+                  <div :style="{display:'flex',alignItems:'center',gap:'12px'}">
+                    <div class="adv-icon" :style="{width:'32px',height:'32px',borderRadius:'9px',background:'rgba(109,78,232,0.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                    </div>
+                    <div>
+                      <div :style="{display:'flex',alignItems:'center',gap:'8px'}">
+                        <span :style="{fontSize:'13px',fontWeight:700,color:C.text}">Options avancées</span>
+                        <span class="adv-badge">Deeplink · Bot</span>
+                      </div>
+                      <span :style="{fontSize:'11px',color:C.textDim}">Bypass navigateur in-app & protection anti-bots</span>
+                    </div>
+                  </div>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2"
+                    :style="{transform:showAdvanced?'rotate(180deg)':'rotate(0deg)',transition:'transform 0.2s',flexShrink:0}">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </div>
+
+                <div v-show="showAdvanced" :style="{borderTop:`1px solid ${C.borderLight}`}">
+
+                  <!-- Tab bar -->
+                  <div :style="{display:'flex',borderBottom:`1px solid ${C.borderLight}`,padding:'0 4px'}">
+                    <div @click="advancedTab = 0"
+                      :style="{padding:'10px 16px',cursor:'pointer',fontSize:'12px',fontWeight:600,transition:'all 0.15s',display:'flex',alignItems:'center',gap:'6px',
+                        color:advancedTab===0?C.text:C.textDim,
+                        borderBottom:`2px solid ${advancedTab===0?'#6D4EE8':'transparent'}`}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" :stroke="advancedTab===0?'#10b981':C.textDim" stroke-width="2" stroke-linecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                      Deeplink
+                    </div>
+                    <div @click="advancedTab = 1"
+                      :style="{padding:'10px 16px',cursor:'pointer',fontSize:'12px',fontWeight:600,transition:'all 0.15s',display:'flex',alignItems:'center',gap:'6px',
+                        color:advancedTab===1?C.text:C.textDim,
+                        borderBottom:`2px solid ${advancedTab===1?'#6D4EE8':'transparent'}`}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" :stroke="advancedTab===1?'#A78BFA':C.textDim" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                      Strict Deeplink
+                    </div>
+                    <div @click="advancedTab = 2"
+                      :style="{padding:'10px 16px',cursor:'pointer',fontSize:'12px',fontWeight:600,transition:'all 0.15s',display:'flex',alignItems:'center',gap:'6px',
+                        color:advancedTab===2?C.text:C.textDim,
+                        borderBottom:`2px solid ${advancedTab===2?'#6D4EE8':'transparent'}`}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" :stroke="advancedTab===2?'#F59E0B':C.textDim" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      Bot Protection
+                    </div>
+                  </div>
+
+                  <!-- ── Tab 0 : Deeplink ── -->
+                  <div v-show="advancedTab === 0" :style="{padding:'20px',display:'grid',gridTemplateColumns:'1fr auto',gap:'28px',alignItems:'center'}">
+
+                    <div :style="{display:'flex',flexDirection:'column',gap:'16px'}">
+                      <div>
+                        <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Deeplink — Bypass navigateur intégré</p>
+                        <p :style="{fontSize:'12px',color:C.textMuted,lineHeight:1.7}">
+                          Instagram, TikTok et Snapchat ouvrent les liens dans leur <strong :style="{color:C.text2}">navigateur intégré</strong>. Le visiteur ne peut pas se connecter à OnlyFans depuis là. Le deeplink détecte cette situation et force l'ouverture dans Safari ou Chrome.
+                        </p>
+                      </div>
+
+                      <!-- Toggle -->
+                      <div :style="{background:'rgba(16,185,129,0.07)',border:'1px solid rgba(16,185,129,0.18)',borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
+                        <div>
+                          <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Activer le deeplink</p>
+                          <p :style="{fontSize:'11px',color:C.textDim}">Recommandé — activé par défaut</p>
+                        </div>
+                        <div @click="form.deep_link_enabled = !form.deep_link_enabled"
+                          :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.deep_link_enabled?'#10b981':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
+                          <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.deep_link_enabled?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+                        </div>
+                      </div>
+
+                      <!-- Platform pills -->
+                      <div>
+                        <p :style="{fontSize:'10px',fontWeight:700,color:C.textFaint,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'8px'}">Plateformes supportées</p>
+                        <div :style="{display:'flex',gap:'5px',flexWrap:'wrap'}">
+                          <div v-for="p in [{l:'Instagram',c:'#E1306C'},{l:'TikTok',c:'#69C9D0'},{l:'Twitter/X',c:'#1d9bf0'},{l:'Facebook',c:'#1877F2'},{l:'Snapchat',c:'#FFFC00'},{l:'Reddit',c:'#FF4500'},{l:'Telegram',c:'#26A5E4'}]" :key="p.l"
+                            :style="{padding:'3px 10px',borderRadius:'999px',fontSize:'10px',fontWeight:600,background:p.c+'18',color:p.c,border:`1px solid ${p.c}30`}">
+                            {{ p.l }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Demo live -->
+                    <div :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}">
+                      <p :style="{fontSize:'9px',fontWeight:700,color:C.textVeryFaint,textTransform:'uppercase',letterSpacing:'0.08em'}">Demo live</p>
+                      <DeeplinkDemo :mode="form.page_type === 'direct' ? 'direct' : 'vsl'" />
+                    </div>
+
+                  </div>
+
+                  <!-- ── Tab 1 : Strict Deeplink ── -->
+                  <div v-show="advancedTab === 1" :style="{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
+
+                    <div>
+                      <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Strict Deeplink — Interception totale</p>
+                      <p :style="{fontSize:'12px',color:C.textMuted,lineHeight:1.7}">
+                        Quand activé, une <strong :style="{color:C.text2}">page plein écran</strong> apparaît avant toute redirection. Le visiteur doit appuyer sur un bouton pour confirmer l'ouverture dans Safari. Aucun élément n'est cliquable avant.
+                      </p>
+                    </div>
+
+                    <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
+                      <!-- Deeplink normal -->
+                      <div :style="{background:C.surface,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px'}">
+                        <p :style="{fontSize:'11px',fontWeight:700,color:C.text2,marginBottom:'6px',display:'flex',alignItems:'center',gap:'5px'}">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                          Deeplink normal
+                        </p>
+                        <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Redirection fluide. Le visiteur est directement envoyé vers Safari. Expérience sans friction.</p>
+                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#10b981',fontWeight:600}">✓ Meilleur taux de conversion</div>
+                      </div>
+                      <!-- Strict -->
+                      <div :style="{background:'rgba(109,78,232,0.07)',border:'1px solid rgba(109,78,232,0.18)',borderRadius:'12px',padding:'14px'}">
+                        <p :style="{fontSize:'11px',fontWeight:700,color:C.text2,marginBottom:'6px',display:'flex',alignItems:'center',gap:'5px'}">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                          Strict Deeplink
+                        </p>
+                        <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Écran interstitiel obligatoire. Garantit l'ouverture dans le navigateur même si le deeplink échoue.</p>
+                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#A78BFA',fontWeight:600}">✓ Ouverture garantie</div>
+                      </div>
+                    </div>
+
+                    <!-- Toggle -->
+                    <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
+                      <div>
+                        <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Activer le Strict Deeplink</p>
+                        <p :style="{fontSize:'11px',color:C.textDim}">À utiliser si le deeplink normal ne fonctionne pas sur ton audience cible</p>
+                      </div>
+                      <div @click="form.strict_deep_link = !form.strict_deep_link"
+                        :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.strict_deep_link?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
+                        <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.strict_deep_link?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- ── Tab 2 : Bot Protection ── -->
+                  <div v-show="advancedTab === 2" :style="{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
+
+                    <div>
+                      <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Bot Protection — Accès réservé aux humains</p>
+                      <p :style="{fontSize:'12px',color:C.textMuted,lineHeight:1.7}">
+                        Bloque les bots, crawlers et scrapers automatiques qui visitent ta page. Aucun robot ne peut accéder au contenu de ta VSL ni à tes liens.
+                      </p>
+                    </div>
+
+                    <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
+                      <div :style="{background:'rgba(16,185,129,0.06)',border:'1px solid rgba(16,185,129,0.14)',borderRadius:'12px',padding:'14px'}">
+                        <p :style="{fontSize:'11px',fontWeight:700,color:'#10b981',marginBottom:'8px'}">✓ Ce que ça bloque</p>
+                        <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
+                          <p v-for="item in ['Crawlers & scrapers','Bots de spam','Previews de liens réseaux sociaux','Outils d\'analyse concurrents']" :key="item"
+                            :style="{fontSize:'11px',color:C.textMuted,display:'flex',alignItems:'center',gap:'5px',lineHeight:1.4}">
+                            <span :style="{color:'#10b981',fontSize:'10px'}">—</span>{{ item }}
+                          </p>
+                        </div>
+                      </div>
+                      <div :style="{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.16)',borderRadius:'12px',padding:'14px'}">
+                        <p :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B',marginBottom:'8px'}">⚠ Effets secondaires</p>
+                        <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
+                          <p v-for="item in ['Plus d\'aperçu quand tu partages le lien','Instagram ne génère pas de preview','Reach organique impacté si tu postes le lien']" :key="item"
+                            :style="{fontSize:'11px',color:C.textMuted,display:'flex',alignItems:'center',gap:'5px',lineHeight:1.4}">
+                            <span :style="{color:'#F59E0B',fontSize:'10px'}">—</span>{{ item }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Toggle -->
+                    <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
+                      <div>
+                        <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Activer la Bot Protection</p>
+                        <p :style="{fontSize:'11px',color:C.textDim}">Désactivé par défaut — recommandé uniquement si tu as un problème spécifique</p>
+                      </div>
+                      <div @click="form.bot_protection = !form.bot_protection"
+                        :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.bot_protection?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
+                        <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.bot_protection?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+                      </div>
+                    </div>
+
+                  </div>
+
                 </div>
               </div>
-              <input ref="avatarInput" type="file" accept="image/*" :style="{display:'none'}" @change="uploadFile($event,'avatar')" />
             </div>
-            <div :style="{flex:1,paddingTop:'4px'}">
-              <p :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'12px'}">Profile Picture</p>
+
+            <!-- Sub-step 1 : Infos -->
+            <div v-show="setupSubStep === 1">
+
+              <!-- VSL infos -->
+              <template v-if="form.page_type === 'vsl'">
+                <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Infos de ta page</h2>
+                <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'32px'}">Ces informations s'affichent sur ta page publique.</p>
+                <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
+                  <div>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
+                      Ton nom / pseudo <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Affiché sur ta page</span>
+                    </label>
+                    <input v-model="form.model_name" @input="autoSlug" placeholder="ex: Sofia, Léa Paris, Chloé…"
+                      :style="inputStyle"
+                      @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                      @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                  </div>
+                  <div>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
+                      Ton @handle <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Affiché sous ton nom</span>
+                    </label>
+                    <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
+                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'14px',color:C.textDim,fontWeight:600,flexShrink:0}">@</span>
+                      <input v-model="form.model_handle" placeholder="sofiafrench"
+                        :style="{flex:1,background:'transparent',border:'none',outline:'none',padding:'10px 14px 10px 0',fontSize:'14px',color:C.text,fontFamily:'inherit'}" />
+                    </div>
+                  </div>
+                  <div>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">URL de ta page</label>
+                    <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
+                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/</span>
+                      <input v-model="form.slug" placeholder="sofia"
+                        :style="{flex:1,background:'transparent',border:'none',outline:'none',padding:'10px 14px 10px 0',fontSize:'14px',color:'#A78BFA',fontFamily:'inherit',fontWeight:600}" />
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Direct link infos -->
+              <template v-else>
+                <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Ton lien direct</h2>
+                <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'32px'}">Les visiteurs seront redirigés immédiatement.</p>
+                <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
+                  <div>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">URL de destination</label>
+                    <input v-model="form.direct_url" type="url" placeholder="https://onlyfans.com/..."
+                      :style="inputStyle"
+                      @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                      @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                  </div>
+                  <div>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Nom interne <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Pour ton dashboard</span></label>
+                    <input v-model="form.model_name" @input="autoSlug" placeholder="ex: Mon OnlyFans"
+                      :style="inputStyle"
+                      @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                      @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                  </div>
+                  <div>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">URL de ta page</label>
+                    <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
+                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/</span>
+                      <input v-model="form.slug" placeholder="sofia"
+                        :style="{flex:1,background:'transparent',border:'none',outline:'none',padding:'10px 14px 10px 0',fontSize:'14px',color:'#A78BFA',fontFamily:'inherit',fontWeight:600}" />
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+            </div>
+          </div>
+
+          <!-- ===== STEP 2 — TEMPLATE ===== -->
+          <div v-else-if="activeTab === 'template'" key="template">
+            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Choisis ton template</h2>
+            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">Les deux gardent la vidéo au centre — tout dépend du nombre de liens.</p>
+
+            <div :style="{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'14px'}">
+
+              <!-- ── Card 1: VSL Pure ── -->
+              <div @click="form.template='vsl-classic'"
+                :style="{borderRadius:'18px',padding:'20px 16px 16px',cursor:'pointer',transition:'all 0.25s',border:'2px solid',position:'relative',overflow:'hidden',
+                  borderColor: form.template==='vsl-classic' ? '#6D4EE8' : C.border,
+                  background: form.template==='vsl-classic' ? 'rgba(109,78,232,0.12)' : C.surface}">
+                <div v-if="form.template==='vsl-classic'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
+                  <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                  Sélectionné
+                </div>
+                <!-- Phone mockup -->
+                <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)',position:'relative'}">
+                  <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
+                    <div :style="{height:'8px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                      <div :style="{width:'18px',height:'2px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                    </div>
+                    <div :style="{aspectRatio:'9/16',position:'relative',background:'linear-gradient(160deg,#0d0822 0%,#1a0d35 50%,#0d0822 100%)'}">
+                      <!-- Fake video content -->
+                      <div :style="{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}">
+                        <div :style="{width:'24px',height:'24px',borderRadius:'50%',border:'1.5px solid rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.05)'}">
+                          <svg width="8" height="8" viewBox="0 0 9 9" fill="rgba(255,255,255,0.7)"><polygon points="3,2 8,4.5 3,7"/></svg>
+                        </div>
+                      </div>
+                      <!-- Labels top -->
+                      <div :style="{position:'absolute',top:'7px',left:'7px',background:'rgba(109,78,232,0.9)',borderRadius:'5px',padding:'2px 5px',fontSize:'6px',fontWeight:800,color:'#fff'}">VSL</div>
+                      <!-- Bottom zone -->
+                      <div :style="{position:'absolute',bottom:0,left:0,right:0,padding:'28px 8px 8px',background:'linear-gradient(to top,rgba(0,0,0,0.95) 0%,transparent 100%)'}">
+                        <div :style="{height:'4px',background:'rgba(255,255,255,0.5)',borderRadius:'2px',marginBottom:'3px',width:'60%'}"></div>
+                        <div :style="{height:'3px',background:'rgba(255,255,255,0.2)',borderRadius:'2px',marginBottom:'8px',width:'40%'}"></div>
+                        <!-- Single CTA -->
+                        <div :style="{height:'14px',background:form.btn_color,borderRadius:'5px',boxShadow:`0 4px 14px ${form.btn_color}60`,display:'flex',alignItems:'center',justifyContent:'center'}">
+                          <div :style="{height:'2px',width:'50%',background:'rgba(255,255,255,0.7)',borderRadius:'2px'}"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div :style="{height:'8px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                      <div :style="{width:'28px',height:'2px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                    </div>
+                  </div>
+                </div>
+                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL Pure</p>
+                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">Vidéo plein écran + 1 bouton CTA. Conversion maximale.</p>
+                <div :style="{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'center'}">
+                  <span v-for="tag in ['1 bouton','No distraction','Max CTR']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(109,78,232,0.15)',color:'#A78BFA',border:'1px solid rgba(109,78,232,0.25)'}">{{ tag }}</span>
+                </div>
+              </div>
+
+              <!-- ── Card 2: VSL + Popup ── -->
+              <div @click="form.template='vsl-popup'"
+                :style="{borderRadius:'18px',padding:'20px 16px 16px',cursor:'pointer',transition:'all 0.25s',border:'2px solid',position:'relative',overflow:'hidden',
+                  borderColor: form.template==='vsl-popup' ? '#6D4EE8' : C.border,
+                  background: form.template==='vsl-popup' ? 'rgba(109,78,232,0.12)' : C.surface}">
+                <div v-if="form.template==='vsl-popup'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
+                  <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                  Sélectionné
+                </div>
+                <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)'}">
+                  <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
+                    <div :style="{height:'8px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                      <div :style="{width:'18px',height:'2px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                    </div>
+                    <div :style="{aspectRatio:'9/16',position:'relative',background:'linear-gradient(160deg,#0d0822 0%,#1a0d35 50%,#0d0822 100%)',display:'flex',alignItems:'center',justifyContent:'center'}">
+                      <!-- Blurred bg hint -->
+                      <div :style="{position:'absolute',inset:0,background:'rgba(0,0,0,0.55)',backdropFilter:'blur(2px)'}"></div>
+                      <!-- Popup card -->
+                      <div :style="{position:'relative',zIndex:2,background:'#1a1433',borderRadius:'10px',padding:'8px',width:'68px',border:'1px solid rgba(109,78,232,0.4)',boxShadow:'0 8px 24px rgba(0,0,0,0.6)',textAlign:'center'}">
+                        <!-- Close x -->
+                        <div :style="{position:'absolute',top:'-5px',right:'-5px',width:'12px',height:'12px',borderRadius:'50%',background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'7px',color:'rgba(255,255,255,0.6)'}">×</div>
+                        <!-- Emoji/icon -->
+                        <div :style="{fontSize:'14px',marginBottom:'4px'}">🔥</div>
+                        <!-- Title bar -->
+                        <div :style="{height:'4px',background:'rgba(255,255,255,0.5)',borderRadius:'2px',marginBottom:'2px',width:'80%',margin:'0 auto 2px'}"></div>
+                        <div :style="{height:'3px',background:'rgba(255,255,255,0.2)',borderRadius:'2px',marginBottom:'6px',width:'60%',margin:'0 auto 6px'}"></div>
+                        <!-- CTA -->
+                        <div :style="{height:'11px',background:form.btn_color,borderRadius:'4px',boxShadow:`0 3px 10px ${form.btn_color}50`}"></div>
+                      </div>
+                    </div>
+                    <div :style="{height:'8px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                      <div :style="{width:'28px',height:'2px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                    </div>
+                  </div>
+                </div>
+                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL + Popup</p>
+                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">Popup centré après X sec. avec titre, texte et CTA.</p>
+                <div :style="{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'center'}">
+                  <span v-for="tag in ['Popup timed','Texte custom','Urgence']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(245,158,11,0.12)',color:'#F59E0B',border:'1px solid rgba(245,158,11,0.2)'}">{{ tag }}</span>
+                </div>
+              </div>
+
+              <!-- ── Card 3: VSL + Bandeau ── -->
+              <div @click="form.template='vsl-bandeau'"
+                :style="{borderRadius:'18px',padding:'20px 16px 16px',cursor:'pointer',transition:'all 0.25s',border:'2px solid',position:'relative',overflow:'hidden',
+                  borderColor: form.template==='vsl-bandeau' ? '#6D4EE8' : C.border,
+                  background: form.template==='vsl-bandeau' ? 'rgba(109,78,232,0.12)' : C.surface}">
+                <div v-if="form.template==='vsl-bandeau'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
+                  <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                  Sélectionné
+                </div>
+                <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)'}">
+                  <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
+                    <div :style="{height:'8px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                      <div :style="{width:'18px',height:'2px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                    </div>
+                    <div :style="{aspectRatio:'9/16',position:'relative',background:'linear-gradient(160deg,#0d0822 0%,#1a0d35 50%,#0d0822 100%)'}">
+                      <div :style="{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}">
+                        <div :style="{width:'24px',height:'24px',borderRadius:'50%',border:'1.5px solid rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.05)'}">
+                          <svg width="8" height="8" viewBox="0 0 9 9" fill="rgba(255,255,255,0.7)"><polygon points="3,2 8,4.5 3,7"/></svg>
+                        </div>
+                      </div>
+                      <!-- Bottom overlay + CTA + drawer handle -->
+                      <div :style="{position:'absolute',bottom:0,left:0,right:0,padding:'28px 8px 8px',background:'linear-gradient(to top,rgba(0,0,0,0.95) 0%,transparent 100%)'}">
+                        <div :style="{height:'4px',background:'rgba(255,255,255,0.5)',borderRadius:'2px',marginBottom:'3px',width:'60%'}"></div>
+                        <div :style="{height:'3px',background:'rgba(255,255,255,0.2)',borderRadius:'2px',marginBottom:'5px',width:'40%'}"></div>
+                        <!-- Drawer handle -->
+                        <div :style="{display:'flex',justifyContent:'center',marginBottom:'4px'}">
+                          <div :style="{width:'16px',height:'2px',background:'rgba(255,255,255,0.3)',borderRadius:'999px'}"></div>
+                        </div>
+                        <div :style="{height:'14px',background:form.btn_color,borderRadius:'5px',boxShadow:`0 4px 14px ${form.btn_color}60`,display:'flex',alignItems:'center',justifyContent:'center'}">
+                          <div :style="{height:'2px',width:'50%',background:'rgba(255,255,255,0.7)',borderRadius:'2px'}"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Drawer peeking from bottom -->
+                    <div :style="{height:'18px',background:'#1a1733',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'3px',borderTop:'1px solid rgba(255,255,255,0.08)'}">
+                      <div :style="{width:'14px',height:'2px',background:'rgba(255,255,255,0.25)',borderRadius:'999px'}"></div>
+                      <div :style="{display:'flex',gap:'3px'}">
+                        <div :style="{width:'18px',height:'2px',background:'rgba(255,255,255,0.08)',borderRadius:'999px'}"></div>
+                        <div :style="{width:'14px',height:'2px',background:'rgba(255,255,255,0.06)',borderRadius:'999px'}"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL + Bandeau</p>
+                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">1 CTA + tiroir de liens en bas. Parfait pour multi-plateformes.</p>
+                <div :style="{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'center'}">
+                  <span v-for="tag in ['Multi-liens','Tiroir','Swipe up']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(16,185,129,0.1)',color:'#10B981',border:'1px solid rgba(16,185,129,0.2)'}">{{ tag }}</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ===== STEP 3 — VSL ===== -->
+          <div v-else-if="activeTab === 'vsl'" key="vsl">
+            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Ta vidéo VSL</h2>
+            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">La vidéo qui vend. Upload en vertical (9:16) pour un rendu parfait.</p>
+
+            <VideoUpload v-model="form.video_url" @uploading="uploadingVideo = $event" />
+
+            <!-- CTA reveal -->
+            <div :style="{marginTop:'28px',background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'14px',padding:'20px'}">
+              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'4px'}">
+                <span :style="{display:'inline-flex',alignItems:'center',gap:'6px'}">
+                  <i class="bi bi-clock" style="color:#A78BFA"></i>
+                  Apparition du bouton (optionnel)
+                </span>
+              </label>
+              <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px',lineHeight:1.5}">
+                Le bouton est caché jusqu'à ce moment de la vidéo. Laisse vide pour qu'il apparaisse immédiatement.
+              </p>
+              <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
+                <input v-model.number="form.cta_reveal_at" type="number" min="0" placeholder="ex : 30"
+                  :style="{...inputStyle,width:'120px',textAlign:'center'}"
+                  @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                  @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                <span :style="{fontSize:'13px',color:C.textMuted}">secondes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== STEP 4 — CTA ===== -->
+          <div v-else-if="activeTab === 'cta'" key="cta">
+
+            <div>
+            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Ton bouton CTA</h2>
+            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">Un seul bouton, une seule action.</p>
+
+            <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
+
+              <!-- Button type selector -->
+              <div>
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Type de bouton</label>
+                <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}">
+                  <div @click="form.cta_type='text'"
+                    :style="{
+                      padding:'14px 16px',borderRadius:'14px',cursor:'pointer',transition:'all 0.15s',
+                      border:'2px solid',
+                      borderColor:form.cta_type==='text'?'#6D4EE8':C.border,
+                      background:form.cta_type==='text'?'rgba(109,78,232,0.1)':C.surface,
+                    }">
+                    <div :style="{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}">
+                      <div :style="{width:'28px',height:'28px',borderRadius:'8px',background:form.cta_type==='text'?'rgba(109,78,232,0.25)':'rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center'}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="form.cta_type==='text'?'#A78BFA':C.textDim" stroke-width="2"><path d="M4 6h16M4 12h8M4 18h12"/></svg>
+                      </div>
+                      <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='text'?'#A78BFA':C.text2}">Texte</span>
+                    </div>
+                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Bouton classique avec texte et couleur personnalisable.</p>
+                  </div>
+                  <div @click="form.cta_type='image'"
+                    :style="{
+                      padding:'14px 16px',borderRadius:'14px',cursor:'pointer',transition:'all 0.15s',
+                      border:'2px solid',
+                      borderColor:form.cta_type==='image'?'#6D4EE8':C.border,
+                      background:form.cta_type==='image'?'rgba(109,78,232,0.1)':C.surface,
+                    }">
+                    <div :style="{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}">
+                      <div :style="{width:'28px',height:'28px',borderRadius:'8px',background:form.cta_type==='image'?'rgba(109,78,232,0.25)':'rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center'}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="form.cta_type==='image'?'#A78BFA':C.textDim" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      </div>
+                      <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='image'?'#A78BFA':C.text2}">Image</span>
+                    </div>
+                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Carte image cliquable avec lien — idéal pour promouvoir visuellement.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Image upload (image type) -->
+              <div v-if="form.cta_type==='image'">
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Image du bouton</label>
+                <div :style="{
+                  position:'relative',borderRadius:'16px',overflow:'hidden',
+                  border:`2px dashed ${C.border}`,
+                  background:C.surface,
+                  minHeight:'140px',display:'flex',alignItems:'center',justifyContent:'center',
+                  cursor:'pointer',
+                }">
+                  <img v-if="form.cta_image_url" :src="form.cta_image_url" :style="{width:'100%',height:'140px',objectFit:'cover',display:'block'}" />
+                  <div v-else :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'24px'}">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" :stroke="C.textFaint" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span :style="{fontSize:'12px',fontWeight:600,color:C.textFaint}">No image</span>
+                  </div>
+                  <!-- Link icon badge in top-right -->
+                  <div :style="{position:'absolute',top:'8px',right:'8px',width:'28px',height:'28px',borderRadius:'50%',background:'rgba(0,0,0,0.45)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center'}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                  </div>
+                  <input type="file" accept="image/*" :style="{position:'absolute',inset:0,opacity:0,cursor:'pointer'}"
+                    @change="uploadCtaImage" />
+                </div>
+                <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'6px'}">JPG, PNG, WEBP — Ratio recommandé 16:9 ou 3:1</p>
+              </div>
+
+              <!-- CTA URL -->
+              <div>
+                <label :style="{display:'flex',alignItems:'center',gap:'8px',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
+                  Lien de destination
+                  <span :style="{fontSize:'10px',fontWeight:600,color:C.textMuted,background:C.surface,border:`1px solid ${C.border}`,borderRadius:'999px',padding:'1px 8px'}">optionnel</span>
+                </label>
+                <input v-model="form.cta_url" type="url" placeholder="https://onlyfans.com/ton-pseudo/..."
+                  :style="inputStyle"
+                  @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                  @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+              </div>
+
+              <!-- CTA Label (text type only) -->
+              <div v-if="form.cta_type==='text'">
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
+                  Texte du bouton
+                </label>
+                <input v-model="form.btn_label" placeholder="ex: 🔓 Mon OnlyFans — Accès privé"
+                  :style="inputStyle"
+                  @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                  @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+              </div>
+
+              <!-- CTA Color (text type only) -->
+              <div v-if="form.cta_type==='text'">
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">
+                  Couleur du bouton
+                </label>
+                <div :style="{display:'flex',gap:'8px',flexWrap:'wrap',alignItems:'center'}">
+                  <div v-for="preset in colorPresets" :key="preset.value"
+                    @click="form.btn_color = preset.value"
+                    :style="{
+                      display:'flex',alignItems:'center',gap:'6px',padding:'7px 14px',borderRadius:'999px',cursor:'pointer',
+                      border:'2px solid',transition:'all 0.15s',fontSize:'12px',fontWeight:600,
+                      borderColor: form.btn_color === preset.value ? preset.value : C.borderInput,
+                      background: form.btn_color === preset.value ? preset.value + '22' : C.surface2,
+                      color: form.btn_color === preset.value ? '#fff' : C.text2,
+                    }">
+                    <div :style="{width:'10px',height:'10px',borderRadius:'50%',background:preset.value,flexShrink:0}"></div>
+                    {{ preset.label }}
+                  </div>
+                  <div :style="{display:'flex',alignItems:'center',gap:'6px',padding:'7px 14px',borderRadius:'999px',border:`1px solid ${C.borderInput}`,background:C.surface2,cursor:'pointer'}">
+                    <input v-model="form.btn_color" type="color"
+                      :style="{width:'16px',height:'16px',border:'none',background:'none',padding:0,cursor:'pointer',borderRadius:'50%'}" />
+                    <span :style="{fontSize:'12px',color:C.text2,fontWeight:600}">Autre</span>
+                  </div>
+                </div>
+              </div> <!-- end color/v-if-text div -->
+
+              <!-- ── Popup config (vsl-popup uniquement) ── -->
+              <div v-if="form.template === 'vsl-popup'"
+                :style="{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.18)',borderRadius:'14px',padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg>
+                  <p :style="{fontSize:'13px',fontWeight:700,color:'#fff',margin:0}">Configuration du Popup</p>
+                  <span :style="{fontSize:'10px',color:'#F59E0B',fontWeight:600,background:'rgba(245,158,11,0.15)',padding:'2px 8px',borderRadius:'999px',marginLeft:'auto'}">apparaît après {{ form.popup_delay }}s</span>
+                </div>
+                <div>
+                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Délai d'apparition</label>
+                  <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
+                    <input v-model.number="form.popup_delay" type="range" min="0" max="60" step="1"
+                      :style="{flex:1,accentColor:'#F59E0B'}" />
+                    <span :style="{fontSize:'14px',fontWeight:700,color:C.text,width:'50px',textAlign:'right'}">{{ form.popup_delay }}s</span>
+                  </div>
+                  <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'4px'}">0 = apparaît immédiatement à l'ouverture de la page</p>
+                </div>
+                <div>
+                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Titre du popup</label>
+                  <input v-model="form.popup_title" placeholder="ex: Rejoins-moi en privé 🔥"
+                    :style="inputStyle"
+                    @focus="(e:any)=>e.target.style.borderColor='#F59E0B'"
+                    @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                </div>
+                <div>
+                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Sous-titre / description</label>
+                  <input v-model="form.popup_subtitle" placeholder="ex: Contenu exclusif disponible maintenant"
+                    :style="inputStyle"
+                    @focus="(e:any)=>e.target.style.borderColor='#F59E0B'"
+                    @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                </div>
+                <div :style="{background:C.surface2,borderRadius:'10px',padding:'12px',fontSize:'12px',color:C.textMuted,lineHeight:1.6}">
+                  💡 Le bouton du popup utilise le même texte et la même couleur que ton CTA principal ci-dessous.
+                </div>
+              </div>
+
+              <!-- Extra links (bandeau uniquement) -->
+              <div v-if="form.template === 'vsl-bandeau'">
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'4px'}">
+                  Liens du bandeau
+                </label>
+                <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px'}">Ces liens apparaissent dans le tiroir qui s'ouvre depuis le bas.</p>
+
+                <!-- Quick-add platforms — iOS-style square icons -->
+                <div :style="{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'16px'}">
+                  <div v-for="p in bandeauPlatforms" :key="p.id"
+                    @click="addBandeauLink(p)"
+                    :title="p.name"
+                    :style="{
+                      display:'flex',flexDirection:'column',alignItems:'center',gap:'5px',
+                      cursor:'pointer',transition:'all 0.18s',
+                    }">
+                    <div :style="{
+                      width:'54px',height:'54px',borderRadius:'16px',
+                      background: form.extra_links.some(l=>l.type===p.id) ? p.color : (theme.dark ? 'rgba(255,255,255,0.09)' : '#fff'),
+                      border: form.extra_links.some(l=>l.type===p.id) ? '2px solid ' + p.color : `2px solid ${C.border}`,
+                      display:'flex',alignItems:'center',justifyContent:'center',
+                      boxShadow: form.extra_links.some(l=>l.type===p.id) ? `0 4px 16px ${p.color}44` : '0 2px 8px rgba(0,0,0,0.15)',
+                      transition:'all 0.18s',
+                      flexShrink:0,
+                    }">
+                      <span v-html="p.svgLg" style="display:flex;align-items:center"></span>
+                    </div>
+                    <span :style="{fontSize:'10px',fontWeight:600,color:C.textDim,letterSpacing:'0.01em'}">{{ p.name }}</span>
+                  </div>
+                </div>
+
+                <!-- Extra link rows -->
+                <div :style="{display:'flex',flexDirection:'column',gap:'8px'}">
+                  <div v-for="(link, i) in form.extra_links" :key="i"
+                    :style="{display:'flex',gap:'8px',alignItems:'center'}">
+                    <div :style="{width:'8px',height:'8px',borderRadius:'50%',background:link.color||'#6D4EE8',flexShrink:0}"></div>
+                    <input v-model="link.label" placeholder="Label"
+                      :style="{...inputStyle,width:'130px',flex:'none',padding:'8px 10px',fontSize:'12px'}"
+                      @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                      @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                    <input v-model="link.url" type="url" placeholder="https://..."
+                      :style="{...inputStyle,flex:1,padding:'8px 10px',fontSize:'12px'}"
+                      @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
+                      @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                    <button @click="form.extra_links.splice(i,1)"
+                      :style="{background:'none',border:'none',cursor:'pointer',color:C.textFaint,padding:'4px',display:'flex',alignItems:'center',flexShrink:0}"
+                      @mouseover="(e:any)=>e.currentTarget.style.color='#F87171'"
+                      @mouseout="(e:any)=>e.currentTarget.style.color=C.textFaint">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Add custom link -->
+                <button @click="form.extra_links.push({label:'Mon lien',url:'',color:'#6D4EE8'})"
+                  :style="{marginTop:'10px',display:'flex',alignItems:'center',gap:'6px',padding:'7px 14px',border:`1px dashed ${C.border}`,borderRadius:'8px',background:'transparent',color:C.textMuted,fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',width:'100%',justifyContent:'center'}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                  Ajouter un lien
+                </button>
+              </div>
+
+              <!-- Toggles -->
               <div :style="{display:'flex',flexDirection:'column',gap:'10px'}">
-                <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
-                  <div @click="form.show_avatar=!form.show_avatar"
-                    :style="{width:'38px',height:'21px',borderRadius:'999px',cursor:'pointer',background:form.show_avatar?'#6D4EE8':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0}">
-                    <div :style="{width:'15px',height:'15px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.show_avatar?'20px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
-                  </div>
-                  <span :style="{fontSize:'13px',color:'rgba(255,255,255,0.6)'}">Show Profile Picture</span>
-                </div>
-                <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
-                  <div @click="form.verified_badge=!form.verified_badge"
-                    :style="{width:'38px',height:'21px',borderRadius:'999px',cursor:'pointer',background:form.verified_badge?'#6D4EE8':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0}">
-                    <div :style="{width:'15px',height:'15px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.verified_badge?'20px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
-                  </div>
-                  <span :style="{fontSize:'13px',color:'rgba(255,255,255,0.6)'}">Verified Badge</span>
-                </div>
-              </div>
-              <p v-if="uploadingAvatar" :style="{fontSize:'11px',color:'#A78BFA',marginTop:'6px'}">Uploading...</p>
-            </div>
-          </div>
 
-          <!-- Display Name -->
-          <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'14px',padding:'16px',marginBottom:'12px'}">
-            <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}">
-              <label :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)'}">Display Name</label>
-              <span :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)'}">{{ form.model_name.length }}/100</span>
-            </div>
-            <input v-model="form.model_name" maxlength="100" placeholder="e.g. Alexandra Lancaster"
-              :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',padding:'10px 14px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-              @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8';($event.target as HTMLInputElement).style.boxShadow='0 0 0 3px rgba(109,78,232,0.18)'"
-              @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)';($event.target as HTMLInputElement).style.boxShadow='none'" />
-          </div>
-
-          <!-- Bio -->
-          <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'14px',padding:'16px',marginBottom:'16px'}">
-            <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}">
-              <label :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)'}">Bio</label>
-              <span :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)'}">{{ form.bio.length }}/250</span>
-            </div>
-            <textarea v-model="form.bio" maxlength="250" rows="4" placeholder="Tell your visitors a little about yourself..."
-              :style="{background:'rgba(255,255,255,0.06)',border:`1px solid ${triggerWordsInBio.length ? 'rgba(251,191,36,0.5)' : 'rgba(255,255,255,0.1)'}`,borderRadius:'10px',padding:'10px 14px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',resize:'none',fontFamily:'inherit',boxSizing:'border-box'}"
-              @focus="($event.target as HTMLTextAreaElement).style.borderColor='#6D4EE8';($event.target as HTMLTextAreaElement).style.boxShadow='0 0 0 3px rgba(109,78,232,0.18)'"
-              @blur="($event.target as HTMLTextAreaElement).style.borderColor=triggerWordsInBio.length?'rgba(251,191,36,0.5)':'rgba(255,255,255,0.1)';($event.target as HTMLTextAreaElement).style.boxShadow='none'"></textarea>
-            <!-- Trigger word warning -->
-            <div v-if="triggerWordsInBio.length" :style="{
-              display:'flex',alignItems:'flex-start',gap:'8px',
-              background:'rgba(251,191,36,0.08)',border:'1px solid rgba(251,191,36,0.25)',
-              borderRadius:'8px',padding:'10px 12px',marginTop:'8px',
-            }">
-              <i class="bi bi-exclamation-triangle" style="color:#fbbf24;font-size:13px;flex-shrink:0;margin-top:1px"></i>
-              <div>
-                <p style="font-size:12px;font-weight:600;color:#fbbf24;margin:0 0 2px">Trigger words detected</p>
-                <p style="font-size:11px;color:rgba(251,191,36,0.7);margin:0;line-height:1.5">
-                  Words like <strong>{{ triggerWordsInBio.join(', ') }}</strong> may cause Instagram to flag your landing page. Consider rephrasing.
-                </p>
-              </div>
-            </div>
-            <div :style="{background:'rgba(109,78,232,0.08)',border:'1px solid rgba(109,78,232,0.2)',borderRadius:'8px',padding:'10px 12px',marginTop:'10px'}">
-              <p :style="{fontSize:'12px',color:'#A78BFA',fontWeight:500,marginBottom:'6px'}">Dynamic tags:</p>
-              <div :style="{display:'flex',gap:'6px'}">
-                <span :style="{padding:'3px 10px',background:'rgba(109,78,232,0.2)',borderRadius:'999px',fontSize:'12px',fontWeight:600,color:'#A78BFA',cursor:'pointer'}" @click="form.bio+='{city}'">{city}</span>
-                <span :style="{padding:'3px 10px',background:'rgba(109,78,232,0.2)',borderRadius:'999px',fontSize:'12px',fontWeight:600,color:'#A78BFA',cursor:'pointer'}" @click="form.bio+='{country}'">{country}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- VSL card -->
-          <div :style="{background:'rgba(255,255,255,0.04)',border:'2px solid #6D4EE8',borderRadius:'14px',padding:'16px',position:'relative',overflow:'hidden'}">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6D4EE8,#A78BFA,#F59E0B,#A78BFA,#6D4EE8);background-size:200% 100%;animation:shimmer 2.5s linear infinite"></div>
-            <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px',marginTop:'4px'}">
-              <div :style="{display:'flex',alignItems:'center',gap:'8px'}">
-                <span :style="{fontSize:'18px',lineHeight:1}">🎬</span>
-                <p :style="{fontSize:'14px',fontWeight:700,color:'#fff'}">Video Sales Letter (VSL)</p>
-              </div>
-              <div :style="{display:'flex',alignItems:'center',gap:'4px',padding:'3px 10px',borderRadius:'999px',background:'linear-gradient(135deg,#F59E0B,#FBBF24)',boxShadow:'0 2px 8px rgba(245,158,11,0.35)'}">
-                <span :style="{fontSize:'10px'}">⭐</span>
-                <span :style="{fontSize:'10px',fontWeight:700,color:'#fff'}">Recommended</span>
-              </div>
-            </div>
-            <div :style="{background:'rgba(109,78,232,0.1)',border:'1px solid rgba(109,78,232,0.25)',borderRadius:'10px',padding:'12px 14px',marginBottom:'14px'}">
-              <p :style="{fontSize:'12px',fontWeight:700,color:'#A78BFA',marginBottom:'4px'}">What is a VSL?</p>
-              <p :style="{fontSize:'12px',color:'rgba(167,139,250,0.8)',lineHeight:1.6}">A <strong>Video Sales Letter</strong> is the #1 conversion tool. Auto-plays, builds connection, drives up to <strong>3× more</strong> clicks than static pages.</p>
-            </div>
-            <VideoUpload v-model="form.video_url" />
-          </div>
-        </div>
-
-        <!-- ===== STEP 4 — LINKS ===== -->
-        <div v-show="activeTab === 'content'">
-          <h2 :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'20px'}">Links</h2>
-
-          <button @click="showLinkPicker=!showLinkPicker"
-            :style="{width:'100%',padding:'12px',background:'transparent',color:'#A78BFA',border:'1px solid #6D4EE8',borderRadius:'10px',fontSize:'13px',fontWeight:700,cursor:'pointer',fontFamily:'inherit',marginBottom:'16px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px',transition:'all 0.15s'}"
-            @mouseover="($event.currentTarget as HTMLElement).style.background='#6D4EE8';($event.currentTarget as HTMLElement).style.color='#fff'"
-            @mouseout="($event.currentTarget as HTMLElement).style.background='transparent';($event.currentTarget as HTMLElement).style.color='#A78BFA'">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Add New Link
-          </button>
-
-          <div v-if="showLinkPicker" :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',marginBottom:'20px'}">
-            <div v-for="lt in linkTypes" :key="lt.id" @click="addLink(lt.id);showLinkPicker=false"
-              :style="{border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',padding:'12px',cursor:'pointer',transition:'all 0.15s',background:'rgba(255,255,255,0.04)'}"
-              @mouseover="($event.currentTarget as HTMLElement).style.borderColor='#6D4EE8';($event.currentTarget as HTMLElement).style.background='rgba(109,78,232,0.08)'"
-              @mouseout="($event.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.08)';($event.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.04)'">
-              <p :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.8)',marginBottom:'3px'}">{{ lt.name }}</p>
-              <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.35)',lineHeight:1.4}">{{ lt.desc }}</p>
-            </div>
-          </div>
-
-          <div v-if="contentLinks.length > 0" :style="{display:'flex',flexDirection:'column',gap:'8px'}">
-            <div v-for="(link, i) in form.links.filter(l=>!l.is_social)" :key="i"
-              :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',overflow:'hidden'}">
-              <div :style="{display:'flex',alignItems:'center',gap:'10px',padding:'12px 14px'}">
-                <span :style="{color:'rgba(255,255,255,0.2)',cursor:'grab',fontSize:'16px',lineHeight:1}">⠿</span>
-                <span :style="{padding:'2px 8px',background:'rgba(109,78,232,0.15)',borderRadius:'4px',fontSize:'10px',fontWeight:600,color:'#A78BFA',textTransform:'uppercase',flexShrink:0}">{{ link.type }}</span>
-                <div :style="{display:'flex',alignItems:'center',gap:'6px',flex:1,overflow:'hidden'}">
-                  <span :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.8)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">{{ link.label || 'Untitled' }}</span>
-                </div>
-                <button @click="link._open=!link._open"
-                  :style="{padding:'4px 10px',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'6px',background:'transparent',cursor:'pointer',fontSize:'11px',color:'rgba(255,255,255,0.4)',flexShrink:0,fontFamily:'inherit'}">
-                  Settings
-                </button>
-                <button @click="removeLink(link)"
-                  :style="{width:'26px',height:'26px',border:'none',background:'none',cursor:'pointer',color:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
-              </div>
-              <div v-if="link._open" :style="{borderTop:'1px solid rgba(255,255,255,0.06)',padding:'14px',display:'flex',flexDirection:'column',gap:'10px'}">
-                <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,0.5)',marginBottom:'5px'}">Label</label>
-                  <input v-model="link.label" placeholder="Button label"
-                    :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'8px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                    @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                    @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-                </div>
-                <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,0.5)',marginBottom:'5px'}">Button Type</label>
-                  <select v-model="link.type"
-                    :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'8px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}">
-                    <option v-for="lt in linkTypes" :key="lt.id" :value="lt.id">{{ lt.name }}</option>
-                  </select>
-                </div>
-                <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,0.5)',marginBottom:'5px'}">URL</label>
-                  <input v-model="link.url" type="url" placeholder="https://"
-                    :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'8px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                    @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                    @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-                </div>
-                <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,0.5)',marginBottom:'5px'}">Description</label>
-                  <textarea v-model="link.description" rows="2" placeholder="Optional description..."
-                    :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'8px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',resize:'none',fontFamily:'inherit',boxSizing:'border-box'}"
-                    @focus="($event.target as HTMLTextAreaElement).style.borderColor='#6D4EE8'"
-                    @blur="($event.target as HTMLTextAreaElement).style.borderColor='rgba(255,255,255,0.1)'">
-                  </textarea>
-                </div>
-                <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,0.5)',marginBottom:'5px'}">Button Effect</label>
-                  <select v-model="link.animation"
-                    :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'8px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}">
-                    <option value="">None</option>
-                    <option value="bounce">Bouncing</option>
-                    <option value="buzz">Buzzing</option>
-                    <option value="pulse">Pulsing</option>
-                    <option value="shake">Shaking</option>
-                    <option value="swing">Swinging</option>
-                  </select>
-                </div>
-                <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',background:'rgba(239,68,68,0.06)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'8px',padding:'10px 12px'}">
+                <!-- Online status -->
+                <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                   <div>
-                    <p :style="{fontSize:'12px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'1px'}">🔞 18+ Sensitive Content</p>
-                    <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)'}">Show an adult content warning before the link opens.</p>
+                    <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'3px'}">
+                      <span :style="{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#10B981',marginRight:'7px'}"></span>
+                      Online maintenant
+                    </p>
+                    <p :style="{fontSize:'12px',color:C.textDim,lineHeight:1.5}">Affiche un badge vert sur ta page — booste les clics.</p>
                   </div>
-                  <div @click="link.age_restricted=!link.age_restricted"
-                    :style="{width:'36px',height:'20px',borderRadius:'999px',cursor:'pointer',background:link.age_restricted?'#EF4444':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0}">
-                    <div :style="{width:'14px',height:'14px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:link.age_restricted?'19px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+                  <div @click="form.online_status = !form.online_status"
+                    :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.online_status?'#10b981':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
+                    <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.online_status?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div v-else-if="!showLinkPicker" :style="{textAlign:'center',padding:'40px 24px',color:'rgba(255,255,255,0.25)',fontSize:'13px',background:'rgba(255,255,255,0.03)',border:'1px dashed rgba(255,255,255,0.1)',borderRadius:'12px'}">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" :style="{margin:'0 auto 10px',display:'block'}"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-            <p>No links yet — click "Add New Link" to get started.</p>
-          </div>
-        </div>
 
-        <!-- ===== STEP 5 — SOCIALS ===== -->
-        <div v-show="activeTab === 'socials'">
-          <h2 :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">Socials</h2>
-          <p :style="{fontSize:'13px',color:'rgba(255,255,255,0.4)',marginBottom:'20px'}">Quick add platforms</p>
-
-          <!-- Platform preview banner -->
-          <div v-if="hoveredPlatform" :style="{
-            display:'flex',alignItems:'center',gap:'20px',
-            background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)',
-            borderRadius:'16px',padding:'16px',marginBottom:'20px',
-            animation:'fadeIn 0.2s ease',
-          }">
-            <SocialPlatformPreview
-              :platformId="hoveredPlatform"
-              :handle="form.model_handle || 'karine.vip'"
-              :displayName="form.model_name || 'Karine'"
-              :slug="form.slug || 'karine-UFN4V'"
-              :avatarUrl="form.avatar_url || 'https://i.pravatar.cc/300?img=47'"
-              :landingBg="form.bg_color || '#0d0d0d'"
-              :landingBtn="form.btn_color || '#00aff0'"
-              :videoUrl="form.video_url || 'https://streamable.com/e/0ed1q5'"
-              style="flex-shrink:0"
-            />
-            <div>
-              <p :style="{fontSize:'14px',fontWeight:700,color:'#fff',marginBottom:'6px',textTransform:'capitalize'}">
-                {{ hoveredPlatform }} → VSL
-              </p>
-              <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.4)',lineHeight:1.6,margin:'0 0 12px'}">
-                When someone visits your {{ hoveredPlatform }} profile and taps your bio link,
-                our <strong style="color:#A78BFA">deeplink</strong> bypasses the in-app browser
-                and opens your VSL page in Safari/Chrome — higher conversion, better experience.
-              </p>
-              <div style="display:flex;gap:'8px';flex-wrap:wrap;gap:8px">
-                <span style="background:rgba(109,78,232,0.15);border:1px solid rgba(109,78,232,0.3);color:#A78BFA;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600">
-                  ⚡ Deeplink bypass
-                </span>
-                <span style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600">
-                  🛡 Bot protection
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div :style="{display:'flex',flexWrap:'wrap',gap:'8px',marginBottom:'24px'}">
-            <button v-for="s in socialOptions" :key="s.type"
-              @click="toggleSocial(s)"
-              @mouseenter="hoveredPlatform = s.type"
-              @mouseleave="hoveredPlatform = hoveredPlatform === s.type ? hoveredPlatform : hoveredPlatform"
-              :style="{display:'flex',alignItems:'center',gap:'8px',padding:'7px 14px',borderRadius:'8px',border:'1.5px solid',cursor:'pointer',transition:'all 0.15s',fontFamily:'inherit',
-                borderColor:isSocialSelected(s.type)?'#6D4EE8':hoveredPlatform===s.type?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.1)',
-                background:isSocialSelected(s.type)?'rgba(109,78,232,0.12)':hoveredPlatform===s.type?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.04)'}">
-              <div :style="{width:'28px',height:'28px',borderRadius:'6px',background:s.color,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
-                <span v-html="s.svg"></span>
-              </div>
-              <span :style="{fontSize:'13px',fontWeight:600,color:isSocialSelected(s.type)?'#A78BFA':'rgba(255,255,255,0.6)'}">{{ s.name }}</span>
-            </button>
-          </div>
-
-          <div :style="{marginBottom:'20px'}">
-            <label :style="{display:'block',fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}">Paste a URL to auto-detect platform</label>
-            <div :style="{display:'flex',gap:'8px'}">
-              <input v-model="manualUrl" type="url" placeholder="https://instagram.com/yourprofile"
-                :style="{flex:1,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',outline:'none',fontFamily:'inherit',minWidth:0}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'"
-                @keydown.enter="addManualUrl" />
-              <button @click="addManualUrl"
-                :style="{padding:'9px 16px',background:'#6D4EE8',color:'#fff',border:'none',borderRadius:'8px',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap'}">
-                →
-              </button>
-            </div>
-          </div>
-
-          <div v-if="socialLinks.length > 0" :style="{display:'flex',flexDirection:'column',gap:'8px'}">
-            <div v-for="link in socialLinks" :key="link.type"
-              :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'12px 14px',display:'flex',alignItems:'center',gap:'10px'}">
-              <div :style="{width:'32px',height:'32px',borderRadius:'8px',background:getSocialColor(link.type),display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
-                <span v-html="getSocialSvg(link.type)"></span>
-              </div>
-              <span :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',flexShrink:0,width:'80px'}">{{ link.label }}</span>
-              <input v-model="link.url" type="url" :placeholder="`https://...`"
-                :style="{flex:1,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'7px',padding:'7px 10px',fontSize:'12px',color:'#fff',outline:'none',fontFamily:'inherit',minWidth:0}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-              <button @click="removeSocial(link.type)"
-                :style="{width:'26px',height:'26px',border:'none',background:'none',cursor:'pointer',color:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== STEP 6 — DEEPLINK ===== -->
-        <div v-show="activeTab === 'deeplink'">
-          <h2 :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">Deeplink</h2>
-          <p :style="{fontSize:'13px',color:'rgba(255,255,255,0.4)',marginBottom:'20px'}">Deeplink options &amp; platform preview</p>
-
-          <!-- Info banner -->
-          <div :style="{background:'rgba(109,78,232,0.08)',border:'1px solid rgba(109,78,232,0.25)',borderRadius:'12px',padding:'14px 16px',marginBottom:'20px',display:'flex',gap:'10px',alignItems:'flex-start'}">
-            <span style="font-size:18px;flex-shrink:0">⚡</span>
-            <div>
-              <p :style="{fontSize:'13px',fontWeight:600,color:'#A78BFA',marginBottom:'3px'}">Deeplink protection is fully automatic</p>
-              <p :style="{fontSize:'12px',color:'rgba(167,139,250,0.7)',lineHeight:1.6}">All options are enabled to ensure your visitors are redirected out of the in-app browser. Traffic is approximately <strong style="color:#A78BFA">50% Android / 50% iOS</strong>.</p>
-            </div>
-          </div>
-
-          <!-- Platform selector -->
-          <p :style="{fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.35)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}">Select a platform to preview</p>
-          <div :style="{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'20px'}">
-            <button v-for="p in deeplinkPlatforms" :key="p.id"
-              @click="selectedDeeplinkPlatform=p.id"
-              :style="{display:'flex',alignItems:'center',gap:'6px',padding:'6px 12px',borderRadius:'8px',border:'1.5px solid',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:600,transition:'all 0.15s',
-                borderColor:selectedDeeplinkPlatform===p.id?p.color:'rgba(255,255,255,0.1)',
-                background:selectedDeeplinkPlatform===p.id?`${p.color}18`:'rgba(255,255,255,0.04)',
-                color:selectedDeeplinkPlatform===p.id?'#fff':'rgba(255,255,255,0.5)'}">
-              <span :style="{width:'8px',height:'8px',borderRadius:'50%',background:p.color,display:'inline-block',flexShrink:0}"></span>
-              {{ p.label }}
-            </button>
-          </div>
-
-          <!-- Platform behavior + phone mockup -->
-          <div :style="{display:'grid',gridTemplateColumns:'1fr 200px',gap:'20px',marginBottom:'24px',alignItems:'start'}">
-            <div>
-              <div v-for="os in [{key:'ios',label:'iOS'},{key:'android',label:'Android'}]" :key="os.key"
-                :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',padding:'14px',marginBottom:'8px'}">
-                <div :style="{display:'flex',alignItems:'center',gap:'8px',marginBottom:'6px'}">
-                  <span style="font-size:16px">{{ os.key==='ios'?'🍎':'🤖' }}</span>
-                  <p :style="{fontSize:'13px',fontWeight:700,color:'rgba(255,255,255,0.8)'}">{{ os.label }}</p>
-                  <span :style="{background:'rgba(16,185,129,0.15)',border:'1px solid rgba(16,185,129,0.3)',color:'#10b981',borderRadius:'999px',padding:'1px 8px',fontSize:'10px',fontWeight:600}">Auto</span>
-                </div>
-                <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.4)',lineHeight:1.5}">
-                  {{ (deeplinkPlatforms.find(p=>p.id===selectedDeeplinkPlatform) as any)?.[os.key] }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Phone mockup -->
-            <div>
-              <div :style="{display:'flex',gap:'4px',background:'rgba(255,255,255,0.06)',borderRadius:'8px',padding:'2px',marginBottom:'10px'}">
-                <button v-for="os in ['android','ios']" :key="os" @click="deeplinkPreviewOs=(os as 'ios'|'android')"
-                  :style="{flex:1,padding:'4px',border:'none',borderRadius:'6px',cursor:'pointer',fontFamily:'inherit',fontSize:'11px',fontWeight:600,
-                    background:deeplinkPreviewOs===os?'rgba(255,255,255,0.15)':'transparent',
-                    color:deeplinkPreviewOs===os?'#fff':'rgba(255,255,255,0.35)'}">
-                  {{ os==='ios'?'iOS':'Android' }}
-                </button>
-              </div>
-              <div :style="{background:'#1a1a1a',borderRadius:'24px',padding:'5px',boxShadow:'0 0 0 1px #2a2a2a,0 16px 40px rgba(0,0,0,0.5)'}">
-                <div :style="{borderRadius:'20px',overflow:'hidden',background:'#000',minHeight:'200px',position:'relative'}">
-                  <!-- Status bar -->
-                  <div :style="{height:'18px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
-                    <div :style="{width:'40px',height:'5px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+                <!-- Age gate -->
+                <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
+                  <div>
+                    <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'3px'}">
+                      <i class="bi bi-shield-x" style="color:#F87171;margin-right:7px"></i>
+                      Vérification d'âge 18+
+                    </p>
+                    <p :style="{fontSize:'12px',color:C.textDim,lineHeight:1.5}">Une modale de confirmation s'affiche avant d'accéder au lien.</p>
                   </div>
-                  <!-- Android dialog -->
-                  <div v-if="deeplinkPreviewOs==='android'" :style="{padding:'12px 10px'}">
-                    <div :style="{background:'#2d2d2d',borderRadius:'10px',padding:'14px',border:'1px solid rgba(255,255,255,0.1)'}">
-                      <p :style="{fontSize:'9px',fontWeight:700,color:'rgba(255,255,255,0.9)',marginBottom:'5px'}">You're leaving our app</p>
-                      <p :style="{fontSize:'8px',color:'rgba(255,255,255,0.5)',lineHeight:1.4,marginBottom:'12px'}">The website you're viewing is attempting to open an external app. Would you like to continue?</p>
-                      <div :style="{display:'flex',gap:'6px',justifyContent:'flex-end'}">
-                        <div :style="{padding:'4px 10px',border:'1px solid rgba(255,255,255,0.15)',borderRadius:'4px',fontSize:'8px',color:'rgba(255,255,255,0.5)',fontWeight:600}">GO BACK</div>
-                        <div :style="{padding:'4px 10px',background:'#6D4EE8',borderRadius:'4px',fontSize:'8px',color:'#fff',fontWeight:700}">CONTINUE</div>
-                      </div>
+                  <div @click="form.age_gate = !form.age_gate"
+                    :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.age_gate?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
+                    <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.age_gate?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            </div>
+
+          </div>
+
+          </Transition>
+
+        </div>
+
+        <!-- RIGHT: VSL Preview -->
+        <div :style="{width:'380px',background:C.panel,borderLeft:`1px solid ${C.borderLight}`,display:'flex',flexDirection:'column',alignItems:'center',padding:'24px 20px',flexShrink:0,overflowY:'auto'}">
+
+          <p :style="{fontSize:'11px',fontWeight:600,color:C.textMuted,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'20px',alignSelf:'flex-start'}">Aperçu live</p>
+
+          <!-- Phone outer shell -->
+          <div :style="{width:'220px',background:'#1a1a1a',borderRadius:'40px',padding:'8px',boxShadow:'0 0 0 1px #2a2a2a,0 32px 80px rgba(0,0,0,0.7),0 0 60px rgba(109,78,232,0.15)',flexShrink:0}">
+            <div :style="{borderRadius:'33px',overflow:'hidden',background:'#000'}">
+
+              <!-- Status bar -->
+              <div :style="{height:'24px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                <div :style="{width:'48px',height:'6px',background:'#1a1a1a',borderRadius:'999px'}"></div>
+              </div>
+
+              <!-- VSL container: dark bg, 9:16 inside phone -->
+              <div :style="{background:'#0d0d0d',position:'relative'}">
+
+                <!-- Video area placeholder -->
+                <div :style="{aspectRatio:'9/16',width:'100%',position:'relative',overflow:'hidden'}">
+
+                  <!-- Video: real preview when uploaded, placeholder otherwise -->
+                  <video v-if="form.video_url"
+                    :src="form.video_url"
+                    :style="{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}"
+                    autoplay muted loop playsinline>
+                  </video>
+                  <div v-else :style="{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',background:'#0d0d0d'}">
+                    <div :style="{textAlign:'center',opacity:0.2}">
+                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     </div>
                   </div>
-                  <!-- iOS redirect -->
-                  <div v-else :style="{padding:'12px 10px'}">
-                    <div :style="{background:'#1c1c1e',borderRadius:'8px',padding:'10px',marginBottom:'8px',border:'1px solid rgba(255,255,255,0.08)'}">
-                      <div :style="{display:'flex',alignItems:'center',gap:'6px',marginBottom:'6px'}">
-                        <div :style="{width:'16px',height:'16px',borderRadius:'4px',background:'#007AFF',flexShrink:0}"></div>
-                        <p :style="{fontSize:'8px',color:'rgba(255,255,255,0.8)',fontWeight:600}">Opening in Safari...</p>
+
+                  <!-- VSL badge top-left -->
+                  <div :style="{position:'absolute',top:'8px',left:'8px',background:'rgba(109,78,232,0.9)',borderRadius:'999px',padding:'2px 7px',display:'flex',alignItems:'center',gap:'3px',zIndex:5}">
+                    <div :style="{width:'4px',height:'4px',borderRadius:'50%',background:'#fff',animation:'pulse-dot 1.4s ease infinite'}"></div>
+                    <span :style="{fontSize:'7px',fontWeight:800,color:'#fff',letterSpacing:'0.05em'}">VSL</span>
+                  </div>
+
+                  <!-- Online badge top-right -->
+                  <div v-if="form.online_status"
+                    :style="{position:'absolute',top:'8px',right:'8px',background:'rgba(16,185,129,0.15)',border:'1px solid rgba(16,185,129,0.4)',borderRadius:'999px',padding:'2px 7px',display:'flex',alignItems:'center',gap:'3px',zIndex:5}">
+                    <div :style="{width:'4px',height:'4px',borderRadius:'50%',background:'#10B981'}"></div>
+                    <span :style="{fontSize:'7px',fontWeight:600,color:'#10B981'}">Online</span>
+                  </div>
+
+                  <!-- Popup overlay (vsl-popup mode) -->
+                  <div v-if="form.template === 'vsl-popup'"
+                    :style="{position:'absolute',inset:0,background:'rgba(0,0,0,0.6)',zIndex:10,display:'flex',alignItems:'center',justifyContent:'center',padding:'12px'}">
+                    <div :style="{background:'#12102a',borderRadius:'14px',padding:'14px 12px',width:'100%',maxWidth:'150px',border:'1px solid rgba(109,78,232,0.35)',boxShadow:'0 16px 40px rgba(0,0,0,0.7)',position:'relative',textAlign:'center'}">
+                      <!-- X close -->
+                      <div :style="{position:'absolute',top:'6px',right:'7px',width:'14px',height:'14px',borderRadius:'50%',background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'9px',color:'rgba(255,255,255,0.5)',cursor:'pointer',fontWeight:700}">×</div>
+                      <!-- Emoji glow -->
+                      <div :style="{fontSize:'18px',marginBottom:'6px'}">🔥</div>
+                      <!-- Title -->
+                      <p :style="{fontSize:'8px',fontWeight:800,color:'#fff',margin:'0 0 3px',letterSpacing:'-0.2px',lineHeight:1.3}">{{ form.popup_title || 'Rejoins-moi en privé 🔥' }}</p>
+                      <!-- Subtitle -->
+                      <p :style="{fontSize:'6.5px',color:'rgba(255,255,255,0.45)',margin:'0 0 10px',lineHeight:1.5}">{{ form.popup_subtitle || 'Contenu exclusif disponible maintenant' }}</p>
+                      <!-- CTA -->
+                      <div :style="{padding:'7px 8px',borderRadius:'7px',background:form.btn_color,fontSize:'7px',fontWeight:800,color:'#fff',boxShadow:`0 4px 14px ${form.btn_color}55`,letterSpacing:'0.02em'}">
+                        {{ form.btn_label || '🔓 Mon OnlyFans — Accès privé' }}
                       </div>
-                      <div :style="{height:'4px',background:'rgba(255,255,255,0.1)',borderRadius:'2px',overflow:'hidden'}">
-                        <div :style="{width:'70%',height:'100%',background:'#007AFF',borderRadius:'2px'}"></div>
-                      </div>
+                      <!-- Delay badge -->
+                      <div :style="{marginTop:'7px',fontSize:'6px',color:'rgba(255,255,255,0.3)'}">Apparaît après {{ form.popup_delay }}s</div>
                     </div>
-                    <p :style="{fontSize:'7px',color:'rgba(255,255,255,0.3)',textAlign:'center'}">Redirecting to native browser</p>
+                  </div>
+
+                  <!-- Bottom overlay (hidden behind popup in popup mode) -->
+                  <div :style="{position:'absolute',bottom:0,left:0,right:0,padding:'48px 10px 12px',background:'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%)',zIndex:5,opacity:form.template==='vsl-popup'?0.3:1}">
+                    <!-- Creator info -->
+                    <div :style="{marginBottom:'8px'}">
+                      <p :style="{fontSize:'11px',fontWeight:700,color:'#fff',letterSpacing:'-0.2px',textShadow:'0 1px 6px rgba(0,0,0,0.6)'}">{{ form.model_name || 'Ton nom' }}</p>
+                      <p :style="{fontSize:'8px',color:'rgba(255,255,255,0.62)',textShadow:'0 1px 4px rgba(0,0,0,0.6)'}">@{{ form.model_handle || 'handle' }}</p>
+                    </div>
+
+                    <!-- Bandeau handle (visible uniquement en mode bandeau) -->
+                    <div v-if="form.template === 'vsl-bandeau'"
+                      :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'3px',paddingBottom:'4px',cursor:'pointer'}">
+                      <div :style="{width:'20px',height:'2px',background:'rgba(255,255,255,0.3)',borderRadius:'999px'}"></div>
+                      <span :style="{fontSize:'6px',color:'rgba(255,255,255,0.4)',fontWeight:600}">{{ form.extra_links.length > 0 ? `+${form.extra_links.length} liens` : 'Bandeau' }}</span>
+                    </div>
+
+                    <!-- CTA button with bounce animation (hidden in popup mode) -->
+                    <div v-if="form.template !== 'vsl-popup'" :style="{
+                      width:'100%',padding:'9px 10px',borderRadius:'10px',
+                      textAlign:'center',fontSize:'9px',fontWeight:700,color:'#fff',
+                      background:form.btn_color,cursor:'pointer',
+                      animation:'preview-bounce 2.6s cubic-bezier(0.45,0,0.55,1) infinite',
+                      boxShadow:`0 4px 18px ${form.btn_color}60`,
+                    }">{{ form.btn_label || '🔓 Mon OnlyFans — Accès privé' }}</div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Deeplink customization -->
-          <p :style="{fontSize:'11px',fontWeight:700,color:'rgba(255,255,255,0.35)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}">Customize the Deeplink</p>
-
-          <!-- 3-Dots Hint -->
-          <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px',marginBottom:'8px'}">
-            <div :style="{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'12px'}">
-              <div>
-                <p :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.8)',marginBottom:'3px'}">3-Dots Hint</p>
-                <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.35)',lineHeight:1.5}">Shows a helper in the top-right corner telling users to open in their browser via the 3-dot menu.</p>
-              </div>
-              <div @click="form.deeplink_dots_hint=!form.deeplink_dots_hint"
-                :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.deeplink_dots_hint?'#10b981':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0,marginTop:'2px'}">
-                <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.deeplink_dots_hint?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+              <!-- Home bar -->
+              <div :style="{height:'20px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
+                <div :style="{width:'60px',height:'3px',background:'#1a1a1a',borderRadius:'999px'}"></div>
               </div>
             </div>
           </div>
 
-          <!-- Long Press Button -->
-          <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-            <div :style="{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'12px'}">
-              <div>
-                <p :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.8)',marginBottom:'3px'}">Long Press Button</p>
-                <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.35)',lineHeight:1.5}">User must press 2 seconds on any 18+ link to open it outside the in-app browser.</p>
-              </div>
-              <div @click="form.deeplink_long_press=!form.deeplink_long_press"
-                :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.deeplink_long_press?'#10b981':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0,marginTop:'2px'}">
-                <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.deeplink_long_press?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
-              </div>
-            </div>
+          <!-- Page URL preview -->
+          <div :style="{marginTop:'16px',display:'flex',alignItems:'center',gap:'6px',background:C.surface2,borderRadius:'999px',padding:'6px 14px'}">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" :stroke="C.textDim" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            <span :style="{fontSize:'11px',color:C.textMuted}">mysocialvsl.com/<span :style="{color:'#A78BFA',fontWeight:600}">{{ form.slug || '…' }}</span></span>
           </div>
+
         </div>
-
-        <!-- ===== STEP 7 — PUBLISH (Advanced) ===== -->
-        <div v-show="activeTab === 'advanced'">
-          <h2 :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'16px'}">Advanced</h2>
-
-          <!-- Sub-tabs -->
-          <div :style="{display:'flex',gap:'4px',background:'rgba(255,255,255,0.06)',borderRadius:'10px',padding:'3px',marginBottom:'24px',width:'fit-content'}">
-            <button v-for="st in [{id:'features',label:'Page Features'},{id:'sharing',label:'Sharing & Links'},{id:'analytics',label:'Analytics'},{id:'geo',label:'Geo Filter 🌐'}]" :key="st.id"
-              @click="advancedSubTab=st.id"
-              :style="{padding:'7px 18px',border:'none',borderRadius:'7px',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
-                background:advancedSubTab===st.id?'rgba(255,255,255,0.1)':'transparent',
-                color:advancedSubTab===st.id?'#fff':'rgba(255,255,255,0.35)',
-                boxShadow:advancedSubTab===st.id?'0 1px 4px rgba(0,0,0,0.3)':'none',
-                transition:'all 0.15s'}">
-              {{ st.label }}
-            </button>
-          </div>
-
-          <div v-if="advancedSubTab==='features'" :style="{display:'flex',flexDirection:'column',gap:'10px'}">
-            <div v-for="feat in advancedFeatures" :key="feat.key"
-              :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'12px'}">
-              <div>
-                <p :style="{fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.8)',marginBottom:'3px'}">{{ feat.label }}</p>
-                <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.35)',lineHeight:1.5}">{{ feat.desc }}</p>
-              </div>
-              <div @click="(form as any)[feat.key]=!(form as any)[feat.key]"
-                :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:(form as any)[feat.key]?'#6D4EE8':'rgba(255,255,255,0.15)',position:'relative',transition:'background 0.2s',flexShrink:0,marginTop:'2px'}">
-                <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:(form as any)[feat.key]?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
-              </div>
-            </div>
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'3px'}">🕒 Response Time</label>
-              <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginBottom:'8px'}">Displays "I reply in less than X minutes" on your first button.</p>
-              <select v-model="form.response_time"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}">
-                <option value="">Disabled</option>
-                <option value="2">2 minutes</option>
-                <option value="5">5 minutes</option>
-                <option value="10">10 minutes</option>
-                <option value="30">30 minutes</option>
-                <option value="45">45 minutes</option>
-              </select>
-            </div>
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'6px'}">Promo Banner</label>
-              <input v-model="form.promo_text" placeholder="e.g. 🔥 Limited offer — 50% off today!"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'6px'}">Countdown End Date</label>
-              <input v-model="form.countdown_end" type="datetime-local"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit',colorScheme:'dark'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-          </div>
-
-          <div v-if="advancedSubTab==='sharing'" :style="{display:'flex',flexDirection:'column',gap:'10px'}">
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'6px'}">SEO Title</label>
-              <input v-model="form.seo_title" placeholder="Page title for search engines & social share"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'6px'}">SEO Description</label>
-              <textarea v-model="form.seo_description" rows="3" placeholder="Description for search engines and social share previews"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',resize:'none',fontFamily:'inherit',boxSizing:'border-box'}"
-                @focus="($event.target as HTMLTextAreaElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLTextAreaElement).style.borderColor='rgba(255,255,255,0.1)'">
-              </textarea>
-            </div>
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'6px'}">SEO Image URL</label>
-              <input v-model="form.seo_image" type="url" placeholder="https://..."
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-          </div>
-
-          <div v-if="advancedSubTab==='analytics'" :style="{display:'flex',flexDirection:'column',gap:'10px'}">
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'3px'}">Google Analytics (GA4)</label>
-              <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginBottom:'8px'}">Track page visits via your own GA4 property.</p>
-              <input v-model="form.ga4_code" placeholder="G-XXXXXXXXXX"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-            <div :style="{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'16px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:'rgba(255,255,255,0.7)',marginBottom:'3px'}">Facebook Pixel ID</label>
-              <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginBottom:'8px'}">Track conversions and build retargeting audiences on Meta Ads.</p>
-              <input v-model="form.fb_pixel_id" placeholder="123456789012345"
-                :style="{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#fff',width:'100%',outline:'none',boxSizing:'border-box',fontFamily:'inherit'}"
-                @focus="($event.target as HTMLInputElement).style.borderColor='#6D4EE8'"
-                @blur="($event.target as HTMLInputElement).style.borderColor='rgba(255,255,255,0.1)'" />
-            </div>
-            <div :style="{background:'rgba(109,78,232,0.06)',border:'1px solid rgba(109,78,232,0.2)',borderRadius:'12px',padding:'16px',textAlign:'center'}">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6D4EE8" stroke-width="1.5" :style="{margin:'0 auto 8px',display:'block'}"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-              <p :style="{fontSize:'12px',fontWeight:600,color:'rgba(255,255,255,0.6)',marginBottom:'3px'}">MySocialVSL analytics available after publishing</p>
-              <p :style="{fontSize:'11px',color:'rgba(255,255,255,0.3)'}">Track clicks, views, and conversion rates once your page is live.</p>
-            </div>
-          </div>
-
-          <div v-if="advancedSubTab==='geo'" :style="{display:'flex',flexDirection:'column',gap:'12px'}">
-            <div :style="{background:'rgba(255,255,255,0.03)',border:'1px dashed rgba(255,255,255,0.12)',borderRadius:'14px',padding:'36px 24px',textAlign:'center'}">
-              <div :style="{fontSize:'36px',marginBottom:'12px'}">🌐</div>
-              <p :style="{fontSize:'15px',fontWeight:700,color:'rgba(255,255,255,0.7)',marginBottom:'6px'}">Geo Filter</p>
-              <p :style="{fontSize:'12px',color:'rgba(255,255,255,0.35)',lineHeight:1.6,marginBottom:'16px'}">
-                Redirect visitors from specific countries to different URLs.<br/>
-                Example: 🇺🇸 USA → OnlyFans · 🇫🇷 France → MYM · 🌍 Rest of world → default
-              </p>
-              <div :style="{display:'inline-flex',alignItems:'center',gap:'8px',background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'999px',padding:'6px 14px'}">
-                <span :style="{fontSize:'12px'}">🔒</span>
-                <p :style="{fontSize:'12px',color:'#F87171',fontWeight:600}">Save your page first to unlock Geo Filter options</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- ===== RIGHT PREVIEW PANEL ===== -->
-      <div :style="{width:'420px',background:'rgba(0,0,0,0.3)',borderLeft:'1px solid rgba(255,255,255,0.06)',display:'flex',flexDirection:'column',alignItems:'center',padding:'24px 20px',position:'sticky',top:0,height:'calc(100vh - 60px - 72px)',overflowY:'auto',flexShrink:0}">
+      <!-- BOTTOM BAR -->
+      <div :style="{height:'72px',background:C.bg,borderTop:`1px solid ${C.borderLight}`,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 40px',flexShrink:0}">
+        <button v-if="canGoBack" @click="prevStep"
+          :style="{padding:'10px 22px',border:`1px solid ${C.cancelBorder}`,borderRadius:'10px',background:'transparent',color:C.text,fontSize:'14px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:'6px'}"
+          @mouseover="(e:any)=>e.currentTarget.style.background=C.surface2"
+          @mouseout="(e:any)=>e.currentTarget.style.background='transparent'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
+          Retour
+        </button>
+        <div v-else></div>
 
-        <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',marginBottom:'20px'}">
-          <p :style="{fontSize:'12px',fontWeight:600,color:'rgba(255,255,255,0.6)',letterSpacing:'0.08em'}">Live Preview</p>
-          <div :style="{display:'flex',gap:'2px',background:'rgba(255,255,255,0.08)',borderRadius:'8px',padding:'2px'}">
-            <button @click="previewMode='mobile'"
-              :style="{padding:'4px 14px',border:'none',borderRadius:'6px',fontSize:'11px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
-                background:previewMode==='mobile'?'rgba(255,255,255,0.15)':'transparent',
-                color:previewMode==='mobile'?'#fff':'rgba(255,255,255,0.35)'}">
-              Mobile
-            </button>
-            <button @click="previewMode='desktop'"
-              :style="{padding:'4px 14px',border:'none',borderRadius:'6px',fontSize:'11px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',
-                background:previewMode==='desktop'?'rgba(255,255,255,0.15)':'transparent',
-                color:previewMode==='desktop'?'#fff':'rgba(255,255,255,0.35)'}">
-              Desktop
-            </button>
+        <div :style="{display:'flex',gap:'8px',alignItems:'center'}">
+          <div v-for="(step, i) in steps" :key="step.id" @click="goToStep(i)"
+            :style="{
+              width: i===currentStepIndex ? '28px' : '12px',
+              height: '12px',
+              borderRadius:'999px',
+              transition:'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+              cursor:'pointer',
+              background: i===currentStepIndex ? '#6D4EE8' : i<currentStepIndex ? 'rgba(109,78,232,0.55)' : C.stepDotInactive,
+              transform: i===currentStepIndex ? 'scale(1)' : 'scale(0.9)',
+            }">
           </div>
         </div>
 
-        <!-- Phone mockup -->
-        <div v-if="previewMode==='mobile'"
-          :style="{width:'260px',background:'#1a1a1a',borderRadius:'44px',padding:'9px',boxShadow:'0 0 0 1px #2a2a2a,0 32px 80px rgba(0,0,0,0.6),0 0 60px rgba(109,78,232,0.2)',flexShrink:0}">
-          <div :style="{borderRadius:'36px',overflow:'hidden'}">
-            <div :style="{height:'26px',display:'flex',alignItems:'center',justifyContent:'center',background:'#000'}">
-              <div :style="{width:'56px',height:'7px',background:'#1a1a1a',borderRadius:'999px'}"></div>
-            </div>
-            <div :style="{minHeight:'480px',display:'flex',flexDirection:'column',alignItems:'center',padding:'14px 10px 16px',overflowY:'auto',position:'relative',background:currentTheme?.bg||form.bg_color||'#0d0d1a'}">
-              <div v-if="currentTheme?.bgGradient" :style="{position:'absolute',inset:0,backgroundImage:currentTheme.bgGradient}"></div>
-              <div v-if="form.bg_image_url" :style="{position:'absolute',inset:0,backgroundImage:`url(${form.bg_image_url})`,backgroundSize:'cover',backgroundPosition:'center',opacity:0.3}"></div>
-              <div v-if="form.online_status" :style="{display:'flex',alignItems:'center',gap:'3px',background:'rgba(16,185,129,0.15)',border:'1px solid rgba(16,185,129,0.3)',borderRadius:'999px',padding:'3px 8px',marginBottom:'10px',position:'relative',zIndex:1,flexShrink:0}">
-                <div :style="{width:'5px',height:'5px',borderRadius:'50%',background:'#10B981'}"></div>
-                <span :style="{fontSize:'9px',color:'#10B981',fontWeight:600}">Online</span>
-              </div>
-              <div v-if="form.show_avatar" :style="{marginBottom:'8px',position:'relative',zIndex:1,flexShrink:0}">
-                <div :style="{width:'60px',height:'60px',borderRadius:'50%',background:'#333',overflow:'hidden',border:'2px solid rgba(255,255,255,0.15)'}">
-                  <img v-if="form.avatar_url" :src="form.avatar_url" :style="{width:'100%',height:'100%',objectFit:'cover'}" />
-                  <div v-else :style="{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  </div>
-                </div>
-                <div v-if="form.verified_badge" :style="{position:'absolute',bottom:0,right:0,width:'16px',height:'16px',background:'#3B82F6',borderRadius:'50%',border:'2px solid #000',display:'flex',alignItems:'center',justifyContent:'center'}">
-                  <svg width="7" height="7" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-              </div>
-              <p :style="{fontSize:'13px',fontWeight:700,color:'#fff',marginBottom:'3px',position:'relative',zIndex:1}">{{ form.model_name || 'Your Name' }}</p>
-              <p v-if="form.bio" :style="{fontSize:'10px',color:'rgba(255,255,255,0.5)',textAlign:'center',lineHeight:1.4,marginBottom:'8px',maxWidth:'180px',position:'relative',zIndex:1}">{{ form.bio.slice(0,80) }}{{ form.bio.length>80?'...':'' }}</p>
-              <div v-if="form.promo_text" :style="{background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'6px',padding:'4px 8px',marginBottom:'8px',position:'relative',zIndex:1}">
-                <p :style="{fontSize:'9px',color:'#F87171',textAlign:'center',fontWeight:600}">{{ form.promo_text }}</p>
-              </div>
-              <div v-if="form.video_url" :style="{width:'100%',borderRadius:'8px',overflow:'hidden',background:'linear-gradient(135deg,#1e3a5f,#000)',marginBottom:'8px',height:'70px',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',zIndex:1,flexShrink:0}">
-                <div :style="{width:'22px',height:'22px',background:'rgba(255,255,255,0.9)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center'}">
-                  <svg width="8" height="8" viewBox="0 0 24 24" fill="#111"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </div>
-              </div>
-              <div :style="{width:'100%',display:'flex',flexDirection:'column',gap:'6px',position:'relative',zIndex:1}">
-                <template v-if="previewLinks.length > 0">
-                  <div v-if="previewLinks[0]"
-                    :style="{
-                      width:'100%',padding:'8px 10px',
-                      borderRadius:form.btn_style==='pill'?'999px':form.btn_style==='square'?'4px':'10px',
-                      textAlign:'center',fontSize:'11px',fontWeight:700,color:'#fff',
-                      background:`linear-gradient(90deg,${form.btn_color||currentTheme?.btnColor||'#6D4EE8'},#A78BFA,${form.btn_color||currentTheme?.btnColor||'#6D4EE8'})`,
-                      backgroundSize:'200% auto',
-                      animation:'shimmer-btn 2.5s linear infinite',
-                      boxSizing:'border-box',
-                    }">{{ previewLinks[0].label }}</div>
-                  <div v-if="previewLinks[1]"
-                    :style="{
-                      width:'100%',padding:'8px 10px',
-                      borderRadius:form.btn_style==='pill'?'999px':form.btn_style==='square'?'4px':'10px',
-                      textAlign:'center',fontSize:'11px',fontWeight:700,color:'#fff',
-                      background:form.btn_color||currentTheme?.btnColor||'#6D4EE8',
-                      animation:'pulse-btn 2s ease-in-out infinite',
-                      boxSizing:'border-box',
-                    }">{{ previewLinks[1].label }}</div>
-                  <div v-for="link in previewLinks.slice(2)" :key="link.type+link.label"
-                    :style="{
-                      width:'100%',padding:'8px 10px',
-                      borderRadius:form.btn_style==='pill'?'999px':form.btn_style==='square'?'4px':'10px',
-                      textAlign:'center',fontSize:'11px',fontWeight:700,color:'#fff',
-                      background:form.btn_color||currentTheme?.btnColor||'#6D4EE8',
-                      animation:'glow-btn 2.5s ease-in-out infinite',
-                      boxSizing:'border-box',
-                    }">{{ link.label }}</div>
-                </template>
-                <template v-else>
-                  <div :style="{width:'100%',height:'32px',borderRadius:'10px',background:'rgba(255,255,255,0.07)',border:'1px dashed rgba(255,255,255,0.12)'}"></div>
-                  <div :style="{width:'100%',height:'32px',borderRadius:'10px',background:'rgba(255,255,255,0.07)',border:'1px dashed rgba(255,255,255,0.12)'}"></div>
-                </template>
-              </div>
-              <p v-if="form.response_time" :style="{fontSize:'9px',color:'rgba(255,255,255,0.25)',marginTop:'8px',position:'relative',zIndex:1,textAlign:'center'}">💬 {{ form.response_time }}</p>
-            </div>
-            <div :style="{height:'22px',background:'#000',display:'flex',alignItems:'center',justifyContent:'center'}">
-              <div :style="{width:'72px',height:'4px',background:'#1a1a1a',borderRadius:'999px'}"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desktop mockup -->
-        <div v-if="previewMode==='desktop'" :style="{width:'100%',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',overflow:'hidden',boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}">
-          <div :style="{background:'#1a1a2e',padding:'7px 10px',display:'flex',alignItems:'center',gap:'5px',borderBottom:'1px solid rgba(255,255,255,0.06)'}">
-            <div v-for="c in ['#EF4444','#F59E0B','#22C55E']" :key="c" :style="{width:'7px',height:'7px',borderRadius:'50%',background:c}"></div>
-            <div :style="{flex:1,background:'rgba(255,255,255,0.07)',borderRadius:'3px',padding:'2px 8px',fontSize:'9px',color:'rgba(255,255,255,0.25)',marginLeft:'4px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">
-              mysocialvsl.com/{{ form.slug || form.dashboard_name?.toLowerCase().replace(/\s+/g,'-') || '...' }}
-            </div>
-          </div>
-          <div :style="{background:currentTheme?.bg||form.bg_color||'#0d0d1a',padding:'20px 16px',display:'flex',flexDirection:'column',alignItems:'center',minHeight:'240px',position:'relative'}">
-            <div v-if="currentTheme?.bgGradient" :style="{position:'absolute',inset:0,backgroundImage:currentTheme.bgGradient}"></div>
-            <div v-if="form.show_avatar" :style="{width:'44px',height:'44px',borderRadius:'50%',background:'#333',marginBottom:'6px',overflow:'hidden',border:'2px solid rgba(255,255,255,0.15)',position:'relative',zIndex:1,flexShrink:0}">
-              <img v-if="form.avatar_url" :src="form.avatar_url" :style="{width:'100%',height:'100%',objectFit:'cover'}" />
-            </div>
-            <p :style="{fontSize:'12px',fontWeight:700,color:'#fff',marginBottom:'2px',position:'relative',zIndex:1}">{{ form.model_name || 'Your Name' }}</p>
-            <p v-if="form.bio" :style="{fontSize:'9px',color:'rgba(255,255,255,0.45)',marginBottom:'10px',textAlign:'center',maxWidth:'160px',position:'relative',zIndex:1}">{{ form.bio.slice(0,60) }}</p>
-            <div :style="{width:'100%',display:'flex',flexDirection:'column',gap:'5px',position:'relative',zIndex:1}">
-              <div v-for="link in previewLinks" :key="link.type+link.label"
-                :style="{width:'100%',padding:'7px',borderRadius:form.btn_style==='pill'?'999px':form.btn_style==='square'?'3px':'6px',textAlign:'center',fontSize:'10px',fontWeight:600,color:'#fff',background:form.btn_color||currentTheme?.btnColor||'#6D4EE8',boxSizing:'border-box'}">
-                {{ link.label }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Template badge -->
-        <div :style="{marginTop:'16px',padding:'5px 14px',background:'rgba(255,255,255,0.06)',borderRadius:'999px',fontSize:'12px',color:'rgba(255,255,255,0.45)'}">
-          {{ currentTheme?.name || 'No theme' }}
-        </div>
-
+        <button @click="nextStep" :disabled="saving || uploadingVideo || !isStepValid"
+          :style="{padding:'10px 28px',background:'#6D4EE8',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:700,cursor:(saving||uploadingVideo||!isStepValid)?'not-allowed':'pointer',fontFamily:'inherit',opacity:(saving||uploadingVideo||!isStepValid)?0.45:1,transition:'opacity 0.2s',display:'flex',alignItems:'center',gap:'6px'}"
+          :title="uploadingVideo ? 'Attends la fin de l\'upload vidéo' : !isStepValid ? 'Remplis les champs requis' : ''">
+          <i v-if="uploadingVideo" class="bi bi-hourglass-split" style="animation:spin 1s linear infinite"></i>
+          <template v-else-if="!isLastAction">
+            Continuer
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5l7 7-7 7"/></svg>
+          </template>
+          <template v-else>
+            <span>{{ saving ? (isEditMode ? 'Mise à jour…' : 'Publication…') : (isEditMode ? 'Mettre à jour' : 'Publier') }}</span>
+            <i v-if="!saving" :class="isEditMode ? 'bi bi-cloud-check' : 'bi bi-rocket-takeoff'"></i>
+          </template>
+        </button>
       </div>
+
     </div>
-
-    <!-- ===== BOTTOM BAR ===== -->
-    <div :style="{height:'72px',background:'#0d0b1e',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 40px',flexShrink:0,fontFamily:'Inter,sans-serif'}">
-      <!-- Back button -->
-      <button v-if="currentStepIndex > 0" @click="prevStep"
-        :style="{padding:'10px 22px',border:'1px solid rgba(255,255,255,0.15)',borderRadius:'10px',background:'transparent',color:'#fff',fontSize:'14px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:'6px'}"
-        @mouseover="($event.currentTarget as HTMLElement).style.background='rgba(255,255,255,0.06)'"
-        @mouseout="($event.currentTarget as HTMLElement).style.background='transparent'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>
-        Back
-      </button>
-      <div v-else></div>
-
-      <!-- Dots indicator -->
-      <div :style="{display:'flex',gap:'6px',alignItems:'center'}">
-        <div v-for="(step, i) in steps" :key="step.id"
-          :style="{width:i===currentStepIndex?'20px':'6px',height:'6px',borderRadius:'999px',background:i===currentStepIndex?'#6D4EE8':i<currentStepIndex?'rgba(109,78,232,0.5)':'rgba(255,255,255,0.15)',transition:'all 0.2s'}">
-        </div>
-      </div>
-
-      <!-- Continue / Publish -->
-      <button @click="nextStep" :disabled="saving"
-        :style="{padding:'10px 28px',background:'#6D4EE8',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:700,cursor:saving?'not-allowed':'pointer',fontFamily:'inherit',opacity:saving?0.7:1,display:'flex',alignItems:'center',gap:'6px'}">
-        <span v-if="currentStepIndex < steps.length - 1">Continue →</span>
-        <span v-else>{{ saving ? 'Publishing...' : '🚀 Publish' }}</span>
-      </button>
-    </div>
-
   </DashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import api from '@/lib/axios'
 import VideoUpload from '@/components/VideoUpload.vue'
-import PresetPicker from '@/components/PresetPicker.vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
-import SocialPlatformPreview from '@/components/SocialPlatformPreview.vue'
+import DeeplinkDemo from '@/components/DeeplinkDemo.vue'
+import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
+const route  = useRoute()
+const theme  = useThemeStore()
 
-// ===== STATE =====
+const editPageId = computed(() => route.params.id as string | undefined)
+const isEditMode = computed(() => !!editPageId.value)
+
+const C = computed(() => theme.dark ? {
+  bg: '#0a0812',
+  panel: 'rgba(0,0,0,0.3)',
+  border: 'rgba(255,255,255,0.08)',
+  borderLight: 'rgba(255,255,255,0.06)',
+  borderInput: 'rgba(255,255,255,0.1)',
+  text: '#fff',
+  text2: 'rgba(255,255,255,0.6)',
+  textMuted: 'rgba(255,255,255,0.4)',
+  textDim: 'rgba(255,255,255,0.3)',
+  textFaint: 'rgba(255,255,255,0.25)',
+  textVeryFaint: 'rgba(255,255,255,0.2)',
+  surface: 'rgba(255,255,255,0.03)',
+  surface2: 'rgba(255,255,255,0.04)',
+  inputBg: 'rgba(255,255,255,0.05)',
+  pillBg: 'rgba(255,255,255,0.06)',
+  pillText: 'rgba(255,255,255,0.3)',
+  cancelBorder: 'rgba(255,255,255,0.12)',
+  cancelColor: 'rgba(255,255,255,0.5)',
+  stepRail: 'rgba(255,255,255,0.1)',
+  stepInactiveBg: 'rgba(255,255,255,0.08)',
+  stepInactiveText: 'rgba(255,255,255,0.3)',
+  stepLabelActive: '#A78BFA',
+  stepLabelDone: 'rgba(255,255,255,0.5)',
+  stepLabelInactive: 'rgba(255,255,255,0.2)',
+  stepDotInactive: 'rgba(255,255,255,0.15)',
+  toggleInactive: 'rgba(255,255,255,0.15)',
+} : {
+  bg: '#F9FAFB',
+  panel: '#F3F4F6',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
+  borderInput: '#D1D5DB',
+  text: '#111827',
+  text2: '#4B5563',
+  textMuted: '#6B7280',
+  textDim: '#9CA3AF',
+  textFaint: '#D1D5DB',
+  textVeryFaint: '#E5E7EB',
+  surface: '#fff',
+  surface2: '#F9FAFB',
+  inputBg: '#fff',
+  pillBg: '#F3F4F6',
+  pillText: '#6B7280',
+  cancelBorder: '#E5E7EB',
+  cancelColor: '#6B7280',
+  stepRail: '#E5E7EB',
+  stepInactiveBg: '#E5E7EB',
+  stepInactiveText: '#9CA3AF',
+  stepLabelActive: '#7C3AED',
+  stepLabelDone: '#6B7280',
+  stepLabelInactive: '#D1D5DB',
+  stepDotInactive: '#E5E7EB',
+  toggleInactive: '#D1D5DB',
+})
+
 const saving = ref(false)
 const error = ref('')
-const activeTab = ref('basics')
-const advancedSubTab = ref('features')
-const previewMode = ref<'mobile'|'desktop'>('mobile')
-const dragOverBg = ref(false)
-const uploadingAvatar = ref(false)
-const uploadingBg = ref(false)
-const manualUrl = ref('')
-const showAdvancedSettings = ref(false)
-const showThemeAdvanced = ref(true)
-const showLinkPicker = ref(false)
-const hoveredPlatform = ref<string|null>('instagram')
+const successMsg = ref(false)
+const activeTab = ref('setup')
+const uploadingVideo = ref(false)
+const setupSubStep = ref(0) // 0=type, 1=infos
+const showAdvanced = ref(false)
+const advancedTab  = ref(0) // 0=deeplink, 1=strict, 2=bot
+const stepDir = ref<'forward' | 'back'>('forward')
 
-// ===== STATIC DATA =====
-const themes = [
-  { id:'ethereal',    name:'Ethereal',    bg:'#f0e6ff', btnColor:'#7C3AED', bgGradient:null },
-  { id:'dreamy',      name:'Dreamy',      bg:'#ffe0f0', btnColor:'#DB2777', bgGradient:null },
-  { id:'nightfall',   name:'Nightfall',   bg:'#0d0d1a', btnColor:'#818CF8', bgGradient:'linear-gradient(160deg,#0d0d2b 0%,#0d0d1a 100%)' },
-  { id:'bold',        name:'Bold',        bg:'#0a0a0a', btnColor:'#EF4444', bgGradient:null },
-  { id:'hero',        name:'Hero',        bg:'#1a1a2e', btnColor:'#6366F1', bgGradient:'linear-gradient(135deg,#1a1a2e,#16213e)' },
-  { id:'bento',       name:'Bento',       bg:'#fff',    btnColor:'#111827', bgGradient:null },
-  { id:'terrain',     name:'Terrain',     bg:'#1c2b1a', btnColor:'#4ADE80', bgGradient:'linear-gradient(135deg,#1c2b1a,#0f1f0e)' },
-  { id:'luminescent', name:'Luminescent', bg:'#001a33', btnColor:'#22D3EE', bgGradient:'linear-gradient(135deg,#001a33,#002952)' },
-  { id:'luggage-tag', name:'Luggage Tag', bg:'#f5f0e8', btnColor:'#92400E', bgGradient:null },
-  { id:'clay',        name:'Clay',        bg:'#f0ede8', btnColor:'#78716C', bgGradient:null },
-]
-
-const themeGradients: Record<string, string> = {
-  'ethereal':    'linear-gradient(135deg,#c084fc,#818cf8,#f0abfc)',
-  'dreamy':      'linear-gradient(135deg,#f9a8d4,#c084fc,#f472b6)',
-  'nightfall':   'linear-gradient(135deg,#1e1b4b,#312e81,#4f46e5)',
-  'bold':        'linear-gradient(135deg,#450a0a,#7f1d1d,#ef4444)',
-  'hero':        'linear-gradient(135deg,#0f172a,#1e3a5f,#3b82f6)',
-  'bento':       'linear-gradient(135deg,#f3f4f6,#e5e7eb,#d1d5db)',
-  'terrain':     'linear-gradient(135deg,#052e16,#14532d,#4ade80)',
-  'luminescent': 'linear-gradient(135deg,#0c4a6e,#0e7490,#22d3ee)',
-  'luggage-tag': 'linear-gradient(135deg,#78350f,#b45309,#fbbf24)',
-  'clay':        'linear-gradient(135deg,#292524,#44403c,#a8a29e)',
-}
-
-const linkTypes = [
-  { id:'classic',  name:'Classic Link',    desc:'Standard button with icon and text' },
-  { id:'image',    name:'Button Image',    desc:'Custom image as button' },
-  { id:'product',  name:'Product Button',  desc:'Product card with price' },
-  { id:'creator',  name:'Creator Card',    desc:'Profile-style card' },
-  { id:'carousel', name:'Image Carousel',  desc:'Sliding image gallery' },
-  { id:'grid',     name:'Image Grid',      desc:'Grid of clickable images' },
-  { id:'tip',      name:'Tip Me',          desc:'Accept tips from your audience' },
-]
-
-const socialOptions = [
-  { type:'onlyfans',  color:'#00AFF0', name:'OnlyFans',  label:'My OnlyFans',  icon:'📸', svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 5.838a6.162 6.162 0 1 1 0 12.324A6.162 6.162 0 0 1 12 5.838zm0 2.456a3.706 3.706 0 1 0 0 7.412 3.706 3.706 0 0 0 0-7.412zm6.31-3.853a1.228 1.228 0 1 1 0 2.456 1.228 1.228 0 0 1 0-2.456z"/></svg>' },
-  { type:'instagram', color:'#E1306C', name:'Instagram', label:'My Instagram', icon:'📸', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="white" stroke="none"/></svg>' },
-  { type:'tiktok',    color:'#010101', name:'TikTok',    label:'My TikTok',    icon:'🎵', svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z"/></svg>' },
-  { type:'twitter',   color:'#000000', name:'Twitter/X', label:'My X',         icon:'✕',  svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' },
-  { type:'mym',       color:'#E8A020', name:'MYM',       label:'My MYM',       icon:'💛', svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><text x="2" y="18" font-size="16" font-weight="bold" font-family="Arial">M</text></svg>' },
-  { type:'telegram',  color:'#26A5E4', name:'Telegram',  label:'My Telegram',  icon:'✈️', svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' },
-  { type:'youtube',   color:'#FF0000', name:'YouTube',   label:'My YouTube',   icon:'▶️', svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M23 7s-.3-2-1.2-2.7c-1.1-1.2-2.4-1.2-3-1.3C16.6 3 12 3 12 3s-4.6 0-6.8.1c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.2.7 11.5v2.1c0 2.2.3 4.4.3 4.4s.3 2 1.2 2.7c1.1 1.2 2.6 1.1 3.3 1.2C7.5 22 12 22 12 22s4.6 0 6.8-.2c.6-.1 1.9-.1 3-1.3.9-.7 1.2-2.7 1.2-2.7s.3-2.2.3-4.4v-2.1C23.3 9.2 23 7 23 7zM9.7 15.5V8.4l8.1 3.6-8.1 3.5z"/></svg>' },
-  { type:'twitch',    color:'#9146FF', name:'Twitch',    label:'My Twitch',    icon:'💜', svg:'<svg viewBox="0 0 24 24" fill="white" width="14" height="14"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>' },
-  { type:'snapchat',  color:'#FFFC00', name:'Snapchat',  label:'My Snapchat',  icon:'👻', svg:'<i class="bi bi-snapchat" style="color:#000;font-size:14px;line-height:1"></i>' },
-]
-
-const bgSwatches = [
-  {color:'#7C3AED'},{color:'#0284C7'},{color:'#0d0d1a'},{color:'#1a1a2e'},{color:'#f0e6ff'},{color:'#ffffff'},
-]
-
-const fontOptions = [
-  { id:'auto',       label:'Auto',      family:'Inter,sans-serif' },
-  { id:'inter',      label:'Inter',     family:'Inter,sans-serif' },
-  { id:'poppins',    label:'Poppins',   family:'Poppins,sans-serif' },
-  { id:'montserrat', label:'Montserrat',family:'Montserrat,sans-serif' },
-  { id:'outfit',     label:'Outfit',    family:'Outfit,sans-serif' },
-  { id:'dm',         label:'DM Sans',   family:'\'DM Sans\',sans-serif' },
-]
-
-const advancedFeatures = [
-  { key:'online_status',      label:'🟢 Online Status',      desc:'Show a green "Online now" indicator — boosts clicks on exclusive content.' },
-  { key:'city_geoip',         label:'📍 City Display',        desc:'Use GeoIP to show the visitor\'s city — makes fans feel closer to you.' },
-  { key:'age_gate',           label:'🔞 Age Gate',            desc:'Show age verification before visitors can view your page.' },
-  { key:'disable_link_logos', label:'🚫 Disable Link Logos',  desc:'Hide platform logos in your buttons (OnlyFans, Instagram, etc.).' },
-  { key:'hide_branding',      label:'✨ Hide Branding',       desc:'Remove "Powered by MySocialVSL" from your page (Pro).' },
-  { key:'traffic_recovery',   label:'♻️ Traffic Recovery',   desc:'Recover visitors who close the page without clicking.' },
-]
-
-const deeplinkPlatforms = [
-  { id:'instagram', label:'Instagram', color:'#E1306C', ios:'Users are automatically redirected to their default browser.', android:'Users are automatically redirected to their default browser.' },
-  { id:'tiktok',    label:'TikTok',    color:'#010101', ios:'Users are redirected to Safari via a deeplink trigger.',       android:'A system dialog prompts users to open in Chrome.' },
-  { id:'twitter',   label:'Twitter/X', color:'#000000', ios:'Users are redirected to their default browser.',               android:'Users are redirected to their default browser.' },
-  { id:'reddit',    label:'Reddit',    color:'#FF4500', ios:'Users are redirected to Safari.',                               android:'A dialog prompts to open in external browser.' },
-  { id:'facebook',  label:'Facebook',  color:'#1877F2', ios:'Users are redirected to Safari via deeplink.',                 android:'A "Leave app?" dialog appears before redirect.' },
-  { id:'messenger', label:'Messenger', color:'#0084FF', ios:'Users are redirected to their default browser.',               android:'A dialog prompts users to open externally.' },
-  { id:'snapchat',  label:'Snapchat',  color:'#FFFC00', ios:'Users are redirected to Safari.',                               android:'Users are redirected to their default browser.' },
-  { id:'telegram',  label:'Telegram',  color:'#26A5E4', ios:'Users are redirected to Safari.',                               android:'Users are redirected to their default browser.' },
-  { id:'pinterest', label:'Pinterest', color:'#E60023', ios:'Users are redirected to their default browser.',               android:'Users are redirected to their default browser.' },
-]
-const selectedDeeplinkPlatform = ref('instagram')
-const deeplinkPreviewOs = ref<'ios'|'android'>('android')
-
-// ===== FORM =====
-const form = ref({
-  page_type: 'landing' as 'landing'|'direct',
-  direct_url: '',
-  slug: '',
-  dashboard_name: '',
-  group_name: '',
-  bot_protection: false,
-  deep_link_enabled: true,
-  strict_deep_link: false,
-  deeplink_dots_hint: true,
-  deeplink_long_press: true,
-  city_geoip: false,
-  disable_link_logos: false,
-  ga4_code: '',
-  fb_pixel_id: '',
-  template: 'nightfall',
-  bg_color: '#0d0d1a',
-  btn_color: '#818CF8',
-  text_color: 'light',
-  btn_style: 'rounded',
-  font: 'auto',
-  avatar_url: '',
-  bg_image_url: '',
-  show_avatar: true,
-  verified_badge: false,
-  model_name: '',
-  bio: '',
-  video_url: '',
-  online_status: false,
-  location_display: '0',
-  response_time: '',
-  promo_text: '',
-  countdown_end: '',
-  age_gate: false,
-  hide_branding: false,
-  traffic_recovery: false,
-  seo_title: '',
-  seo_description: '',
-  seo_image: '',
-  links: [] as Array<{
-    type: string
-    label: string
-    url: string
-    description?: string
-    age_restricted: boolean
-    is_social?: boolean
-    container_style?: string
-    animation?: string
-    grid_size?: string
-    hide_logo?: boolean
-    title_color?: string
-    desc_color?: string
-    _open?: boolean
-  }>,
-})
-
-// ===== COMPUTED =====
 const steps = computed(() =>
   form.value.page_type === 'direct'
-    ? [{id:1,label:'Type'},{id:2,label:'Deeplink'},{id:3,label:'Publish'}]
-    : [{id:1,label:'Type'},{id:2,label:'Theme'},{id:3,label:'Profile'},{id:4,label:'Links'},{id:5,label:'Socials'},{id:6,label:'Deeplink'},{id:7,label:'Publish'}]
+    ? [
+        { id: 'setup', label: '1 — Setup' },
+      ]
+    : [
+        { id: 'setup',    label: '1 — Setup' },
+        { id: 'template', label: '2 — Template' },
+        { id: 'vsl',      label: '3 — VSL' },
+        { id: 'cta',      label: '4 — CTA' },
+      ]
 )
-const tabOrder = computed(() =>
-  form.value.page_type === 'direct'
-    ? ['basics','deeplink','advanced']
-    : ['basics','theme','profile','content','socials','deeplink','advanced']
-)
+const tabOrder = computed(() => steps.value.map(s => s.id))
 const currentStepIndex = computed(() => tabOrder.value.indexOf(activeTab.value))
-const currentStepNumber = computed(() => currentStepIndex.value + 1)
-
-const TRIGGER_WORDS = ['onlyfans','only fans','fanvue','mym','fansly','uncove','18+','xxx','nude','naked','nsfw','adult','explicit','sex','porn','escort','leaked']
-const triggerWordsInBio = computed(() => {
-  const bio = (form.value.bio || '').toLowerCase()
-  return TRIGGER_WORDS.filter(w => bio.includes(w))
+const canGoBack = computed(() =>
+  currentStepIndex.value > 0 || setupSubStep.value > 0
+)
+const isLastAction = computed(() => {
+  if (form.value.page_type === 'direct') return activeTab.value === 'setup' && setupSubStep.value === 1
+  return currentStepIndex.value === steps.value.length - 1 && activeTab.value !== 'setup'
 })
 
-const currentTheme = computed(() => themes.find(t => t.id === form.value.template))
-const socialLinks = computed(() => form.value.links.filter(l => l.is_social))
-const contentLinks = computed(() => form.value.links.filter(l => !l.is_social))
-const previewLinks = computed(() => form.value.links.slice(0, 3))
-
-// ===== NAVIGATION =====
-function nextStep() {
-  const next = tabOrder.value[currentStepIndex.value + 1]
-  if (next) activeTab.value = next
-  else save()
-}
-function prevStep() {
-  const prev = tabOrder.value[currentStepIndex.value - 1]
-  if (prev) activeTab.value = prev
-}
-function goToStep(i: number) {
-  const tab = tabOrder.value[i]
-  if (tab) activeTab.value = tab
-}
-
-// ===== THEME =====
-function applyTheme(t: typeof themes[0]) {
-  form.value.template = t.id
-  form.value.bg_color  = t.bg
-  form.value.btn_color = t.btnColor
-}
-
-const selectedPreset = ref<string|null>(null)
-function applyPreset(p: any) {
-  selectedPreset.value = p.id
-  form.value.template  = p.apply.template
-  form.value.bg_color  = p.apply.bg_color
-  form.value.btn_color = p.apply.btn_color
-  if (p.btnStyle) form.value.btn_style = p.btnStyle
-}
-
-// ===== LINKS =====
-function addLink(typeId: string) {
-  const lt = linkTypes.find(l => l.id === typeId)
-  form.value.links.push({
-    type: typeId,
-    label: lt?.name || 'New Link',
-    url: '',
-    description: '',
-    age_restricted: false,
-    is_social: false,
-    _open: true,
-  })
-}
-
-function removeLink(link: typeof form.value.links[0]) {
-  const idx = form.value.links.indexOf(link)
-  if (idx >= 0) form.value.links.splice(idx, 1)
-}
-
-// ===== SOCIALS =====
-function isSocialSelected(type: string): boolean {
-  return form.value.links.some(l => l.type === type && l.is_social)
-}
-
-function toggleSocial(s: typeof socialOptions[0]) {
-  const idx = form.value.links.findIndex(l => l.type === s.type && l.is_social)
-  if (idx >= 0) {
-    form.value.links.splice(idx, 1)
-  } else {
-    form.value.links.push({ type: s.type, label: s.label, url: '', age_restricted: false, is_social: true })
+const isStepValid = computed(() => {
+  if (activeTab.value === 'setup') {
+    if (setupSubStep.value === 0) return true // type selection always valid
+    if (!form.value.model_name.trim()) return false
+    if (form.value.page_type === 'direct' && !form.value.direct_url.trim()) return false
+    return true
   }
+  if (activeTab.value === 'template') return true
+  if (activeTab.value === 'vsl') return true
+  if (activeTab.value === 'cta') return true // CTA URL optional — can be added later
+  return true
+})
+
+const colorPresets = [
+  { label: 'OnlyFans', value: '#00AFF0' },
+  { label: 'Rose',     value: '#EC4899' },
+  { label: 'Violet',   value: '#6D4EE8' },
+  { label: 'Rouge',    value: '#EF4444' },
+  { label: 'Vert',     value: '#10B981' },
+]
+
+const inputStyle = computed(() => ({
+  width: '100%',
+  background: C.value.inputBg,
+  border: `1px solid ${C.value.borderInput}`,
+  borderRadius: '10px',
+  padding: '11px 14px',
+  fontSize: '14px',
+  color: C.value.text,
+  outline: 'none',
+  boxSizing: 'border-box' as const,
+  fontFamily: 'inherit',
+  transition: 'border-color 0.15s',
+}))
+
+const form = ref({
+  page_type:        'vsl' as 'vsl' | 'direct',
+  model_name:       '',
+  model_handle:     '',
+  slug:             '',
+  direct_url:       '',
+  template:         'vsl-classic' as 'vsl-classic' | 'vsl-bandeau' | 'vsl-popup',
+  video_url:        '',
+  cta_url:          '',
+  cta_type:         'text' as 'text' | 'image',
+  cta_image_url:    '',
+  btn_label:        '',
+  btn_color:        '#00AFF0',
+  online_status:    false,
+  age_gate:         false,
+  deep_link_enabled:  true,
+  strict_deep_link:   false,
+  bot_protection:     false,
+  cta_reveal_at:    null as number | null,
+  extra_links:      [] as Array<{ type?: string; label: string; url: string; color: string }>,
+  popup_title:      'Rejoins-moi en privé 🔥',
+  popup_subtitle:   'Contenu exclusif disponible maintenant',
+  popup_delay:      5,
+})
+
+const bandeauPlatforms = [
+  { id: 'instagram', name: 'Instagram', color: '#E1306C', defaultLabel: 'Mon Instagram',
+    svgLg: '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" width="24" height="24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="white" stroke="none"/></svg>',
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg>' },
+  { id: 'tiktok', name: 'TikTok', color: '#010101', defaultLabel: 'Mon TikTok',
+    svgLg: '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z"/></svg>',
+    svg: '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z"/></svg>' },
+  { id: 'twitter', name: 'X', color: '#000000', defaultLabel: 'Mon X',
+    svgLg: '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+    svg: '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' },
+  { id: 'telegram', name: 'Telegram', color: '#26A5E4', defaultLabel: 'Mon Telegram',
+    svgLg: '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>',
+    svg: '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' },
+  { id: 'snapchat', name: 'Snapchat', color: '#FFFC00', defaultLabel: 'Mon Snapchat',
+    svgLg: '<svg viewBox="0 0 24 24" fill="black" width="22" height="22"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.239.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z"/></svg>',
+    svg: '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.239.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z"/></svg>' },
+]
+
+function addBandeauLink(p: typeof bandeauPlatforms[0]) {
+  const idx = form.value.extra_links.findIndex(l => l.type === p.id)
+  if (idx !== -1) { form.value.extra_links.splice(idx, 1); return }
+  form.value.extra_links.push({ type: p.id, label: p.defaultLabel, url: '', color: p.color })
 }
 
-function removeSocial(type: string) {
-  const idx = form.value.links.findIndex(l => l.type === type && l.is_social)
-  if (idx >= 0) form.value.links.splice(idx, 1)
-}
-
-function getSocialColor(type: string): string {
-  return socialOptions.find(s => s.type === type)?.color || '#6D4EE8'
-}
-
-function getSocialSvg(type: string): string {
-  return socialOptions.find(s => s.type === type)?.svg || ''
-}
-
-function addManualUrl() {
-  const url = manualUrl.value.trim()
-  if (!url) return
-  const platforms = [
-    { key:'onlyfans',  matches:['onlyfans.com'] },
-    { key:'mym',       matches:['mym.fans'] },
-    { key:'instagram', matches:['instagram.com'] },
-    { key:'tiktok',    matches:['tiktok.com'] },
-    { key:'twitter',   matches:['twitter.com','x.com'] },
-    { key:'telegram',  matches:['t.me','telegram.me'] },
-    { key:'youtube',   matches:['youtube.com','youtu.be'] },
-    { key:'twitch',    matches:['twitch.tv'] },
-    { key:'snapchat',  matches:['snapchat.com','snap.com'] },
-  ]
-  let type = 'classic'
-  let label = 'My Link'
-  for (const p of platforms) {
-    if (p.matches.some(m => url.includes(m))) {
-      type  = p.key
-      label = socialOptions.find(s => s.type === p.key)?.name || p.key
-      break
-    }
-  }
-  const existing = form.value.links.find(l => l.type === type && l.is_social)
-  if (existing) {
-    existing.url = url
-  } else {
-    form.value.links.push({ type, label, url, age_restricted: false, is_social: true })
-  }
-  manualUrl.value = ''
-}
-
-// ===== UPLOAD =====
-async function uploadFile(event: Event | { target: { files: File[] } }, type: 'avatar' | 'background') {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
+async function uploadCtaImage(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
   const fd = new FormData()
   fd.append('file', file)
-  fd.append('type', type)
-  if (type === 'avatar') uploadingAvatar.value = true
-  else uploadingBg.value = true
+  fd.append('type', 'cta')
   try {
     const { data } = await api.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
-    if (type === 'avatar') form.value.avatar_url = data.url
-    else form.value.bg_image_url = data.url
-  } catch (e: any) {
-    error.value = 'Upload error: ' + (e.response?.data?.message || e.message || 'Upload failed')
-  } finally {
-    if (type === 'avatar') uploadingAvatar.value = false
-    else uploadingBg.value = false
+    form.value.cta_image_url = data.url
+  } catch { error.value = 'Upload image échoué.' }
+}
+
+function autoSlug() {
+  if (isEditMode.value) return // don't override slug when editing
+  const base = (form.value.model_handle || form.value.model_name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  if (base) form.value.slug = base
+}
+
+async function loadPageForEdit() {
+  try {
+    const { data } = await api.get(`/pages/${editPageId.value}`)
+    const ctaLink     = (data.links || []).find((l: any) => l.type === 'classic')
+    const extraLinks  = (data.links || [])
+      .filter((l: any) => l !== ctaLink && l.url)
+      .map((l: any) => ({ label: l.label || l.type, url: l.url, color: l.btn_color || '#6D4EE8' }))
+
+    form.value.page_type        = data.page_type === 'direct' ? 'direct' : 'vsl'
+    form.value.model_name       = data.model_name   || ''
+    form.value.model_handle     = data.model_handle || ''
+    form.value.slug             = data.slug         || ''
+    form.value.direct_url       = data.direct_url   || ''
+    form.value.template         = (data.template as any) || 'vsl-classic'
+    form.value.video_url        = data.video_url    || ''
+    form.value.cta_url          = ctaLink?.url      || ''
+    form.value.btn_label        = ctaLink?.label    || ''
+    form.value.btn_color        = data.btn_color    || '#00AFF0'
+    form.value.online_status    = !!data.online_status
+    form.value.age_gate         = !!data.age_gate
+    form.value.deep_link_enabled  = data.deep_link_enabled  !== false
+    form.value.strict_deep_link   = !!data.strict_deep_link
+    form.value.bot_protection     = !!data.bot_protection
+    form.value.cta_reveal_at    = data.cta_reveal_at ?? null
+    form.value.extra_links      = extraLinks
+    form.value.popup_title      = data.popup_title    || 'Rejoins-moi en privé 🔥'
+    form.value.popup_subtitle   = data.popup_subtitle || 'Contenu exclusif disponible maintenant'
+    form.value.popup_delay      = data.popup_delay_seconds ?? 5
+
+    // skip type-selection sub-step, go straight to infos
+    setupSubStep.value = 1
+  } catch {
+    error.value = 'Impossible de charger la page.'
   }
 }
 
-function onDrop(event: DragEvent, type: 'avatar' | 'background') {
-  dragOverBg.value = false
-  const file = event.dataTransfer?.files[0]
-  if (file) uploadFile({ target: { files: [file] } } as any, type)
+onMounted(() => {
+  if (isEditMode.value) loadPageForEdit()
+})
+
+function goToStep(i: number) {
+  const tab = tabOrder.value[i]
+  if (!tab) return
+  stepDir.value = i > currentStepIndex.value ? 'forward' : 'back'
+  activeTab.value = tab
+  if (tab === 'setup') setupSubStep.value = 1
 }
 
-// ===== SAVE =====
+function nextStep() {
+  error.value = ''
+  stepDir.value = 'forward'
+
+  if (activeTab.value === 'setup') {
+    if (setupSubStep.value === 0) { setupSubStep.value = 1; return }
+    if (!form.value.model_name.trim()) { error.value = 'Entre ton nom ou pseudo.'; return }
+    if (form.value.page_type === 'direct' && !form.value.direct_url.trim()) {
+      error.value = 'Entre l\'URL de destination.'; return
+    }
+    if (form.value.page_type === 'direct') { save(); return }
+  }
+
+  const next = tabOrder.value[currentStepIndex.value + 1]
+  if (next) { activeTab.value = next }
+  else { save() }
+}
+
+function prevStep() {
+  stepDir.value = 'back'
+  if (activeTab.value === 'setup' && setupSubStep.value > 0) {
+    setupSubStep.value--; return
+  }
+  const prev = tabOrder.value[currentStepIndex.value - 1]
+  if (prev) {
+    activeTab.value = prev
+    if (prev === 'setup') setupSubStep.value = 1
+  }
+}
+
 async function save() {
   saving.value = true
   error.value = ''
   try {
     const payload: any = {
-      model_name: form.value.model_name || form.value.dashboard_name,
-      slug: form.value.slug || undefined,
-      group_name: form.value.group_name || undefined,
-      page_type: form.value.page_type,
-      direct_url: form.value.direct_url || undefined,
-      template: form.value.template,
-      bg_color: form.value.bg_color,
-      btn_color: form.value.btn_color,
-      avatar_url: form.value.avatar_url || undefined,
-      bg_image_url: form.value.bg_image_url || undefined,
-      show_avatar: form.value.show_avatar,
-      verified_badge: form.value.verified_badge,
-      bio: form.value.bio || undefined,
-      video_url: form.value.video_url || undefined,
-      deep_link_enabled: form.value.deep_link_enabled,
-      age_gate: form.value.age_gate,
+      model_name:    form.value.model_name,
+      model_handle:  form.value.model_handle || undefined,
+      slug:          form.value.slug || undefined,
+      group_name:    form.value.model_name,
+      page_type:     form.value.page_type === 'direct' ? 'direct' : 'landing',
+      direct_url:    form.value.direct_url || undefined,
+      template:      form.value.page_type === 'direct' ? 'direct' : form.value.template,
+      bg_color:      '#0d0d0d',
+      btn_color:     form.value.btn_color,
+      video_url:     form.value.video_url || undefined,
+      vsl_enabled:   true,
       online_status: form.value.online_status,
-      response_time: form.value.response_time || undefined,
-      promo_text: form.value.promo_text || undefined,
-      countdown_end: form.value.countdown_end || null,
-      is_active: true,
+      age_gate:      form.value.age_gate,
+      cta_reveal_at: form.value.cta_reveal_at || undefined,
+      deep_link_enabled:  form.value.deep_link_enabled,
+      strict_deep_link:   form.value.strict_deep_link,
+      bot_protection:     form.value.bot_protection,
+      popup_title:        form.value.popup_title || undefined,
+      popup_subtitle:     form.value.popup_subtitle || undefined,
+      popup_delay:        form.value.popup_delay || undefined,
+      is_active:     true,
+      links: [
+        ...(form.value.cta_url ? [{
+          type:      form.value.cta_type === 'image' ? 'image_button' : 'classic',
+          label:     form.value.cta_type === 'image' ? '' : (form.value.btn_label || '🔓 Mon OnlyFans — Accès privé'),
+          url:       form.value.cta_url,
+          image_url: form.value.cta_image_url || undefined,
+          order:     0,
+        }] : []),
+        ...form.value.extra_links
+          .filter(l => l.url)
+          .map((l, i) => ({ type: l.type || 'classic', label: l.label, url: l.url, order: i + 1 })),
+      ],
     }
-    payload.links = form.value.links
-      .filter((l: any) => l.url)
-      .map((l: any, i: number) => ({
-        type: l.is_social ? 'social' : (l.type || 'classic'),
-        label: l.label || l.type || 'Link',
-        url: l.url,
-        order: i,
-      }))
-    const { data } = await api.post('/pages', payload)
-    router.push(`/pages/${data.id}/edit`)
+
+    if (isEditMode.value) {
+      await api.put(`/pages/${editPageId.value}`, payload)
+      successMsg.value = true
+      setTimeout(() => router.push('/dashboard/links'), 1200)
+    } else {
+      const { data } = await api.post('/pages', payload)
+      successMsg.value = true
+      setTimeout(() => router.push('/dashboard/links'), 1200)
+    }
   } catch (e: any) {
-    if (e.response?.data?.error === 'plan_limit') { router.push('/billing?limit=1'); return }
+    if (e.response?.data?.error === 'plan_limit') {
+      router.push('/billing?limit=1')
+      return
+    }
     const errors = e.response?.data?.errors
-    error.value = errors ? Object.values(errors).flat().join(' ') : (e.response?.data?.message || 'Error creating page.')
-    activeTab.value = 'basics'
+    error.value = errors
+      ? Object.values(errors).flat().join(' ')
+      : (e.response?.data?.message || (isEditMode.value ? 'Erreur lors de la mise à jour.' : 'Erreur lors de la création.'))
+    activeTab.value = 'setup'
     window.scrollTo(0, 0)
   } finally {
     saving.value = false
@@ -1387,20 +1404,44 @@ async function save() {
 </script>
 
 <style>
-@keyframes shimmer {
-  0%   { background-position: 200% 0 }
-  100% { background-position: -200% 0 }
+@keyframes spin {
+  from { transform: rotate(0deg) }
+  to   { transform: rotate(360deg) }
 }
-@keyframes shimmer-btn {
-  0%   { background-position: -200% center }
-  100% { background-position: 200% center }
+
+/* ── Advanced options toggle — highlighted ── */
+.adv-toggle { transition: background 0.18s, filter 0.15s; }
+.adv-toggle:hover { filter: brightness(1.18); }
+.adv-icon { transition: transform 0.25s ease; }
+.adv-toggle:hover .adv-icon { transform: rotate(35deg); }
+.adv-toggle--attn { animation: adv-pulse 2.4s ease-in-out infinite; }
+@keyframes adv-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(109,78,232,0); }
+  50%      { box-shadow: inset 0 0 0 1.5px rgba(109,78,232,0.5); }
 }
-@keyframes pulse-btn {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.02); }
+.adv-badge {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #A78BFA; background: rgba(109,78,232,0.18);
+  border: 1px solid rgba(109,78,232,0.32); border-radius: 999px; padding: 2px 7px;
 }
-@keyframes glow-btn {
-  0%, 100% { box-shadow: 0 0 6px rgba(109,78,232,0.3) }
-  50%       { box-shadow: 0 0 20px rgba(109,78,232,0.7) }
+
+/* ── Step slide transitions ── */
+.step-fwd-enter-active,
+.step-back-enter-active { transition: all 0.22s cubic-bezier(0.4,0,0.2,1); }
+.step-fwd-leave-active,
+.step-back-leave-active { transition: all 0.18s cubic-bezier(0.4,0,0.2,1); }
+
+.step-fwd-enter-from { opacity:0; transform:translateX(32px); }
+.step-fwd-leave-to   { opacity:0; transform:translateX(-32px); }
+.step-back-enter-from { opacity:0; transform:translateX(-32px); }
+.step-back-leave-to   { opacity:0; transform:translateX(32px); }
+@keyframes preview-bounce {
+  0%   { transform: scale(1);     box-shadow: 0 4px 16px color-mix(in srgb, var(--btn, #00AFF0) 38%, transparent); }
+  48%  { transform: scale(1.035); box-shadow: 0 8px 32px color-mix(in srgb, var(--btn, #00AFF0) 72%, transparent); }
+  100% { transform: scale(1);     box-shadow: 0 4px 16px color-mix(in srgb, var(--btn, #00AFF0) 38%, transparent); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1 }
+  50%       { opacity: 0.4 }
 }
 </style>

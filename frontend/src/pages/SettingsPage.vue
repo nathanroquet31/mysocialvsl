@@ -22,6 +22,25 @@
       <!-- Notification preferences -->
       <div :style="{background:theme.dark?'rgba(255,255,255,0.04)':'#fff',border:`1px solid ${theme.dark?'rgba(255,255,255,0.08)':'#E5E7EB'}`,borderRadius:'12px',padding:'24px'}">
         <p :style="{fontSize:'11px',fontWeight:600,color:theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF',textTransform:'uppercase',letterSpacing:'0.1em',margin:'0 0 16px'}">Notifications</p>
+
+        <!-- Email digest frequency -->
+        <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${theme.dark?'rgba(255,255,255,0.06)':'#F3F4F6'}`}">
+          <div>
+            <p :style="{fontSize:'13px',fontWeight:500,color:theme.dark?'#fff':'#111827',margin:'0 0 2px'}">Email digest</p>
+            <p :style="{fontSize:'12px',color:theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF',margin:0}">How often we email you a summary of your stats</p>
+          </div>
+          <div :style="{display:'flex',gap:'4px',background:theme.dark?'rgba(255,255,255,0.07)':'#F3F4F6',borderRadius:'8px',padding:'3px',flexShrink:0}">
+            <button v-for="f in [{id:'daily',label:'Daily'},{id:'weekly',label:'Weekly'},{id:'disabled',label:'Off'}]" :key="f.id"
+              @click="prefs.email_frequency = f.id"
+              :style="{padding:'5px 12px',borderRadius:'6px',border:'none',fontSize:'12px',cursor:'pointer',fontFamily:'Inter,sans-serif',
+                fontWeight: prefs.email_frequency===f.id ? '600' : '500',
+                background: prefs.email_frequency===f.id ? (theme.dark?'rgba(255,255,255,0.12)':'#fff') : 'transparent',
+                color: prefs.email_frequency===f.id ? (theme.dark?'#fff':'#111827') : (theme.dark?'rgba(255,255,255,0.45)':'#6B7280')}">
+              {{ f.label }}
+            </button>
+          </div>
+        </div>
+
         <div v-for="notif in notifications" :key="notif.key"
           :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:`1px solid ${theme.dark?'rgba(255,255,255,0.06)':'#F3F4F6'}`}">
           <div>
@@ -68,7 +87,8 @@
             </select>
           </div>
         </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:16px">
+          <span v-if="prefsSaved" style="font-size:12px;color:#059669;font-weight:600"><i class="bi bi-check-circle"></i> Saved</span>
           <button @click="savePrefs" style="background:#6D4EE8;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.15s,transform 0.15s"
             @mouseenter="e => { e.currentTarget.style.opacity='0.9'; e.currentTarget.style.transform='translateY(-1px)' }"
             @mouseleave="e => { e.currentTarget.style.opacity='1'; e.currentTarget.style.transform='translateY(0)' }">
@@ -94,12 +114,38 @@
 
       <!-- Active sessions -->
       <div :style="{background:theme.dark?'rgba(255,255,255,0.04)':'#fff',border:`1px solid ${theme.dark?'rgba(255,255,255,0.08)':'#E5E7EB'}`,borderRadius:'12px',padding:'24px'}">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px">
           <div>
             <p :style="{fontSize:'14px',fontWeight:600,color:theme.dark?'#fff':'#111827',margin:'0 0 6px'}">Active Sessions</p>
-            <p :style="{fontSize:'13px',color:theme.dark?'rgba(255,255,255,0.5)':'#6B7280',margin:0}">Manage devices that are currently logged into your account.</p>
+            <p :style="{fontSize:'13px',color:theme.dark?'rgba(255,255,255,0.5)':'#6B7280',margin:0}">Devices currently logged into your account. If you don't recognize a session, revoke it and change your password.</p>
           </div>
-          <span :style="{background:theme.dark?'rgba(255,255,255,0.07)':'#F3F4F6',color:theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF',border:`1px solid ${theme.dark?'rgba(255,255,255,0.1)':'#E5E7EB'}`,borderRadius:'999px',padding:'2px 10px',fontSize:'11px',fontWeight:600,whiteSpace:'nowrap',flexShrink:0}">Coming Soon</span>
+          <button v-if="sessions.length > 1" @click="revokeOthers"
+            style="background:none;border:1px solid #EF4444;color:#EF4444;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;flex-shrink:0">
+            Revoke all others
+          </button>
+        </div>
+        <div v-if="sessionsLoading" :style="{fontSize:'13px',color:theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF'}">Loading…</div>
+        <div v-else style="display:flex;flex-direction:column;gap:10px">
+          <div v-for="s in sessions" :key="s.id"
+            :style="{display:'flex',alignItems:'center',gap:'14px',padding:'12px 14px',border:`1px solid ${theme.dark?'rgba(255,255,255,0.08)':'#E5E7EB'}`,borderRadius:'10px',flexWrap:'wrap'}">
+            <div :style="{width:'34px',height:'34px',borderRadius:'9px',background:theme.dark?'rgba(255,255,255,0.07)':'#F3F4F6',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
+              <i :class="deviceIcon(s.user_agent)" :style="{fontSize:'15px',color:theme.dark?'rgba(255,255,255,0.6)':'#6B7280'}"></i>
+            </div>
+            <div style="flex:1;min-width:160px">
+              <p :style="{fontSize:'13px',fontWeight:600,color:theme.dark?'#fff':'#111827',margin:0}">
+                {{ describeUA(s.user_agent) }}
+                <span v-if="s.is_current" style="background:#ECFDF5;color:#059669;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:6px">This device</span>
+              </p>
+              <p :style="{fontSize:'11px',color:theme.dark?'rgba(255,255,255,0.4)':'#9CA3AF',margin:'2px 0 0'}">
+                {{ s.ip_address || 'Unknown IP' }} · {{ s.last_used_at ? 'Active ' + relTime(s.last_used_at) : 'Created ' + relTime(s.created_at) }}
+              </p>
+            </div>
+            <button v-if="!s.is_current" @click="revokeSession(s)"
+              style="background:none;border:none;color:#EF4444;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;padding:4px 8px;flex-shrink:0">
+              Revoke
+            </button>
+          </div>
+          <p v-if="sessions.length === 0" :style="{textAlign:'center',padding:'16px',color:theme.dark?'rgba(255,255,255,0.3)':'#9CA3AF',fontSize:'13px',margin:0}">No active sessions.</p>
         </div>
       </div>
     </div>
@@ -139,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -176,10 +222,71 @@ const notifPrefs = reactive({
 const prefs = reactive({
   language: 'en',
   timezone: 'UTC',
+  email_frequency: 'weekly',
 })
 
+const prefsSaved = ref(false)
+
 function savePrefs() {
-  api.patch('/user', { preferences: { ...prefs, notifications: { ...notifPrefs } } }).catch(() => {})
+  api.patch('/user', {
+    timezone: prefs.timezone,
+    preferences: { language: prefs.language, email_frequency: prefs.email_frequency, notifications: { ...notifPrefs } },
+  }).then(() => {
+    prefsSaved.value = true
+    setTimeout(() => prefsSaved.value = false, 2500)
+  }).catch(() => {})
+}
+
+// ─── Sessions ──────────────────────────────────────────────────────────────────
+const sessions = ref([])
+const sessionsLoading = ref(true)
+
+async function loadSessions() {
+  sessionsLoading.value = true
+  try { sessions.value = (await api.get('/sessions')).data } catch {}
+  sessionsLoading.value = false
+}
+
+async function revokeSession(s) {
+  try { await api.delete(`/sessions/${s.id}`); await loadSessions() } catch {}
+}
+
+async function revokeOthers() {
+  if (!confirm('Revoke all other sessions? Other devices will be logged out.')) return
+  try { await api.delete('/sessions'); await loadSessions() } catch {}
+}
+
+function describeUA(ua) {
+  if (!ua) return 'Unknown device'
+  const browser =
+    /Edg\//.test(ua) ? 'Edge' :
+    /OPR\//.test(ua) ? 'Opera' :
+    /Chrome\//.test(ua) ? 'Chrome' :
+    /Safari\//.test(ua) && /Version\//.test(ua) ? 'Safari' :
+    /Firefox\//.test(ua) ? 'Firefox' : 'Browser'
+  const os =
+    /Windows/.test(ua) ? 'Windows' :
+    /Mac OS X/.test(ua) && !/iPhone|iPad/.test(ua) ? 'macOS' :
+    /iPhone|iPad/.test(ua) ? 'iOS' :
+    /Android/.test(ua) ? 'Android' :
+    /Linux/.test(ua) ? 'Linux' : 'Unknown OS'
+  return `${browser} on ${os}`
+}
+
+function deviceIcon(ua) {
+  if (/iPhone|Android.*Mobile/.test(ua || '')) return 'bi bi-phone'
+  if (/iPad|Tablet/.test(ua || '')) return 'bi bi-tablet'
+  return 'bi bi-laptop'
+}
+
+function relTime(d) {
+  const diff = Date.now() - new Date(d).getTime()
+  const mins = Math.round(diff / 60000)
+  if (mins < 2) return 'just now'
+  if (mins < 60) return `${mins} min ago`
+  const hours = Math.round(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.round(hours / 24)}d ago`
 }
 
 async function deleteAccount() {
@@ -194,7 +301,25 @@ async function deleteAccount() {
   }
 }
 
+// Auto-save quand on change les toggles de notifications ou la fréquence email
+let notifSaveTimer = null
+let hydrated = false
+watch([notifPrefs, () => prefs.email_frequency], () => {
+  if (!hydrated) return
+  clearTimeout(notifSaveTimer)
+  notifSaveTimer = setTimeout(savePrefs, 600)
+})
+
 onMounted(async () => {
   await auth.fetchMe()
+  // Hydrate prefs from the server
+  const u = auth.user || {}
+  if (u.timezone) prefs.timezone = u.timezone
+  const p = u.preferences || {}
+  if (p.language) prefs.language = p.language
+  if (p.email_frequency) prefs.email_frequency = p.email_frequency
+  Object.assign(notifPrefs, p.notifications || {})
+  setTimeout(() => hydrated = true, 0)
+  loadSessions()
 })
 </script>

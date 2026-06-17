@@ -33,7 +33,7 @@
           <p :style="{fontSize:'14px',fontWeight:600,color:text,margin:'0 0 6px'}">Connect your own domain</p>
           <p :style="{fontSize:'13px',color:sub,margin:'0 0 16px'}">Upgrade to Pro or Agency to use a custom domain like <strong>links.yoursite.com</strong>.</p>
           <RouterLink to="/billing" style="display:inline-flex;align-items:center;gap:6px;background:#6D4EE8;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
-            Upgrade to Pro →
+            Upgrade to Pro <i class="bi bi-arrow-right"></i>
           </RouterLink>
         </div>
 

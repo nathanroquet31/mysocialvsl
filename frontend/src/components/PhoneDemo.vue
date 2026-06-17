@@ -33,6 +33,14 @@
           <div class="phone-screen">
             <div class="lp">
 
+              <!-- Vidéo plein écran -->
+              <iframe
+                :src="`https://streamable.com/e/${videoId}?autoplay=1&muted=1&loop=1`"
+                allow="autoplay; fullscreen"
+                allowfullscreen
+                class="lp-vid-iframe"
+              />
+
               <!-- Dynamic Island -->
               <div class="island">
                 <div class="island-cam"></div>
@@ -61,34 +69,20 @@
                 </div>
               </div>
 
-              <!-- Avatar -->
-              <div class="av-wrap">
-                <div class="av-ring">
-                  <div class="av-inner">
-                    <img :src="avatar" :alt="name">
-                  </div>
-                </div>
-                <div class="av-online"></div>
+              <!-- VSL badge haut-gauche -->
+              <div class="lp-vsl-badge">
+                <i class="bi bi-play-fill" style="font-size:7px"></i>
+                <span>VSL</span>
               </div>
 
-              <div class="lp-name">{{ name }}</div>
-              <div class="lp-hdl">{{ handle }}</div>
-              <div class="lp-bio" v-html="bio"></div>
-
-              <!-- Vidéo -->
-              <div class="lp-vid">
-                <iframe
-                  :src="`https://streamable.com/e/${videoId}?autoplay=1&muted=1&loop=1`"
-                  allow="autoplay; fullscreen"
-                  allowfullscreen
-                />
+              <!-- Overlay bas : gradient + nom + CTA -->
+              <div class="lp-overlay">
+                <div class="lp-overlay-name">{{ name }}</div>
+                <div class="lp-overlay-hdl">{{ handle }}</div>
+                <button class="lp-cta">{{ cta }}</button>
+                <div class="home-indicator"></div>
               </div>
 
-              <button class="lp-cta">{{ cta }}</button>
-              <div class="lp-trust">🔒 Sécurisé · Annulation à tout moment</div>
-
-              <!-- Home indicator -->
-              <div class="home-indicator"></div>
             </div>
           </div>
 
@@ -114,12 +108,12 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 defineProps({
-  name:    { type: String, default: '🌸 Karine' },
+  name:    { type: String, default: 'Karine' },
   handle:  { type: String, default: '@karinefrenchwoman' },
-  bio:     { type: String, default: 'Je partage ici ce qui me ressemble,<br>sans en faire trop 😌' },
+  bio:     { type: String, default: 'Je partage ici ce qui me ressemble,<br>sans en faire trop' },
   avatar:  { type: String, default: '/karine.jpg' },
   videoId: { type: String, default: '0ed1q5' },
-  cta:     { type: String, default: '🔓 Accès privé — Rejoindre' },
+  cta:     { type: String, default: 'Accès privé — Rejoindre' },
 })
 
 const phoneEl = ref(null)
@@ -333,15 +327,22 @@ onUnmounted(() => {
 }
 
 /* ══════════════════════════════════════════
-   LANDING PAGE CONTENT
+   LANDING PAGE CONTENT (overlay style)
 ══════════════════════════════════════════ */
 .lp {
   width: 100%; height: 100%;
-  background: #0d0d0d;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 52px 14px 20px;
+  background: #000;
   font-family: -apple-system, sans-serif;
-  overflow: hidden; position: relative;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Vidéo plein écran */
+.lp-vid-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  border: none;
 }
 
 /* Dynamic Island */
@@ -384,64 +385,55 @@ onUnmounted(() => {
   width: 3px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 0 2px 2px 0;
 }
 
-/* Avatar */
-.av-wrap { position: relative; margin-bottom: 8px; flex-shrink: 0; }
-.av-ring {
-  width: 64px; height: 64px; border-radius: 50%; padding: 2.5px;
-  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-}
-.av-inner {
-  width: 100%; height: 100%; border-radius: 50%;
-  overflow: hidden; border: 2.5px solid #0d0d0d; background: #1a1a1a;
-}
-.av-inner img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center 15%; display: block;
-}
-.av-online {
-  position: absolute; bottom: 1px; right: 1px;
-  width: 15px; height: 15px; border-radius: 50%;
-  background: #22c55e; border: 2.5px solid #0d0d0d;
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-@keyframes pulse-dot {
-  0%,100% { box-shadow: 0 0 5px rgba(34,197,94,0.5); }
-  50%     { box-shadow: 0 0 14px rgba(34,197,94,1); }
+/* VSL badge */
+.lp-vsl-badge {
+  position: absolute; top: 58px; left: 12px; z-index: 10;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-radius: 999px; padding: 3px 8px;
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid rgba(255,255,255,0.14);
+  font-size: 8px; font-weight: 800; color: #fff; letter-spacing: 0.08em;
 }
 
-.lp-name { font-size: 14.5px; font-weight: 800; color: #fff; letter-spacing: -.4px; margin-bottom: 1px; }
-.lp-hdl  { font-size: 9px; color: #444; margin-bottom: 5px; font-weight: 500; }
-.lp-bio  { font-size: 8.5px; color: #555; text-align: center; line-height: 1.6; margin-bottom: 10px; max-width: 215px; }
-
-/* Vidéo */
-.lp-vid {
-  width: 100%; flex: 1; min-height: 0;
-  border-radius: 14px; overflow: hidden;
-  position: relative; margin-bottom: 10px; background: #000;
+/* Overlay bas */
+.lp-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 5;
+  padding: 70px 14px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 55%, transparent 100%);
+  display: flex; flex-direction: column; align-items: flex-start;
 }
-.lp-vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+.lp-overlay-name {
+  font-size: 16px; font-weight: 700; color: #fff;
+  letter-spacing: -0.3px; margin-bottom: 2px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+}
+.lp-overlay-hdl {
+  font-size: 10px; color: rgba(255,255,255,0.6);
+  margin-bottom: 10px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
 
 /* CTA */
 .lp-cta {
   width: 100%; background: #00aff0; color: #fff; border: none;
-  padding: 12px; border-radius: 14px;
-  font-size: 10.5px; font-weight: 800; letter-spacing: .2px;
-  text-align: center; cursor: pointer; flex-shrink: 0;
-  box-shadow: 0 4px 20px rgba(0,175,240,0.45);
+  padding: 11px; border-radius: 12px;
+  font-size: 10px; font-weight: 800; letter-spacing: .2px;
+  text-align: center; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,175,240,0.5);
   animation: cta-pulse 3s ease-in-out infinite;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 @keyframes cta-pulse {
-  0%,100% { box-shadow: 0 4px 16px rgba(0,175,240,0.35); }
-  50%     { box-shadow: 0 6px 32px rgba(0,175,240,0.7); }
+  0%,100% { box-shadow: 0 4px 16px rgba(0,175,240,0.4); }
+  50%     { box-shadow: 0 6px 28px rgba(0,175,240,0.75); }
 }
-.lp-trust { font-size: 7px; color: #282828; text-align: center; flex-shrink: 0; letter-spacing: .2px; }
 
 /* Home indicator */
 .home-indicator {
-  width: 100px; height: 4px; border-radius: 3px;
-  background: rgba(255,255,255,0.18);
-  margin-top: 8px; flex-shrink: 0;
+  width: 80px; height: 4px; border-radius: 3px;
+  background: rgba(255,255,255,0.2);
+  align-self: center;
 }
 
 /* ── Boutons ─────────────────────────────── */

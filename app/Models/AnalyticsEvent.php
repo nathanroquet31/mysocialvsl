@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['page_id', 'type', 'page_link_id', 'country', 'device'])]
+#[Fillable(['page_id', 'type', 'page_link_id', 'country', 'device', 'value', 'referrer'])]
 class AnalyticsEvent extends Model
 {
     public $updated_at = false;

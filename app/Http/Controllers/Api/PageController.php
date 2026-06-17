@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\ResolvesPublicPages;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Stevebauman\Location\Facades\Location;
 
 class PageController extends Controller
 {
+    use ResolvesPublicPages;
+
     public function index(Request $request)
     {
         return response()->json(
@@ -45,23 +47,54 @@ class PageController extends Controller
             'strict_deep_link'     => 'boolean',
             'link_preview_enabled' => 'boolean',
             'custom_domain' => 'nullable|string|max:255',
+            'video_fit'     => 'nullable|in:cover,contain',
+            'overlay_opacity' => 'nullable|numeric|min:0|max:1',
+            'card_position' => 'nullable|in:bottom,center',
+            'vsl_enabled'   => 'boolean',
+            'vsl_position'  => 'nullable|in:top,middle,bottom',
+            'fomo_enabled'  => 'boolean',
+            'fomo_title'    => 'nullable|string|max:255',
+            'fomo_message'  => 'nullable|string|max:500',
+            'fomo_cta_label'=> 'nullable|string|max:100',
+            'fomo_delay_seconds' => 'nullable|integer|min:0|max:300',
+            'meta_title'    => 'nullable|string|max:120',
+            'meta_description' => 'nullable|string|max:300',
+            'og_image_url'  => 'nullable|url',
+            'utm_passthrough' => 'boolean',
             'links'         => 'nullable|array',
             'links.*.type'  => 'required|string|max:50',
-            'links.*.label' => 'required|string|max:100',
-            'links.*.url'   => 'required|url',
+            'links.*.label' => 'nullable|string|max:100',
+            'links.*.title' => 'nullable|string|max:255',
+            'links.*.subtitle' => 'nullable|string|max:255',
+            'links.*.url'   => 'nullable|url',
             'links.*.icon'  => 'nullable|string|max:50',
             'links.*.image_url' => 'nullable|url',
+            'links.*.meta'  => 'nullable|array',
             'links.*.btn_color' => 'nullable|string|max:7',
+            'links.*.is_visible' => 'boolean',
         ]);
 
-        if (!$request->user()->canCreatePage()) {
-            $limit = $request->user()->pageLimit();
-            return response()->json([
-                'error' => 'plan_limit',
-                'message' => "Votre plan ne permet pas plus de {$limit} page(s). Passez à un plan supérieur.",
-                'plan'  => $request->user()->plan,
-                'limit' => $limit,
-            ], 403);
+        $isDirectLink = $request->input('page_type') === 'direct';
+        if ($isDirectLink) {
+            if (!$request->user()->canCreateLink()) {
+                $limit = $request->user()->linkLimit();
+                return response()->json([
+                    'error'   => 'plan_limit',
+                    'message' => "Votre plan ne permet pas plus de {$limit} lien(s) direct(s). Ajoutez un pack ou passez à un plan supérieur.",
+                    'plan'    => $request->user()->plan,
+                    'limit'   => $limit,
+                ], 403);
+            }
+        } else {
+            if (!$request->user()->canCreatePage()) {
+                $limit = $request->user()->pageLimit();
+                return response()->json([
+                    'error'   => 'plan_limit',
+                    'message' => "Votre plan ne permet pas plus de {$limit} page(s). Ajoutez un pack ou passez à un plan supérieur.",
+                    'plan'    => $request->user()->plan,
+                    'limit'   => $limit,
+                ], 403);
+            }
         }
 
         $slug = Str::slug($request->model_name) . '-' . Str::random(5);
@@ -93,17 +126,35 @@ class PageController extends Controller
             'strict_deep_link'     => $request->strict_deep_link ?? false,
             'link_preview_enabled' => $request->link_preview_enabled ?? true,
             'custom_domain' => $request->custom_domain,
+            'video_fit'     => $request->video_fit ?? 'contain',
+            'overlay_opacity' => $request->overlay_opacity ?? 0.6,
+            'card_position' => $request->card_position ?? 'bottom',
+            'vsl_enabled'   => $request->vsl_enabled ?? true,
+            'vsl_position'  => $request->vsl_position ?? 'top',
+            'fomo_enabled'  => $request->fomo_enabled ?? false,
+            'fomo_title'    => $request->fomo_title,
+            'fomo_message'  => $request->fomo_message,
+            'fomo_cta_label'=> $request->fomo_cta_label,
+            'fomo_delay_seconds' => $request->fomo_delay_seconds ?? 5,
+            'meta_title'    => $request->meta_title,
+            'meta_description' => $request->meta_description,
+            'og_image_url'  => $request->og_image_url,
+            'utm_passthrough' => $request->utm_passthrough ?? true,
         ]);
 
         foreach ($request->links ?? [] as $i => $link) {
             $page->links()->create([
                 'type'      => $link['type'],
-                'label'     => $link['label'],
-                'url'       => $link['url'],
+                'label'     => $link['label'] ?? '',
+                'title'     => $link['title'] ?? null,
+                'subtitle'  => $link['subtitle'] ?? null,
+                'url'       => $link['url'] ?? '',
                 'icon'      => $link['icon'] ?? null,
                 'image_url' => $link['image_url'] ?? null,
+                'meta'      => $link['meta'] ?? null,
                 'btn_color' => $link['btn_color'] ?? null,
                 'order'     => $i,
+                'is_visible'=> $link['is_visible'] ?? true,
             ]);
         }
 
@@ -118,45 +169,10 @@ class PageController extends Controller
 
     public function showPublic(Request $request, string $slug)
     {
-        $page = Page::where('slug', $slug)
-            ->where('is_active', true)
-            ->with(['links', 'geoRules'])
-            ->firstOrFail();
+        $page = $this->resolvePublicPage($slug);
 
-        // Résolution IP
-        $ua = $request->userAgent() ?? '';
-        $device = preg_match('/Mobile|Android|iPhone/i', $ua) ? 'mobile' : 'desktop';
-
-        // Shield Protection™ — intercept bots server-side before any JS loads
-        if ($page->bot_protection) {
-            $isMetaBot = preg_match('/facebookexternalhit|Facebot|facebookcatalog|FacebookBot|meta-externalagent/i', $ua);
-            $isBot = $isMetaBot || preg_match('/bot|crawl|spider|slurp|Googlebot|bingbot|YandexBot|Applebot|LinkedInBot|Twitterbot|WhatsApp|Slackbot|TelegramBot|Discordbot|Pinterest|AhrefsBot|SemrushBot/i', $ua);
-            if ($isBot) {
-                $page->analytics()->create(['type' => 'bot_blocked', 'device' => $device, 'country' => null]);
-                return response('<html><head><meta name="robots" content="noindex,nofollow"><title>My Links</title></head><body><p>Check out my latest content.</p></body></html>', 200)
-                    ->header('Content-Type', 'text/html');
-            }
-        }
-
-        $country = null;
-        try {
-            $position = Location::get($request->ip());
-            $country = $position ? $position->countryCode : null;
-        } catch (\Exception $e) {}
-
-        // Geo-routing — redirige si une règle correspond au pays
-        if ($country && $page->geoRules->count()) {
-            $rule = $page->geoRules->firstWhere('country_code', $country);
-            if ($rule) {
-                $page->analytics()->create(['type' => 'page_view', 'device' => $device, 'country' => $country]);
-                return redirect()->away($rule->redirect_url);
-            }
-        }
-
-        // Direct link — redirect immédiat
-        if ($page->page_type === 'direct' && $page->direct_url) {
-            $page->analytics()->create(['type' => 'page_view', 'device' => $device, 'country' => $country]);
-            return redirect()->away($page->direct_url);
+        if ($guard = $this->publicPageGuards($page, $request)) {
+            return $guard;
         }
 
         return response()->json($page);
@@ -193,13 +209,31 @@ class PageController extends Controller
             'link_preview_enabled' => 'boolean',
             'custom_domain' => 'nullable|string|max:255',
             'is_active'     => 'boolean',
+            'video_fit'     => 'nullable|in:cover,contain',
+            'overlay_opacity' => 'nullable|numeric|min:0|max:1',
+            'card_position' => 'nullable|in:bottom,center',
+            'vsl_enabled'   => 'boolean',
+            'vsl_position'  => 'nullable|in:top,middle,bottom',
+            'fomo_enabled'  => 'boolean',
+            'fomo_title'    => 'nullable|string|max:255',
+            'fomo_message'  => 'nullable|string|max:500',
+            'fomo_cta_label'=> 'nullable|string|max:100',
+            'fomo_delay_seconds' => 'nullable|integer|min:0|max:300',
+            'meta_title'    => 'nullable|string|max:120',
+            'meta_description' => 'nullable|string|max:300',
+            'og_image_url'  => 'nullable|url',
+            'utm_passthrough' => 'boolean',
             'links'         => 'nullable|array',
             'links.*.type'  => 'required|string|max:50',
-            'links.*.label' => 'required|string|max:100',
-            'links.*.url'   => 'required|url',
+            'links.*.label' => 'nullable|string|max:100',
+            'links.*.title' => 'nullable|string|max:255',
+            'links.*.subtitle' => 'nullable|string|max:255',
+            'links.*.url'   => 'nullable|url',
             'links.*.icon'  => 'nullable|string|max:50',
             'links.*.image_url' => 'nullable|url',
+            'links.*.meta'  => 'nullable|array',
             'links.*.btn_color' => 'nullable|string|max:7',
+            'links.*.is_visible' => 'boolean',
         ]);
 
         $page->update($request->only([
@@ -208,6 +242,10 @@ class PageController extends Controller
             'age_gate', 'is_active', 'online_status', 'location', 'response_time',
             'countdown_end', 'promo_text', 'bot_protection', 'deep_link_enabled',
             'strict_deep_link', 'link_preview_enabled', 'custom_domain',
+            'video_fit', 'overlay_opacity', 'card_position',
+            'vsl_enabled', 'vsl_position',
+            'fomo_enabled', 'fomo_title', 'fomo_message', 'fomo_cta_label', 'fomo_delay_seconds',
+            'meta_title', 'meta_description', 'og_image_url', 'utm_passthrough',
         ]));
 
         if ($request->has('links')) {
@@ -215,12 +253,16 @@ class PageController extends Controller
             foreach ($request->links as $i => $link) {
                 $page->links()->create([
                     'type'      => $link['type'],
-                    'label'     => $link['label'],
-                    'url'       => $link['url'],
+                    'label'     => $link['label'] ?? '',
+                    'title'     => $link['title'] ?? null,
+                    'subtitle'  => $link['subtitle'] ?? null,
+                    'url'       => $link['url'] ?? '',
                     'icon'      => $link['icon'] ?? null,
                     'image_url' => $link['image_url'] ?? null,
+                    'meta'      => $link['meta'] ?? null,
                     'btn_color' => $link['btn_color'] ?? null,
                     'order'     => $i,
+                    'is_visible'=> $link['is_visible'] ?? true,
                 ]);
             }
         }

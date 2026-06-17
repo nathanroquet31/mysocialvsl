@@ -14,11 +14,21 @@ class UserController extends Controller
         $user = $request->user();
 
         $request->validate([
-            'name'  => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $user->id,
+            'name'        => 'sometimes|string|max:255',
+            'email'       => 'sometimes|email|unique:users,email,' . $user->id,
+            'timezone'    => 'sometimes|string|timezone:all',
+            'avatar_url'  => 'sometimes|nullable|url',
+            'preferences' => 'sometimes|array',
         ]);
 
-        $user->update($request->only(['name', 'email']));
+        // Merge pour ne pas écraser les préférences non envoyées
+        if ($request->has('preferences')) {
+            $request->merge([
+                'preferences' => array_replace_recursive($user->preferences ?? [], $request->preferences),
+            ]);
+        }
+
+        $user->update($request->only(['name', 'email', 'timezone', 'avatar_url', 'preferences']));
 
         return response()->json($user);
     }
