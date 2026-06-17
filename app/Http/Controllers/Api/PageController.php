@@ -80,7 +80,7 @@ class PageController extends Controller
                 $limit = $request->user()->linkLimit();
                 return response()->json([
                     'error'   => 'plan_limit',
-                    'message' => "Votre plan ne permet pas plus de {$limit} lien(s) direct(s). Ajoutez un pack ou passez à un plan supérieur.",
+                    'message' => "Your plan doesn't allow more than {$limit} direct link(s). Add a pack or upgrade to a higher plan.",
                     'plan'    => $request->user()->plan,
                     'limit'   => $limit,
                 ], 403);
@@ -90,7 +90,7 @@ class PageController extends Controller
                 $limit = $request->user()->pageLimit();
                 return response()->json([
                     'error'   => 'plan_limit',
-                    'message' => "Votre plan ne permet pas plus de {$limit} page(s). Ajoutez un pack ou passez à un plan supérieur.",
+                    'message' => "Your plan doesn't allow more than {$limit} page(s). Add a pack or upgrade to a higher plan.",
                     'plan'    => $request->user()->plan,
                     'limit'   => $limit,
                 ], 403);
@@ -282,6 +282,6 @@ class PageController extends Controller
     public function destroy(Request $request, string $id)
     {
         $request->user()->pages()->findOrFail($id)->delete();
-        return response()->json(['message' => 'Page supprimée.']);
+        return response()->json(['message' => 'Page deleted.']);
     }
 }

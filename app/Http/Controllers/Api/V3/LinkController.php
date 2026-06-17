@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 /**
- * REST API v3 — accès programmatique aux liens/pages et analytics.
- * Auth : Bearer token (clé API v3, scopes v3:read / v3:write).
+ * REST API v3 — programmatic access to links/pages and analytics.
+ * Auth: Bearer token (v3 API key, scopes v3:read / v3:write).
  */
 class LinkController extends Controller
 {
-    // GET /api/v3 — descripteur de l'API
+    // GET /api/v3 — API descriptor
     public function root()
     {
         return response()->json([

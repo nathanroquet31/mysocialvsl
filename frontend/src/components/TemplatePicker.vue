@@ -222,7 +222,7 @@ const templates = [
   {
     id: 'cinematic',
     label: 'Cinematic',
-    desc: 'Vidéo plein écran',
+    desc: 'Full-screen video',
     bg: '#000',
     btnColor: '#6D4EE8',
     textColor: '#fff',
@@ -257,8 +257,8 @@ const templates = [
   },
   {
     id: 'vsl-bandeau',
-    label: 'Tiroir',
-    desc: 'Liens dans un drawer',
+    label: 'Drawer',
+    desc: 'Links in a drawer',
     bg: '#0d0d0d',
     btnColor: '#6D4EE8',
     textColor: '#fff',
@@ -269,13 +269,13 @@ const templates = [
   {
     id: 'vsl-popup',
     label: 'Popup',
-    desc: 'Popup central avec image',
+    desc: 'Centered popup with image',
     bg: '#0d0d0d',
     btnColor: '#6D4EE8',
     textColor: '#fff',
     name: 'Sofia',
     handle: '@sofiamodel',
-    links: ['Rejoindre'],
+    links: ['Join'],
   },
   {
     id: 'card',

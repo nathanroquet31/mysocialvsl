@@ -147,14 +147,14 @@ function screenTransform(i: number) {
 // ─── Phase labels ────────────────────────────────────────────────────────────
 const phaseLabel = computed(() => {
   const all = [
-    { icon: '📱', text: 'Profil Instagram',      bg: 'rgba(225,48,108,0.12)',  color:'#E1306C', border:'rgba(225,48,108,0.25)' },
+    { icon: '📱', text: 'Instagram profile',     bg: 'rgba(225,48,108,0.12)',  color:'#E1306C', border:'rgba(225,48,108,0.25)' },
     { icon: '🎬', text: 'Page VSL — Safari',     bg: 'rgba(109,78,232,0.12)', color:'#A78BFA', border:'rgba(109,78,232,0.25)' },
-    { icon: '🔞', text: 'Vérification 18+',       bg: 'rgba(239,68,68,0.12)',  color:'#F87171', border:'rgba(239,68,68,0.25)' },
-    { icon: '✅', text: 'OnlyFans — Accès privé', bg: 'rgba(0,175,240,0.12)', color:'#00AFF0', border:'rgba(0,175,240,0.25)' },
+    { icon: '🔞', text: '18+ Verification',        bg: 'rgba(239,68,68,0.12)',  color:'#F87171', border:'rgba(239,68,68,0.25)' },
+    { icon: '✅', text: 'OnlyFans — Private access', bg: 'rgba(0,175,240,0.12)', color:'#00AFF0', border:'rgba(0,175,240,0.25)' },
   ]
   const direct = [
-    { icon: '📱', text: 'Profil Instagram',      bg: 'rgba(225,48,108,0.12)',  color:'#E1306C', border:'rgba(225,48,108,0.25)' },
-    { icon: '✅', text: 'OnlyFans — Accès privé', bg: 'rgba(0,175,240,0.12)', color:'#00AFF0', border:'rgba(0,175,240,0.25)' },
+    { icon: '📱', text: 'Instagram profile',     bg: 'rgba(225,48,108,0.12)',  color:'#E1306C', border:'rgba(225,48,108,0.25)' },
+    { icon: '✅', text: 'OnlyFans — Private access', bg: 'rgba(0,175,240,0.12)', color:'#00AFF0', border:'rgba(0,175,240,0.25)' },
   ]
   const labels = props.mode === 'direct' ? direct : all
   return labels[phase.value] ?? labels[0]

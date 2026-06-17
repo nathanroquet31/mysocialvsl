@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class ApiKeyController extends Controller
 {
-    // GET /api-keys — liste des clés API v3 (jamais le secret, affiché une seule fois au mint)
+    // GET /api-keys — list of v3 API keys (never the secret, shown only once at mint)
     public function index(Request $request)
     {
         $keys = $request->user()->tokens()
@@ -26,7 +26,7 @@ class ApiKeyController extends Controller
         return response()->json($keys);
     }
 
-    // POST /api-keys — mint une clé v3 ; le token en clair n'est retourné qu'une fois
+    // POST /api-keys — mint a v3 key; the plaintext token is only returned once
     public function store(Request $request)
     {
         $request->validate([
@@ -48,13 +48,13 @@ class ApiKeyController extends Controller
             'id'        => $result->accessToken->id,
             'name'      => $result->accessToken->name,
             'abilities' => $abilities,
-            // Affiché une seule fois — non récupérable ensuite
+            // Shown only once — not retrievable afterwards
             'plain_text_key' => $result->plainTextToken,
             'created_at'     => $result->accessToken->created_at,
         ], 201);
     }
 
-    // DELETE /api-keys/{id} — révocation
+    // DELETE /api-keys/{id} — revocation
     public function destroy(Request $request, int $id)
     {
         $request->user()->tokens()->where('kind', 'api')->where('id', $id)->delete();

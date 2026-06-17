@@ -12,7 +12,7 @@ use Stevebauman\Location\Facades\Location;
 
 class AnalyticsController extends Controller
 {
-    // POST /p/{slug}/event — enregistre un événement (public, appelé par la page fan)
+    // POST /p/{slug}/event — records an event (public, called by the fan page)
     public function track(Request $request, string $slug)
     {
         $page = Page::where('slug', $slug)->where('is_active', true)->firstOrFail();
@@ -113,7 +113,7 @@ class AnalyticsController extends Controller
         return response()->json($stats);
     }
 
-    // GET /api/analytics/live — données temps réel uniquement (poll 8s)
+    // GET /api/analytics/live — real-time data only (poll 8s)
     public function live(Request $request)
     {
         $user    = $request->user();
@@ -132,7 +132,7 @@ class AnalyticsController extends Controller
         return response()->json($this->buildLive($pageIds));
     }
 
-    // GET /api/analytics/dashboard — vue agrégée cross-pages pour le dashboard principal
+    // GET /api/analytics/dashboard — aggregated cross-page view for the main dashboard
     public function dashboard(Request $request)
     {
         $user    = $request->user();

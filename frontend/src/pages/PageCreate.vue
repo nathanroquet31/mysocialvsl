@@ -6,8 +6,8 @@
       :style="{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Inter,sans-serif'}">
       <div :style="{textAlign:'center'}">
         <div :style="{fontSize:'48px',marginBottom:'12px'}">{{ isEditMode ? '✅' : '🚀' }}</div>
-        <p :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">{{ isEditMode ? 'Page mise à jour !' : 'Page publiée !' }}</p>
-        <p :style="{fontSize:'14px',color:'rgba(255,255,255,0.5)'}">Redirection en cours…</p>
+        <p :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">{{ isEditMode ? 'Page updated!' : 'Page published!' }}</p>
+        <p :style="{fontSize:'14px',color:'rgba(255,255,255,0.5)'}">Redirecting…</p>
       </div>
     </div>
 
@@ -54,7 +54,7 @@
 
         <button @click="$router.push('/dashboard/links')"
           :style="{padding:'6px 16px',border:`1px solid ${C.cancelBorder}`,borderRadius:'8px',background:'transparent',color:C.cancelColor,fontSize:'13px',cursor:'pointer',fontFamily:'inherit'}">
-          {{ isEditMode ? '← Retour' : 'Annuler' }}
+          {{ isEditMode ? '← Back' : 'Cancel' }}
         </button>
       </div>
 
@@ -83,13 +83,13 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="C.textVeryFaint" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
               <div :style="{padding:'4px 14px',borderRadius:'999px',fontSize:'11px',fontWeight:700,transition:'all 0.2s',
                 background:setupSubStep===1?'#6D4EE8':C.pillBg,
-                color:setupSubStep===1?'#fff':C.pillText}">Infos</div>
+                color:setupSubStep===1?'#fff':C.pillText}">Info</div>
             </div>
 
-            <!-- Sub-step 0 : Type de page -->
+            <!-- Sub-step 0 : Page type -->
             <div v-show="setupSubStep === 0">
-              <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Crée ta page de conversion</h2>
-              <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">Deux formats disponibles selon ton objectif.</p>
+              <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Create your conversion page</h2>
+              <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">Two formats available depending on your goal.</p>
 
               <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}">
 
@@ -99,8 +99,8 @@
                     borderColor:form.page_type==='vsl'?'#6D4EE8':C.border,
                     background:form.page_type==='vsl'?'rgba(109,78,232,0.1)':C.surface}">
 
-                  <!-- Badge Recommandé -->
-                  <div :style="{position:'absolute',top:'12px',right:'12px',background:'linear-gradient(135deg,#6D4EE8,#A78BFA)',borderRadius:'999px',padding:'2px 8px',fontSize:'9px',fontWeight:700,color:'#fff'}">Recommandé</div>
+                  <!-- Recommended badge -->
+                  <div :style="{position:'absolute',top:'12px',right:'12px',background:'linear-gradient(135deg,#6D4EE8,#A78BFA)',borderRadius:'999px',padding:'2px 8px',fontSize:'9px',fontWeight:700,color:'#fff'}">Recommended</div>
 
                   <!-- Phone mockup VSL -->
                   <div :style="{width:'88px',margin:'0 auto 14px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 12px 32px rgba(0,0,0,0.6)'}">
@@ -109,7 +109,7 @@
                         <div :style="{width:'18px',height:'3px',background:'#1a1a1a',borderRadius:'999px'}"></div>
                       </div>
                       <div :style="{aspectRatio:'9/16',position:'relative',background:'linear-gradient(180deg,#0a0814 0%,#1a0d30 100%)'}">
-                        <!-- Play icon centré -->
+                        <!-- Centered play icon -->
                         <div :style="{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-60%)'}">
                           <div :style="{width:'26px',height:'26px',borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1.5px solid rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center'}">
                             <svg width="9" height="9" viewBox="0 0 9 9" fill="rgba(255,255,255,0.85)"><polygon points="3,2 8,4.5 3,7"/></svg>
@@ -137,21 +137,21 @@
                     </div>
                   </div>
 
-                  <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">Page VSL</p>
-                  <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">Vidéo plein écran qui convainc<br/>avant même le clic.</p>
+                  <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">VSL Page</p>
+                  <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">A full-screen video that convinces<br/>before they even click.</p>
                   <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                    <div v-for="f in ['🎬 Vidéo verticale 9:16','🔓 Bouton CTA configurable','⏱ Apparition du CTA différée']" :key="f"
+                    <div v-for="f in ['🎬 Vertical 9:16 video','🔓 Configurable CTA button','⏱ Delayed CTA reveal']" :key="f"
                       :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
                   </div>
                   <div v-if="form.page_type==='vsl'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
                     <div :style="{background:'#6D4EE8',borderRadius:'999px',padding:'3px 12px',fontSize:'10px',fontWeight:700,color:'#fff',display:'inline-flex',alignItems:'center',gap:'4px'}">
                       <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                      Sélectionné
+                      Selected
                     </div>
                   </div>
                 </div>
 
-                <!-- Card Lien direct -->
+                <!-- Card Direct link -->
                 <div @click="form.page_type='direct'"
                   :style="{borderRadius:'18px',padding:'20px 16px',cursor:'pointer',transition:'all 0.2s',border:'2px solid',
                     borderColor:form.page_type==='direct'?'#6D4EE8':C.border,
@@ -184,16 +184,16 @@
                     <p :style="{fontSize:'8px',color:'rgba(255,255,255,0.22)',marginTop:'10px',fontWeight:700,letterSpacing:'0.08em',zIndex:1}">INSTAGRAM → SAFARI → ONLYFANS</p>
                   </div>
 
-                  <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">Lien direct</p>
-                  <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">Redirection instantanée avec<br/>deeplink bypass inclus.</p>
+                  <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">Direct link</p>
+                  <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">Instant redirect with<br/>deeplink bypass included.</p>
                   <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                    <div v-for="f in ['⚡ Redirection instantanée','🔗 Deeplink bypass automatique','📱 Compatible Instagram, TikTok…']" :key="f"
+                    <div v-for="f in ['⚡ Instant redirect','🔗 Automatic deeplink bypass','📱 Works with Instagram, TikTok…']" :key="f"
                       :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
                   </div>
                   <div v-if="form.page_type==='direct'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
                     <div :style="{background:'#6D4EE8',borderRadius:'999px',padding:'3px 12px',fontSize:'10px',fontWeight:700,color:'#fff',display:'inline-flex',alignItems:'center',gap:'4px'}">
                       <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                      Sélectionné
+                      Selected
                     </div>
                   </div>
                 </div>
@@ -214,10 +214,10 @@
                     </div>
                     <div>
                       <div :style="{display:'flex',alignItems:'center',gap:'8px'}">
-                        <span :style="{fontSize:'13px',fontWeight:700,color:C.text}">Options avancées</span>
+                        <span :style="{fontSize:'13px',fontWeight:700,color:C.text}">Advanced options</span>
                         <span class="adv-badge">Deeplink · Bot</span>
                       </div>
-                      <span :style="{fontSize:'11px',color:C.textDim}">Bypass navigateur in-app & protection anti-bots</span>
+                      <span :style="{fontSize:'11px',color:C.textDim}">In-app browser bypass & anti-bot protection</span>
                     </div>
                   </div>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.2"
@@ -258,17 +258,17 @@
 
                     <div :style="{display:'flex',flexDirection:'column',gap:'16px'}">
                       <div>
-                        <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Deeplink — Bypass navigateur intégré</p>
+                        <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Deeplink — Built-in browser bypass</p>
                         <p :style="{fontSize:'12px',color:C.textMuted,lineHeight:1.7}">
-                          Instagram, TikTok et Snapchat ouvrent les liens dans leur <strong :style="{color:C.text2}">navigateur intégré</strong>. Le visiteur ne peut pas se connecter à OnlyFans depuis là. Le deeplink détecte cette situation et force l'ouverture dans Safari ou Chrome.
+                          Instagram, TikTok and Snapchat open links in their <strong :style="{color:C.text2}">in-app browser</strong>. Visitors can't log in to OnlyFans from there. The deeplink detects this situation and forces the link to open in Safari or Chrome.
                         </p>
                       </div>
 
                       <!-- Toggle -->
                       <div :style="{background:'rgba(16,185,129,0.07)',border:'1px solid rgba(16,185,129,0.18)',borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                         <div>
-                          <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Activer le deeplink</p>
-                          <p :style="{fontSize:'11px',color:C.textDim}">Recommandé — activé par défaut</p>
+                          <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Enable deeplink</p>
+                          <p :style="{fontSize:'11px',color:C.textDim}">Recommended — enabled by default</p>
                         </div>
                         <div @click="form.deep_link_enabled = !form.deep_link_enabled"
                           :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.deep_link_enabled?'#10b981':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
@@ -278,7 +278,7 @@
 
                       <!-- Platform pills -->
                       <div>
-                        <p :style="{fontSize:'10px',fontWeight:700,color:C.textFaint,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'8px'}">Plateformes supportées</p>
+                        <p :style="{fontSize:'10px',fontWeight:700,color:C.textFaint,textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'8px'}">Supported platforms</p>
                         <div :style="{display:'flex',gap:'5px',flexWrap:'wrap'}">
                           <div v-for="p in [{l:'Instagram',c:'#E1306C'},{l:'TikTok',c:'#69C9D0'},{l:'Twitter/X',c:'#1d9bf0'},{l:'Facebook',c:'#1877F2'},{l:'Snapchat',c:'#FFFC00'},{l:'Reddit',c:'#FF4500'},{l:'Telegram',c:'#26A5E4'}]" :key="p.l"
                             :style="{padding:'3px 10px',borderRadius:'999px',fontSize:'10px',fontWeight:600,background:p.c+'18',color:p.c,border:`1px solid ${p.c}30`}">
@@ -288,9 +288,9 @@
                       </div>
                     </div>
 
-                    <!-- Demo live -->
+                    <!-- Live demo -->
                     <div :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px'}">
-                      <p :style="{fontSize:'9px',fontWeight:700,color:C.textVeryFaint,textTransform:'uppercase',letterSpacing:'0.08em'}">Demo live</p>
+                      <p :style="{fontSize:'9px',fontWeight:700,color:C.textVeryFaint,textTransform:'uppercase',letterSpacing:'0.08em'}">Live demo</p>
                       <DeeplinkDemo :mode="form.page_type === 'direct' ? 'direct' : 'vsl'" />
                     </div>
 
@@ -300,21 +300,21 @@
                   <div v-show="advancedTab === 1" :style="{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
 
                     <div>
-                      <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Strict Deeplink — Interception totale</p>
+                      <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Strict Deeplink — Total interception</p>
                       <p :style="{fontSize:'12px',color:C.textMuted,lineHeight:1.7}">
-                        Quand activé, une <strong :style="{color:C.text2}">page plein écran</strong> apparaît avant toute redirection. Le visiteur doit appuyer sur un bouton pour confirmer l'ouverture dans Safari. Aucun élément n'est cliquable avant.
+                        When enabled, a <strong :style="{color:C.text2}">full-screen page</strong> appears before any redirect. Visitors have to tap a button to confirm opening in Safari. Nothing else is clickable beforehand.
                       </p>
                     </div>
 
                     <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
-                      <!-- Deeplink normal -->
+                      <!-- Normal deeplink -->
                       <div :style="{background:C.surface,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px'}">
                         <p :style="{fontSize:'11px',fontWeight:700,color:C.text2,marginBottom:'6px',display:'flex',alignItems:'center',gap:'5px'}">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                          Deeplink normal
+                          Normal deeplink
                         </p>
-                        <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Redirection fluide. Le visiteur est directement envoyé vers Safari. Expérience sans friction.</p>
-                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#10b981',fontWeight:600}">✓ Meilleur taux de conversion</div>
+                        <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Smooth redirect. Visitors are sent straight to Safari. A frictionless experience.</p>
+                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#10b981',fontWeight:600}">✓ Best conversion rate</div>
                       </div>
                       <!-- Strict -->
                       <div :style="{background:'rgba(109,78,232,0.07)',border:'1px solid rgba(109,78,232,0.18)',borderRadius:'12px',padding:'14px'}">
@@ -322,16 +322,16 @@
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                           Strict Deeplink
                         </p>
-                        <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Écran interstitiel obligatoire. Garantit l'ouverture dans le navigateur même si le deeplink échoue.</p>
-                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#A78BFA',fontWeight:600}">✓ Ouverture garantie</div>
+                        <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Mandatory interstitial screen. Guarantees the link opens in the browser even if the deeplink fails.</p>
+                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#A78BFA',fontWeight:600}">✓ Guaranteed open</div>
                       </div>
                     </div>
 
                     <!-- Toggle -->
                     <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                       <div>
-                        <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Activer le Strict Deeplink</p>
-                        <p :style="{fontSize:'11px',color:C.textDim}">À utiliser si le deeplink normal ne fonctionne pas sur ton audience cible</p>
+                        <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Enable Strict Deeplink</p>
+                        <p :style="{fontSize:'11px',color:C.textDim}">Use this if the normal deeplink doesn't work with your target audience</p>
                       </div>
                       <div @click="form.strict_deep_link = !form.strict_deep_link"
                         :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.strict_deep_link?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
@@ -345,26 +345,26 @@
                   <div v-show="advancedTab === 2" :style="{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
 
                     <div>
-                      <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Bot Protection — Accès réservé aux humains</p>
+                      <p :style="{fontSize:'14px',fontWeight:700,color:C.text,marginBottom:'6px'}">Bot Protection — Humans only</p>
                       <p :style="{fontSize:'12px',color:C.textMuted,lineHeight:1.7}">
-                        Bloque les bots, crawlers et scrapers automatiques qui visitent ta page. Aucun robot ne peut accéder au contenu de ta VSL ni à tes liens.
+                        Blocks the bots, crawlers and automated scrapers that visit your page. No robot can access your VSL content or your links.
                       </p>
                     </div>
 
                     <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
                       <div :style="{background:'rgba(16,185,129,0.06)',border:'1px solid rgba(16,185,129,0.14)',borderRadius:'12px',padding:'14px'}">
-                        <p :style="{fontSize:'11px',fontWeight:700,color:'#10b981',marginBottom:'8px'}">✓ Ce que ça bloque</p>
+                        <p :style="{fontSize:'11px',fontWeight:700,color:'#10b981',marginBottom:'8px'}">✓ What it blocks</p>
                         <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                          <p v-for="item in ['Crawlers & scrapers','Bots de spam','Previews de liens réseaux sociaux','Outils d\'analyse concurrents']" :key="item"
+                          <p v-for="item in ['Crawlers & scrapers','Spam bots','Social media link previews','Competitor analytics tools']" :key="item"
                             :style="{fontSize:'11px',color:C.textMuted,display:'flex',alignItems:'center',gap:'5px',lineHeight:1.4}">
                             <span :style="{color:'#10b981',fontSize:'10px'}">—</span>{{ item }}
                           </p>
                         </div>
                       </div>
                       <div :style="{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.16)',borderRadius:'12px',padding:'14px'}">
-                        <p :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B',marginBottom:'8px'}">⚠ Effets secondaires</p>
+                        <p :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B',marginBottom:'8px'}">⚠ Side effects</p>
                         <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                          <p v-for="item in ['Plus d\'aperçu quand tu partages le lien','Instagram ne génère pas de preview','Reach organique impacté si tu postes le lien']" :key="item"
+                          <p v-for="item in ['No more preview when you share the link','Instagram won\'t generate a preview','Organic reach impacted if you post the link']" :key="item"
                             :style="{fontSize:'11px',color:C.textMuted,display:'flex',alignItems:'center',gap:'5px',lineHeight:1.4}">
                             <span :style="{color:'#F59E0B',fontSize:'10px'}">—</span>{{ item }}
                           </p>
@@ -375,8 +375,8 @@
                     <!-- Toggle -->
                     <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                       <div>
-                        <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Activer la Bot Protection</p>
-                        <p :style="{fontSize:'11px',color:C.textDim}">Désactivé par défaut — recommandé uniquement si tu as un problème spécifique</p>
+                        <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Enable Bot Protection</p>
+                        <p :style="{fontSize:'11px',color:C.textDim}">Disabled by default — only recommended if you have a specific issue</p>
                       </div>
                       <div @click="form.bot_protection = !form.bot_protection"
                         :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.bot_protection?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
@@ -390,26 +390,26 @@
               </div>
             </div>
 
-            <!-- Sub-step 1 : Infos -->
+            <!-- Sub-step 1 : Info -->
             <div v-show="setupSubStep === 1">
 
-              <!-- VSL infos -->
+              <!-- VSL info -->
               <template v-if="form.page_type === 'vsl'">
-                <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Infos de ta page</h2>
-                <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'32px'}">Ces informations s'affichent sur ta page publique.</p>
+                <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Your page info</h2>
+                <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'32px'}">This information shows up on your public page.</p>
                 <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
                   <div>
                     <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
-                      Ton nom / pseudo <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Affiché sur ta page</span>
+                      Your name / username <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Shown on your page</span>
                     </label>
-                    <input v-model="form.model_name" @input="autoSlug" placeholder="ex: Sofia, Léa Paris, Chloé…"
+                    <input v-model="form.model_name" @input="autoSlug" placeholder="e.g. Sofia, Lea Paris, Chloe…"
                       :style="inputStyle"
                       @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                       @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
                   </div>
                   <div>
                     <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
-                      Ton @handle <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Affiché sous ton nom</span>
+                      Your @handle <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Shown under your name</span>
                     </label>
                     <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
                       <span :style="{padding:'10px 12px 10px 14px',fontSize:'14px',color:C.textDim,fontWeight:600,flexShrink:0}">@</span>
@@ -418,7 +418,7 @@
                     </div>
                   </div>
                   <div>
-                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">URL de ta page</label>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Your page URL</label>
                     <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
                       <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/</span>
                       <input v-model="form.slug" placeholder="sofia"
@@ -428,27 +428,27 @@
                 </div>
               </template>
 
-              <!-- Direct link infos -->
+              <!-- Direct link info -->
               <template v-else>
-                <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Ton lien direct</h2>
-                <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'32px'}">Les visiteurs seront redirigés immédiatement.</p>
+                <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Your direct link</h2>
+                <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'32px'}">Visitors will be redirected immediately.</p>
                 <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
                   <div>
-                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">URL de destination</label>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Destination URL</label>
                     <input v-model="form.direct_url" type="url" placeholder="https://onlyfans.com/..."
                       :style="inputStyle"
                       @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                       @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
                   </div>
                   <div>
-                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Nom interne <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">Pour ton dashboard</span></label>
-                    <input v-model="form.model_name" @input="autoSlug" placeholder="ex: Mon OnlyFans"
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Internal name <span :style="{fontSize:'11px',fontWeight:400,color:C.textFaint,marginLeft:'6px'}">For your dashboard</span></label>
+                    <input v-model="form.model_name" @input="autoSlug" placeholder="e.g. My OnlyFans"
                       :style="inputStyle"
                       @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                       @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
                   </div>
                   <div>
-                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">URL de ta page</label>
+                    <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Your page URL</label>
                     <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
                       <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/</span>
                       <input v-model="form.slug" placeholder="sofia"
@@ -463,8 +463,8 @@
 
           <!-- ===== STEP 2 — TEMPLATE ===== -->
           <div v-else-if="activeTab === 'template'" key="template">
-            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Choisis ton template</h2>
-            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">Les deux gardent la vidéo au centre — tout dépend du nombre de liens.</p>
+            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Choose your template</h2>
+            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">They all keep the video front and center — it just comes down to how many links you need.</p>
 
             <div :style="{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'14px'}">
 
@@ -475,7 +475,7 @@
                   background: form.template==='vsl-classic' ? 'rgba(109,78,232,0.12)' : C.surface}">
                 <div v-if="form.template==='vsl-classic'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
                   <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                  Sélectionné
+                  Selected
                 </div>
                 <!-- Phone mockup -->
                 <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)',position:'relative'}">
@@ -507,10 +507,10 @@
                     </div>
                   </div>
                 </div>
-                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL Pure</p>
-                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">Vidéo plein écran + 1 bouton CTA. Conversion maximale.</p>
+                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">Pure VSL</p>
+                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">Full-screen video + 1 CTA button. Maximum conversion.</p>
                 <div :style="{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'center'}">
-                  <span v-for="tag in ['1 bouton','No distraction','Max CTR']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(109,78,232,0.15)',color:'#A78BFA',border:'1px solid rgba(109,78,232,0.25)'}">{{ tag }}</span>
+                  <span v-for="tag in ['1 button','No distraction','Max CTR']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(109,78,232,0.15)',color:'#A78BFA',border:'1px solid rgba(109,78,232,0.25)'}">{{ tag }}</span>
                 </div>
               </div>
 
@@ -521,7 +521,7 @@
                   background: form.template==='vsl-popup' ? 'rgba(109,78,232,0.12)' : C.surface}">
                 <div v-if="form.template==='vsl-popup'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
                   <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                  Sélectionné
+                  Selected
                 </div>
                 <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)'}">
                   <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
@@ -550,9 +550,9 @@
                   </div>
                 </div>
                 <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL + Popup</p>
-                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">Popup centré après X sec. avec titre, texte et CTA.</p>
+                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">Centered popup after X sec. with title, text and CTA.</p>
                 <div :style="{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'center'}">
-                  <span v-for="tag in ['Popup timed','Texte custom','Urgence']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(245,158,11,0.12)',color:'#F59E0B',border:'1px solid rgba(245,158,11,0.2)'}">{{ tag }}</span>
+                  <span v-for="tag in ['Timed popup','Custom text','Urgency']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(245,158,11,0.12)',color:'#F59E0B',border:'1px solid rgba(245,158,11,0.2)'}">{{ tag }}</span>
                 </div>
               </div>
 
@@ -563,7 +563,7 @@
                   background: form.template==='vsl-bandeau' ? 'rgba(109,78,232,0.12)' : C.surface}">
                 <div v-if="form.template==='vsl-bandeau'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
                   <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-                  Sélectionné
+                  Selected
                 </div>
                 <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)'}">
                   <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
@@ -599,10 +599,10 @@
                     </div>
                   </div>
                 </div>
-                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL + Bandeau</p>
-                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">1 CTA + tiroir de liens en bas. Parfait pour multi-plateformes.</p>
+                <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'3px'}">VSL + Banner</p>
+                <p :style="{fontSize:'10px',color:C.textMuted,textAlign:'center',lineHeight:1.5}">1 CTA + a link drawer at the bottom. Perfect for multi-platform.</p>
                 <div :style="{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'4px',justifyContent:'center'}">
-                  <span v-for="tag in ['Multi-liens','Tiroir','Swipe up']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(16,185,129,0.1)',color:'#10B981',border:'1px solid rgba(16,185,129,0.2)'}">{{ tag }}</span>
+                  <span v-for="tag in ['Multi-link','Drawer','Swipe up']" :key="tag" :style="{fontSize:'9px',padding:'2px 7px',borderRadius:'999px',background:'rgba(16,185,129,0.1)',color:'#10B981',border:'1px solid rgba(16,185,129,0.2)'}">{{ tag }}</span>
                 </div>
               </div>
 
@@ -611,8 +611,8 @@
 
           <!-- ===== STEP 3 — VSL ===== -->
           <div v-else-if="activeTab === 'vsl'" key="vsl">
-            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Ta vidéo VSL</h2>
-            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">La vidéo qui vend. Upload en vertical (9:16) pour un rendu parfait.</p>
+            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Your VSL video</h2>
+            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">The video that sells. Upload it vertical (9:16) for a perfect look.</p>
 
             <VideoUpload v-model="form.video_url" @uploading="uploadingVideo = $event" />
 
@@ -621,18 +621,18 @@
               <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'4px'}">
                 <span :style="{display:'inline-flex',alignItems:'center',gap:'6px'}">
                   <i class="bi bi-clock" style="color:#A78BFA"></i>
-                  Apparition du bouton (optionnel)
+                  Button reveal (optional)
                 </span>
               </label>
               <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px',lineHeight:1.5}">
-                Le bouton est caché jusqu'à ce moment de la vidéo. Laisse vide pour qu'il apparaisse immédiatement.
+                The button stays hidden until this point in the video. Leave it empty to show it right away.
               </p>
               <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
-                <input v-model.number="form.cta_reveal_at" type="number" min="0" placeholder="ex : 30"
+                <input v-model.number="form.cta_reveal_at" type="number" min="0" placeholder="e.g. 30"
                   :style="{...inputStyle,width:'120px',textAlign:'center'}"
                   @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                   @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
-                <span :style="{fontSize:'13px',color:C.textMuted}">secondes</span>
+                <span :style="{fontSize:'13px',color:C.textMuted}">seconds</span>
               </div>
             </div>
           </div>
@@ -641,14 +641,14 @@
           <div v-else-if="activeTab === 'cta'" key="cta">
 
             <div>
-            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Ton bouton CTA</h2>
-            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">Un seul bouton, une seule action.</p>
+            <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Your CTA button</h2>
+            <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">One button, one action.</p>
 
             <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
 
               <!-- Button type selector -->
               <div>
-                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Type de bouton</label>
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Button type</label>
                 <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}">
                   <div @click="form.cta_type='text'"
                     :style="{
@@ -661,9 +661,9 @@
                       <div :style="{width:'28px',height:'28px',borderRadius:'8px',background:form.cta_type==='text'?'rgba(109,78,232,0.25)':'rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center'}">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="form.cta_type==='text'?'#A78BFA':C.textDim" stroke-width="2"><path d="M4 6h16M4 12h8M4 18h12"/></svg>
                       </div>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='text'?'#A78BFA':C.text2}">Texte</span>
+                      <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='text'?'#A78BFA':C.text2}">Text</span>
                     </div>
-                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Bouton classique avec texte et couleur personnalisable.</p>
+                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Classic button with customizable text and color.</p>
                   </div>
                   <div @click="form.cta_type='image'"
                     :style="{
@@ -678,14 +678,14 @@
                       </div>
                       <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='image'?'#A78BFA':C.text2}">Image</span>
                     </div>
-                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Carte image cliquable avec lien — idéal pour promouvoir visuellement.</p>
+                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Clickable image card with a link — great for promoting visually.</p>
                   </div>
                 </div>
               </div>
 
               <!-- Image upload (image type) -->
               <div v-if="form.cta_type==='image'">
-                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Image du bouton</label>
+                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Button image</label>
                 <div :style="{
                   position:'relative',borderRadius:'16px',overflow:'hidden',
                   border:`2px dashed ${C.border}`,
@@ -705,16 +705,16 @@
                   <input type="file" accept="image/*" :style="{position:'absolute',inset:0,opacity:0,cursor:'pointer'}"
                     @change="uploadCtaImage" />
                 </div>
-                <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'6px'}">JPG, PNG, WEBP — Ratio recommandé 16:9 ou 3:1</p>
+                <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'6px'}">JPG, PNG, WEBP — Recommended ratio 16:9 or 3:1</p>
               </div>
 
               <!-- CTA URL -->
               <div>
                 <label :style="{display:'flex',alignItems:'center',gap:'8px',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
-                  Lien de destination
-                  <span :style="{fontSize:'10px',fontWeight:600,color:C.textMuted,background:C.surface,border:`1px solid ${C.border}`,borderRadius:'999px',padding:'1px 8px'}">optionnel</span>
+                  Destination link
+                  <span :style="{fontSize:'10px',fontWeight:600,color:C.textMuted,background:C.surface,border:`1px solid ${C.border}`,borderRadius:'999px',padding:'1px 8px'}">optional</span>
                 </label>
-                <input v-model="form.cta_url" type="url" placeholder="https://onlyfans.com/ton-pseudo/..."
+                <input v-model="form.cta_url" type="url" placeholder="https://onlyfans.com/your-username/..."
                   :style="inputStyle"
                   @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                   @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
@@ -723,9 +723,9 @@
               <!-- CTA Label (text type only) -->
               <div v-if="form.cta_type==='text'">
                 <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
-                  Texte du bouton
+                  Button text
                 </label>
-                <input v-model="form.btn_label" placeholder="ex: 🔓 Mon OnlyFans — Accès privé"
+                <input v-model="form.btn_label" placeholder="e.g. 🔓 My OnlyFans — Private access"
                   :style="inputStyle"
                   @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                   @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
@@ -734,7 +734,7 @@
               <!-- CTA Color (text type only) -->
               <div v-if="form.cta_type==='text'">
                 <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">
-                  Couleur du bouton
+                  Button color
                 </label>
                 <div :style="{display:'flex',gap:'8px',flexWrap:'wrap',alignItems:'center'}">
                   <div v-for="preset in colorPresets" :key="preset.value"
@@ -752,44 +752,44 @@
                   <div :style="{display:'flex',alignItems:'center',gap:'6px',padding:'7px 14px',borderRadius:'999px',border:`1px solid ${C.borderInput}`,background:C.surface2,cursor:'pointer'}">
                     <input v-model="form.btn_color" type="color"
                       :style="{width:'16px',height:'16px',border:'none',background:'none',padding:0,cursor:'pointer',borderRadius:'50%'}" />
-                    <span :style="{fontSize:'12px',color:C.text2,fontWeight:600}">Autre</span>
+                    <span :style="{fontSize:'12px',color:C.text2,fontWeight:600}">Other</span>
                   </div>
                 </div>
               </div> <!-- end color/v-if-text div -->
 
-              <!-- ── Popup config (vsl-popup uniquement) ── -->
+              <!-- ── Popup config (vsl-popup only) ── -->
               <div v-if="form.template === 'vsl-popup'"
                 :style="{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.18)',borderRadius:'14px',padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
                 <div style="display:flex;align-items:center;gap:8px">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg>
-                  <p :style="{fontSize:'13px',fontWeight:700,color:'#fff',margin:0}">Configuration du Popup</p>
-                  <span :style="{fontSize:'10px',color:'#F59E0B',fontWeight:600,background:'rgba(245,158,11,0.15)',padding:'2px 8px',borderRadius:'999px',marginLeft:'auto'}">apparaît après {{ form.popup_delay }}s</span>
+                  <p :style="{fontSize:'13px',fontWeight:700,color:'#fff',margin:0}">Popup settings</p>
+                  <span :style="{fontSize:'10px',color:'#F59E0B',fontWeight:600,background:'rgba(245,158,11,0.15)',padding:'2px 8px',borderRadius:'999px',marginLeft:'auto'}">appears after {{ form.popup_delay }}s</span>
                 </div>
                 <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Délai d'apparition</label>
+                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Appearance delay</label>
                   <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
                     <input v-model.number="form.popup_delay" type="range" min="0" max="60" step="1"
                       :style="{flex:1,accentColor:'#F59E0B'}" />
                     <span :style="{fontSize:'14px',fontWeight:700,color:C.text,width:'50px',textAlign:'right'}">{{ form.popup_delay }}s</span>
                   </div>
-                  <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'4px'}">0 = apparaît immédiatement à l'ouverture de la page</p>
+                  <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'4px'}">0 = appears immediately when the page opens</p>
                 </div>
                 <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Titre du popup</label>
-                  <input v-model="form.popup_title" placeholder="ex: Rejoins-moi en privé 🔥"
+                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Popup title</label>
+                  <input v-model="form.popup_title" placeholder="e.g. Join me in private 🔥"
                     :style="inputStyle"
                     @focus="(e:any)=>e.target.style.borderColor='#F59E0B'"
                     @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
                 </div>
                 <div>
-                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Sous-titre / description</label>
-                  <input v-model="form.popup_subtitle" placeholder="ex: Contenu exclusif disponible maintenant"
+                  <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Subtitle / description</label>
+                  <input v-model="form.popup_subtitle" placeholder="e.g. Exclusive content available now"
                     :style="inputStyle"
                     @focus="(e:any)=>e.target.style.borderColor='#F59E0B'"
                     @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
                 </div>
                 <div :style="{background:C.surface2,borderRadius:'10px',padding:'12px',fontSize:'12px',color:C.textMuted,lineHeight:1.6}">
-                  💡 Le bouton du popup utilise le même texte et la même couleur que ton CTA principal ci-dessous.
+                  💡 The popup button uses the same text and color as your main CTA below.
                 </div>
               </div>
 
@@ -847,10 +847,10 @@
                 </div>
 
                 <!-- Add custom link -->
-                <button @click="form.extra_links.push({label:'Mon lien',url:'',color:'#6D4EE8'})"
+                <button @click="form.extra_links.push({label:'My link',url:'',color:'#6D4EE8'})"
                   :style="{marginTop:'10px',display:'flex',alignItems:'center',gap:'6px',padding:'7px 14px',border:`1px dashed ${C.border}`,borderRadius:'8px',background:'transparent',color:C.textMuted,fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',width:'100%',justifyContent:'center'}">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                  Ajouter un lien
+                  Add a link
                 </button>
               </div>
 
@@ -862,9 +862,9 @@
                   <div>
                     <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'3px'}">
                       <span :style="{display:'inline-block',width:'8px',height:'8px',borderRadius:'50%',background:'#10B981',marginRight:'7px'}"></span>
-                      Online maintenant
+                      Online now
                     </p>
-                    <p :style="{fontSize:'12px',color:C.textDim,lineHeight:1.5}">Affiche un badge vert sur ta page — booste les clics.</p>
+                    <p :style="{fontSize:'12px',color:C.textDim,lineHeight:1.5}">Shows a green badge on your page — boosts clicks.</p>
                   </div>
                   <div @click="form.online_status = !form.online_status"
                     :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.online_status?'#10b981':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
@@ -877,9 +877,9 @@
                   <div>
                     <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'3px'}">
                       <i class="bi bi-shield-x" style="color:#F87171;margin-right:7px"></i>
-                      Vérification d'âge 18+
+                      18+ age verification
                     </p>
-                    <p :style="{fontSize:'12px',color:C.textDim,lineHeight:1.5}">Une modale de confirmation s'affiche avant d'accéder au lien.</p>
+                    <p :style="{fontSize:'12px',color:C.textDim,lineHeight:1.5}">A confirmation modal appears before accessing the link.</p>
                   </div>
                   <div @click="form.age_gate = !form.age_gate"
                     :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.age_gate?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
@@ -900,7 +900,7 @@
         <!-- RIGHT: VSL Preview -->
         <div :style="{width:'380px',background:C.panel,borderLeft:`1px solid ${C.borderLight}`,display:'flex',flexDirection:'column',alignItems:'center',padding:'24px 20px',flexShrink:0,overflowY:'auto'}">
 
-          <p :style="{fontSize:'11px',fontWeight:600,color:C.textMuted,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'20px',alignSelf:'flex-start'}">Aperçu live</p>
+          <p :style="{fontSize:'11px',fontWeight:600,color:C.textMuted,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'20px',alignSelf:'flex-start'}">Live preview</p>
 
           <!-- Phone outer shell -->
           <div :style="{width:'220px',background:'#1a1a1a',borderRadius:'40px',padding:'8px',boxShadow:'0 0 0 1px #2a2a2a,0 32px 80px rgba(0,0,0,0.7),0 0 60px rgba(109,78,232,0.15)',flexShrink:0}">
@@ -951,15 +951,15 @@
                       <!-- Emoji glow -->
                       <div :style="{fontSize:'18px',marginBottom:'6px'}">🔥</div>
                       <!-- Title -->
-                      <p :style="{fontSize:'8px',fontWeight:800,color:'#fff',margin:'0 0 3px',letterSpacing:'-0.2px',lineHeight:1.3}">{{ form.popup_title || 'Rejoins-moi en privé 🔥' }}</p>
+                      <p :style="{fontSize:'8px',fontWeight:800,color:'#fff',margin:'0 0 3px',letterSpacing:'-0.2px',lineHeight:1.3}">{{ form.popup_title || 'Join me in private 🔥' }}</p>
                       <!-- Subtitle -->
                       <p :style="{fontSize:'6.5px',color:'rgba(255,255,255,0.45)',margin:'0 0 10px',lineHeight:1.5}">{{ form.popup_subtitle || 'Contenu exclusif disponible maintenant' }}</p>
                       <!-- CTA -->
                       <div :style="{padding:'7px 8px',borderRadius:'7px',background:form.btn_color,fontSize:'7px',fontWeight:800,color:'#fff',boxShadow:`0 4px 14px ${form.btn_color}55`,letterSpacing:'0.02em'}">
-                        {{ form.btn_label || '🔓 Mon OnlyFans — Accès privé' }}
+                        {{ form.btn_label || '🔓 My OnlyFans — Private access' }}
                       </div>
                       <!-- Delay badge -->
-                      <div :style="{marginTop:'7px',fontSize:'6px',color:'rgba(255,255,255,0.3)'}">Apparaît après {{ form.popup_delay }}s</div>
+                      <div :style="{marginTop:'7px',fontSize:'6px',color:'rgba(255,255,255,0.3)'}">Appears after {{ form.popup_delay }}s</div>
                     </div>
                   </div>
 
@@ -985,7 +985,7 @@
                       background:form.btn_color,cursor:'pointer',
                       animation:'preview-bounce 2.6s cubic-bezier(0.45,0,0.55,1) infinite',
                       boxShadow:`0 4px 18px ${form.btn_color}60`,
-                    }">{{ form.btn_label || '🔓 Mon OnlyFans — Accès privé' }}</div>
+                    }">{{ form.btn_label || '🔓 My OnlyFans — Private access' }}</div>
                   </div>
                 </div>
               </div>
@@ -1033,14 +1033,14 @@
 
         <button @click="nextStep" :disabled="saving || uploadingVideo || !isStepValid"
           :style="{padding:'10px 28px',background:'#6D4EE8',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:700,cursor:(saving||uploadingVideo||!isStepValid)?'not-allowed':'pointer',fontFamily:'inherit',opacity:(saving||uploadingVideo||!isStepValid)?0.45:1,transition:'opacity 0.2s',display:'flex',alignItems:'center',gap:'6px'}"
-          :title="uploadingVideo ? 'Attends la fin de l\'upload vidéo' : !isStepValid ? 'Remplis les champs requis' : ''">
+          :title="uploadingVideo ? 'Wait for the video upload to finish' : !isStepValid ? 'Fill in the required fields' : ''">
           <i v-if="uploadingVideo" class="bi bi-hourglass-split" style="animation:spin 1s linear infinite"></i>
           <template v-else-if="!isLastAction">
             Continuer
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5l7 7-7 7"/></svg>
           </template>
           <template v-else>
-            <span>{{ saving ? (isEditMode ? 'Mise à jour…' : 'Publication…') : (isEditMode ? 'Mettre à jour' : 'Publier') }}</span>
+            <span>{{ saving ? (isEditMode ? 'Updating…' : 'Publishing…') : (isEditMode ? 'Update' : 'Publish') }}</span>
             <i v-if="!saving" :class="isEditMode ? 'bi bi-cloud-check' : 'bi bi-rocket-takeoff'"></i>
           </template>
         </button>
@@ -1209,7 +1209,7 @@ const form = ref({
   bot_protection:     false,
   cta_reveal_at:    null as number | null,
   extra_links:      [] as Array<{ type?: string; label: string; url: string; color: string }>,
-  popup_title:      'Rejoins-moi en privé 🔥',
+  popup_title:      'Join me in private 🔥',
   popup_subtitle:   'Contenu exclusif disponible maintenant',
   popup_delay:      5,
 })
@@ -1247,7 +1247,7 @@ async function uploadCtaImage(event: Event) {
   try {
     const { data } = await api.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     form.value.cta_image_url = data.url
-  } catch { error.value = 'Upload image échoué.' }
+  } catch { error.value = 'Image upload failed.' }
 }
 
 function autoSlug() {
@@ -1284,7 +1284,7 @@ async function loadPageForEdit() {
     form.value.bot_protection     = !!data.bot_protection
     form.value.cta_reveal_at    = data.cta_reveal_at ?? null
     form.value.extra_links      = extraLinks
-    form.value.popup_title      = data.popup_title    || 'Rejoins-moi en privé 🔥'
+    form.value.popup_title      = data.popup_title    || 'Join me in private 🔥'
     form.value.popup_subtitle   = data.popup_subtitle || 'Contenu exclusif disponible maintenant'
     form.value.popup_delay      = data.popup_delay_seconds ?? 5
 
@@ -1313,7 +1313,7 @@ function nextStep() {
 
   if (activeTab.value === 'setup') {
     if (setupSubStep.value === 0) { setupSubStep.value = 1; return }
-    if (!form.value.model_name.trim()) { error.value = 'Entre ton nom ou pseudo.'; return }
+    if (!form.value.model_name.trim()) { error.value = 'Enter your name or handle.'; return }
     if (form.value.page_type === 'direct' && !form.value.direct_url.trim()) {
       error.value = 'Entre l\'URL de destination.'; return
     }
@@ -1366,7 +1366,7 @@ async function save() {
       links: [
         ...(form.value.cta_url ? [{
           type:      form.value.cta_type === 'image' ? 'image_button' : 'classic',
-          label:     form.value.cta_type === 'image' ? '' : (form.value.btn_label || '🔓 Mon OnlyFans — Accès privé'),
+          label:     form.value.cta_type === 'image' ? '' : (form.value.btn_label || '🔓 My OnlyFans — Private access'),
           url:       form.value.cta_url,
           image_url: form.value.cta_image_url || undefined,
           order:     0,
@@ -1394,7 +1394,7 @@ async function save() {
     const errors = e.response?.data?.errors
     error.value = errors
       ? Object.values(errors).flat().join(' ')
-      : (e.response?.data?.message || (isEditMode.value ? 'Erreur lors de la mise à jour.' : 'Erreur lors de la création.'))
+      : (e.response?.data?.message || (isEditMode.value ? 'Update failed.' : 'Creation failed.'))
     activeTab.value = 'setup'
     window.scrollTo(0, 0)
   } finally {

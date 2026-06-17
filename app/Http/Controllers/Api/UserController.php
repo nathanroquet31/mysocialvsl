@@ -21,7 +21,7 @@ class UserController extends Controller
             'preferences' => 'sometimes|array',
         ]);
 
-        // Merge pour ne pas écraser les préférences non envoyées
+        // Merge so we don't overwrite preferences that weren't sent
         if ($request->has('preferences')) {
             $request->merge([
                 'preferences' => array_replace_recursive($user->preferences ?? [], $request->preferences),
@@ -42,7 +42,7 @@ class UserController extends Controller
 
         if (! Hash::check($request->current_password, $request->user()->password)) {
             throw ValidationException::withMessages([
-                'current_password' => ['Mot de passe actuel incorrect.'],
+                'current_password' => ['Current password is incorrect.'],
             ]);
         }
 
@@ -50,7 +50,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json(['message' => 'Mot de passe mis à jour.']);
+        return response()->json(['message' => 'Password updated.']);
     }
 
     public function destroy(Request $request)
@@ -61,13 +61,13 @@ class UserController extends Controller
 
         if (! Hash::check($request->password, $request->user()->password)) {
             throw ValidationException::withMessages([
-                'password' => ['Mot de passe incorrect.'],
+                'password' => ['Incorrect password.'],
             ]);
         }
 
         $request->user()->currentAccessToken()->delete();
         $request->user()->delete();
 
-        return response()->json(['message' => 'Compte supprimé.']);
+        return response()->json(['message' => 'Account deleted.']);
     }
 }

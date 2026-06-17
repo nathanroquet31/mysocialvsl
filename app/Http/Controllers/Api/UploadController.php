@@ -13,7 +13,7 @@ class UploadController extends Controller
 
     public function __construct()
     {
-        // Bascule automatiquement sur R2 si configuré, sinon disk public local
+        // Automatically switches to R2 if configured, otherwise the local public disk
         $this->disk = config('filesystems.disks.r2.key') ? 'r2' : 'public';
     }
 
@@ -37,10 +37,10 @@ class UploadController extends Controller
         ]);
     }
 
-    // POST /api/upload/video — vidéo VSL
+    // POST /api/upload/video — VSL video
     public function video(Request $request)
     {
-        set_time_limit(300); // 5 min — R2 upload peut être lent sur gros fichiers
+        set_time_limit(300); // 5 min — R2 upload can be slow for large files
 
         $request->validate([
             'file' => 'required|file|mimes:mp4,mov,webm|max:102400', // 100MB max

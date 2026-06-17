@@ -301,7 +301,7 @@ async function deleteAccount() {
   }
 }
 
-// Auto-save quand on change les toggles de notifications ou la fréquence email
+// Auto-save when notification toggles or email frequency change
 let notifSaveTimer = null
 let hydrated = false
 watch([notifPrefs, () => prefs.email_frequency], () => {

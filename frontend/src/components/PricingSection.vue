@@ -1,7 +1,7 @@
 <template>
   <section id="pricing" :style="{position:'relative',overflow:'hidden',padding:'96px 24px 80px',background:'linear-gradient(to bottom, #080810 0%, #0d0b1e 25%, #0f0c22 100%)'}">
 
-    <!-- Top fade — raccord avec la section du dessus -->
+    <!-- Top fade — blends with the section above -->
     <div style="position:absolute;top:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,#080810 0%,transparent 100%);z-index:2;pointer-events:none"></div>
 
     <!-- Background grid + glow orbs -->
@@ -95,10 +95,10 @@
           <span style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.04em">
             $<NumberFlow :value="isYearly ? plan.yearlyPrice : plan.price" :format="{style:'decimal'}" style="display:inline" />
           </span>
-          <span style="font-size:13px;color:rgba(255,255,255,0.3);margin-left:4px">/{{ isYearly ? 'an' : 'mois' }}</span>
+          <span style="font-size:13px;color:rgba(255,255,255,0.3);margin-left:4px">/{{ isYearly ? 'year' : 'month' }}</span>
         </div>
         <p v-if="isYearly && plan.price > 0" style="font-size:11px;color:rgba(167,139,250,0.8);margin:0 0 24px;font-weight:600">
-          Économisez ${{ plan.price * 12 - plan.yearlyPrice }}/an
+          Save ${{ plan.price * 12 - plan.yearlyPrice }}/year
         </p>
         <div v-else style="margin-bottom:24px"></div>
 
@@ -147,50 +147,50 @@ let observer = null
 const plans = [
   {
     name: 'Free',
-    description: 'Pour démarrer et tester la plateforme sans engagement.',
+    description: 'To get started and test the platform with no commitment.',
     price: 0,
     yearlyPrice: 0,
-    buttonText: 'Démarrer gratuitement',
+    buttonText: 'Start for free',
     includes: [
-      'Inclus :',
+      'Included:',
       '1 VSL Page',
       '1 Direct Link',
-      'Analytics basiques',
+      'Basic analytics',
       'Bot Protection',
-      'Mobile optimisé',
+      'Mobile optimized',
     ],
   },
   {
     name: 'Pro',
-    description: 'La meilleure valeur pour les créatrices qui veulent scaler.',
+    description: 'The best value for creators who want to scale.',
     price: 19,
     yearlyPrice: 182,
-    buttonText: 'Commencer',
+    buttonText: 'Get started',
     popular: true,
     includes: [
-      'Tout ce qui est en Free, +',
+      'Everything in Free, +',
       '5 VSL Pages',
       '2 Direct Links',
-      'Analytics temps réel',
-      'Thèmes premium',
-      'Domaine personnalisé',
+      'Real-time analytics',
+      'Premium themes',
+      'Custom domain',
       'Geo Targeting',
       'Deep Linking',
     ],
   },
   {
     name: 'Agency',
-    description: 'Pour les agences et équipes avec des besoins avancés.',
+    description: 'For agencies and teams with advanced needs.',
     price: 49,
     yearlyPrice: 470,
-    buttonText: 'Commencer',
+    buttonText: 'Get started',
     includes: [
-      'Tout ce qui est en Pro, +',
-      '25 VSL Pages + 25 liens (extensible)',
-      'Analytics avancées',
-      'Paywall intégré',
-      'Accès API',
-      'Support prioritaire',
+      'Everything in Pro, +',
+      '25 VSL Pages + 25 links (expandable)',
+      'Advanced analytics',
+      'Built-in paywall',
+      'API Access',
+      'Priority support',
       'White Label',
     ],
   },
@@ -240,7 +240,7 @@ function initSparkles() {
 onMounted(() => {
   initSparkles()
 
-  // IntersectionObserver pour déclencher l'animation au scroll
+  // IntersectionObserver to trigger the animation on scroll
   const section = document.getElementById('pricing')
   if (section) {
     observer = new IntersectionObserver(

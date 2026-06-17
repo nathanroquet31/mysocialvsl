@@ -1080,7 +1080,7 @@ const socials = [
 </style>
 
 <style>
-/* ── GlowCard ── spotlight + border glow suivant le curseur ── */
+/* ── GlowCard ── spotlight + border glow following the cursor ── */
 [data-glow]:not([data-glow] [data-glow]) {
   --border-size:    calc(var(--border, 1) * 1px);
   --spotlight-size: calc(var(--size, 200) * 1px);

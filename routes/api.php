@@ -21,11 +21,11 @@ Route::post('/login',    [AuthController::class, 'login'])->middleware('throttle
 // Stripe webhook (public, no CSRF/auth)
 Route::post('/billing/webhook', [StripeController::class, 'webhook']);
 
-// Pages publiques — vues par les fans (public)
+// Public pages — seen by fans (public)
 Route::get('/p/{slug}',          [PageController::class, 'showPublic'])->middleware('custom.domain');
 Route::post('/p/{slug}/event',   [AnalyticsController::class, 'track'])->middleware(['throttle:30,1', 'custom.domain']);
 
-// Routes protégées — manager connecté
+// Protected routes — authenticated manager
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',     [AuthController::class, 'me']);
     Route::post('/logout',[AuthController::class, 'logout']);
@@ -50,20 +50,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pages/{pageId}/geo-rules',  [GeoRuleController::class, 'index']);
     Route::put('/pages/{pageId}/geo-rules',  [GeoRuleController::class, 'sync']);
 
-    // API keys (REST API v3) — clé affichée une seule fois au mint
+    // API keys (REST API v3) — key shown only once at mint
     Route::get('/api-keys',         [ApiKeyController::class, 'index']);
     Route::post('/api-keys',        [ApiKeyController::class, 'store']);
     Route::delete('/api-keys/{id}', [ApiKeyController::class, 'destroy']);
 
-    // Sessions actives / appareils connectés
+    // Active sessions / connected devices
     Route::get('/sessions',         [SessionController::class, 'index']);
     Route::delete('/sessions',      [SessionController::class, 'destroyOthers']);
     Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
 
-    // Programme d'affiliation
+    // Affiliate program
     Route::get('/affiliate', [AffiliateController::class, 'show']);
 
-    // Social Analytics (comptes Instagram/TikTok)
+    // Social Analytics (Instagram/TikTok accounts)
     Route::get('/social-accounts',            [SocialAccountController::class, 'index']);
     Route::post('/social-accounts',           [SocialAccountController::class, 'store']);
     Route::patch('/social-accounts/{id}',     [SocialAccountController::class, 'update']);
@@ -71,7 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/social-accounts/{id}',    [SocialAccountController::class, 'destroy']);
 });
 
-// REST API v3 — accès programmatique via clé API (Bearer), scopes v3:read / v3:write
+// REST API v3 — programmatic access via API key (Bearer), scopes v3:read / v3:write
 Route::prefix('v3')->group(function () {
     Route::get('/', [V3LinkController::class, 'root']);
 

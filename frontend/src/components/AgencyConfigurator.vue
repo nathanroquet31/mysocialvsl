@@ -245,7 +245,7 @@ const props = defineProps({
 defineEmits(['checkout'])
 
 // Existing Agency subscribers update their plan in place (no Stripe redirect, proration applies).
-const ctaLabel = computed(() => (props.currentPlan === 'agency' ? 'Mettre à jour le plan' : 'Subscribe Now'))
+const ctaLabel = computed(() => (props.currentPlan === 'agency' ? 'Update plan' : 'Subscribe Now'))
 
 const PAGE_STEPS  = [25, 50, 100, 200, 400, 600, 800, Infinity]
 const LINK_STEPS  = [25, 50, 100, 200, 400, 600, 800, Infinity]

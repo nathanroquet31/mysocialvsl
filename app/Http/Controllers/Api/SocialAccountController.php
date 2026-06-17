@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 /**
- * Social Analytics — architecture prête pour la connexion Instagram via l'API
- * officielle (Instagram Graph API). Tant que l'app Meta n'est pas configurée
- * (services.instagram.client_id), les comptes sont ajoutés manuellement et la
- * synchronisation des stats est en attente.
+ * Social Analytics — architecture ready for the Instagram connection via the
+ * official Instagram Graph API. Until the Meta app is configured
+ * (services.instagram.client_id), accounts are added manually and stat
+ * syncing is pending.
  */
 class SocialAccountController extends Controller
 {
@@ -42,7 +42,7 @@ class SocialAccountController extends Controller
         return response()->json($account);
     }
 
-    // POST /social-accounts/{id}/sync — placeholder tant que l'API officielle n'est pas branchée
+    // POST /social-accounts/{id}/sync — placeholder until the official API is wired up
     public function sync(Request $request, int $id)
     {
         $account = $request->user()->socialAccounts()->findOrFail($id);
@@ -54,7 +54,7 @@ class SocialAccountController extends Controller
             ], 200);
         }
 
-        // Point d'extension : appel Instagram Graph API ici (followers, media, reels…)
+        // Extension point: call the Instagram Graph API here (followers, media, reels…)
         $account->update(['last_synced_at' => now()]);
         return response()->json(['synced' => true, 'account' => $account]);
     }
@@ -62,6 +62,6 @@ class SocialAccountController extends Controller
     public function destroy(Request $request, int $id)
     {
         $request->user()->socialAccounts()->findOrFail($id)->delete();
-        return response()->json(['message' => 'Compte déconnecté.']);
+        return response()->json(['message' => 'Account disconnected.']);
     }
 }

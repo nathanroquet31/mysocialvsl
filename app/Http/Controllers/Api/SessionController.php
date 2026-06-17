@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class SessionController extends Controller
 {
-    // GET /sessions — appareils/sessions connectés (tokens kind=session)
+    // GET /sessions — connected devices/sessions (tokens kind=session)
     public function index(Request $request)
     {
         $currentId = $request->user()->currentAccessToken()?->id;
@@ -28,14 +28,14 @@ class SessionController extends Controller
         return response()->json($sessions);
     }
 
-    // DELETE /sessions/{id} — révoque une session
+    // DELETE /sessions/{id} — revoke one session
     public function destroy(Request $request, int $id)
     {
         $request->user()->tokens()->where('kind', 'session')->where('id', $id)->delete();
-        return response()->json(['message' => 'Session révoquée.']);
+        return response()->json(['message' => 'Session revoked.']);
     }
 
-    // DELETE /sessions — révoque toutes les autres sessions
+    // DELETE /sessions — revoke all other sessions
     public function destroyOthers(Request $request)
     {
         $currentId = $request->user()->currentAccessToken()?->id;
@@ -43,6 +43,6 @@ class SessionController extends Controller
             ->where('kind', 'session')
             ->where('id', '!=', $currentId)
             ->delete();
-        return response()->json(['message' => 'Toutes les autres sessions ont été révoquées.']);
+        return response()->json(['message' => 'All other sessions have been revoked.']);
     }
 }

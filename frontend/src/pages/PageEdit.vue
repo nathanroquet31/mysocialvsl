@@ -148,23 +148,23 @@
               <TemplatePicker v-model="form.template" />
             </div>
             <div v-if="form.template === 'vsl-popup'" class="card">
-              <p style="font-weight:600;font-size:14px;color:#fff;margin:0 0 4px">Configuration du Popup</p>
-              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px">Le popup apparaît au centre de l'écran après X secondes</p>
+              <p style="font-weight:600;font-size:14px;color:#fff;margin:0 0 4px">Popup configuration</p>
+              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px">The popup appears in the center of the screen after X seconds</p>
               <div style="display:flex;flex-direction:column;gap:12px">
                 <div>
-                  <label class="field-label">Délai d'apparition (secondes)</label>
+                  <label class="field-label">Appearance delay (seconds)</label>
                   <input v-model.number="form.popup_delay_seconds" type="number" min="0" max="120" class="field-input" placeholder="5" />
                 </div>
                 <div>
-                  <label class="field-label">Image du popup (URL)</label>
+                  <label class="field-label">Popup image (URL)</label>
                   <input v-model="form.popup_image_url" type="url" class="field-input" placeholder="https://..." />
                   <div v-if="form.popup_image_url" style="margin-top:8px;border-radius:10px;overflow:hidden;max-height:120px">
                     <img :src="form.popup_image_url" style="width:100%;height:120px;object-fit:cover" />
                   </div>
                 </div>
                 <div>
-                  <label class="field-label">Texte sous l'image</label>
-                  <textarea v-model="form.popup_text" rows="2" class="field-input" style="resize:vertical" placeholder="Rejoins-moi en exclusivité 🔥"></textarea>
+                  <label class="field-label">Text below the image</label>
+                  <textarea v-model="form.popup_text" rows="2" class="field-input" style="resize:vertical" placeholder="Join me for exclusive content 🔥"></textarea>
                 </div>
               </div>
             </div>
@@ -254,8 +254,8 @@
                   <div style="width:7px;height:7px;border-radius:50%;background:#ef4444;animation:pulse-rec 1.4s ease-in-out infinite;flex-shrink:0"></div>
                   <span style="font-size:10px;font-weight:800;color:#fca5a5;letter-spacing:0.12em">VIDEO SALES LETTER</span>
                 </div>
-                <h2 style="font-size:26px;font-weight:900;color:#fff;margin:0 0 6px;letter-spacing:-0.04em;line-height:1.05">Votre VSL</h2>
-                <p style="font-size:13px;color:rgba(255,255,255,0.38);margin:0;max-width:360px;line-height:1.6">La vidéo qui convertit.</p>
+                <h2 style="font-size:26px;font-weight:900;color:#fff;margin:0 0 6px;letter-spacing:-0.04em;line-height:1.05">Your VSL</h2>
+                <p style="font-size:13px;color:rgba(255,255,255,0.38);margin:0;max-width:360px;line-height:1.6">The video that converts.</p>
               </div>
             </div>
 
@@ -265,18 +265,18 @@
                 <p :style="{fontSize:'26px',fontWeight:900,margin:0,letterSpacing:'-0.04em',color:analyticsData.play_rate>=50?'#86efac':analyticsData.play_rate>=25?'#fcd34d':'#fca5a5'}">{{ analyticsData.play_rate }}%</p>
               </div>
               <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:14px 16px;text-align:center">
-                <p style="font-size:10px;font-weight:700;color:rgba(252,161,161,0.65);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px">Vu à 50%</p>
+                <p style="font-size:10px;font-weight:700;color:rgba(252,161,161,0.65);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px">Watched to 50%</p>
                 <p :style="{fontSize:'26px',fontWeight:900,margin:0,letterSpacing:'-0.04em',color:analyticsData.milestones[50]>=50?'#86efac':analyticsData.milestones[50]>=25?'#fcd34d':'#fca5a5'}">{{ analyticsData.milestones[50] }}%</p>
               </div>
               <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:14px 16px;text-align:center">
-                <p style="font-size:10px;font-weight:700;color:rgba(252,161,161,0.65);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px">Watch / Clic</p>
+                <p style="font-size:10px;font-weight:700;color:rgba(252,161,161,0.65);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px">Watch / Click</p>
                 <p style="font-size:26px;font-weight:900;margin:0;letter-spacing:-0.04em;color:#fff">{{ analyticsData.avg_watch_before_click != null ? analyticsData.avg_watch_before_click + 's' : '—' }}</p>
               </div>
             </div>
             <div v-else style="display:flex;align-items:center;gap:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);border-radius:12px;padding:12px 16px;margin-bottom:20px">
               <i class="bi bi-bar-chart-line" style="font-size:16px;flex-shrink:0;color:#fca5a5;opacity:0.7"></i>
-              <p style="font-size:12px;color:rgba(255,255,255,0.38);margin:0;line-height:1.5">Vos stats VSL apparaîtront ici une fois la page active.</p>
-              <button @click="loadAnalytics" style="margin-left:auto;font-size:11px;color:#fca5a5;background:none;border:none;cursor:pointer;white-space:nowrap;font-weight:700;padding:0">Charger ↻</button>
+              <p style="font-size:12px;color:rgba(255,255,255,0.38);margin:0;line-height:1.5">Your VSL stats will appear here once the page is active.</p>
+              <button @click="loadAnalytics" style="margin-left:auto;font-size:11px;color:#fca5a5;background:none;border:none;cursor:pointer;white-space:nowrap;font-weight:700;padding:0">Load ↻</button>
             </div>
 
             <div style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.16);border-radius:20px;padding:24px;margin-bottom:12px">
@@ -285,29 +285,29 @@
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 </div>
                 <div>
-                  <p style="font-weight:700;font-size:14px;color:#fff;margin:0;line-height:1">Vidéo VSL</p>
-                  <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:3px 0 0">MP4 · MOV · WEBM — 45s recommandé</p>
+                  <p style="font-weight:700;font-size:14px;color:#fff;margin:0;line-height:1">VSL video</p>
+                  <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:3px 0 0">MP4 · MOV · WEBM — 45s recommended</p>
                 </div>
-                <span style="margin-left:auto;font-size:10px;font-weight:800;color:#fca5a5;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.25);border-radius:999px;padding:3px 10px;letter-spacing:0.06em;white-space:nowrap">PRINCIPAL</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:800;color:#fca5a5;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.25);border-radius:999px;padding:3px 10px;letter-spacing:0.06em;white-space:nowrap">MAIN</span>
               </div>
               <VideoUpload v-model="form.video_url" @uploading="videoUploading = $event" />
             </div>
 
             <div style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.16);border-radius:20px;padding:24px;margin-bottom:12px">
-              <p style="font-weight:700;font-size:14px;color:#fff;margin:0 0 20px">Rendu vidéo</p>
-              <p style="font-size:11px;font-weight:700;color:rgba(252,161,161,0.55);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 10px">Cadrage</p>
+              <p style="font-weight:700;font-size:14px;color:#fff;margin:0 0 20px">Video rendering</p>
+              <p style="font-size:11px;font-weight:700;color:rgba(252,161,161,0.55);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 10px">Framing</p>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px">
                 <button @click="form.video_fit='contain'"
                   :style="{padding:'12px 8px',border:'2px solid',borderRadius:'12px',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:600,transition:'all 0.15s',textAlign:'center',lineHeight:1.5,background:form.video_fit==='contain'?'rgba(239,68,68,0.15)':'rgba(255,255,255,0.04)',borderColor:form.video_fit==='contain'?'#ef4444':'rgba(255,255,255,0.1)',color:form.video_fit==='contain'?'#fca5a5':'rgba(255,255,255,0.6)'}">
-                  Contain<br/><span style="font-weight:400;font-size:10px;opacity:0.7">Vidéo entière visible</span>
+                  Contain<br/><span style="font-weight:400;font-size:10px;opacity:0.7">Entire video visible</span>
                 </button>
                 <button @click="form.video_fit='cover'"
                   :style="{padding:'12px 8px',border:'2px solid',borderRadius:'12px',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:600,transition:'all 0.15s',textAlign:'center',lineHeight:1.5,background:form.video_fit==='cover'?'rgba(239,68,68,0.15)':'rgba(255,255,255,0.04)',borderColor:form.video_fit==='cover'?'#ef4444':'rgba(255,255,255,0.1)',color:form.video_fit==='cover'?'#fca5a5':'rgba(255,255,255,0.6)'}">
-                  Cover<br/><span style="font-weight:400;font-size:10px;opacity:0.7">Remplit, peut recadrer</span>
+                  Cover<br/><span style="font-weight:400;font-size:10px;opacity:0.7">Fills, may crop</span>
                 </button>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                <p style="font-size:11px;font-weight:700;color:rgba(252,161,161,0.55);text-transform:uppercase;letter-spacing:0.08em;margin:0">Fond sombre</p>
+                <p style="font-size:11px;font-weight:700;color:rgba(252,161,161,0.55);text-transform:uppercase;letter-spacing:0.08em;margin:0">Dark overlay</p>
                 <span style="font-size:13px;font-weight:800;color:#fca5a5">{{ Math.round(form.overlay_opacity * 100) }}%</span>
               </div>
               <input type="range" min="0.1" max="0.9" step="0.05" v-model.number="form.overlay_opacity"
@@ -316,14 +316,14 @@
 
             <div style="background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.16);border-radius:20px;padding:24px;margin-bottom:12px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                <p style="font-weight:700;font-size:14px;color:#fff;margin:0">Affichage dans la page</p>
+                <p style="font-weight:700;font-size:14px;color:#fff;margin:0">Display on the page</p>
                 <toggle-switch v-model="form.vsl_enabled" />
               </div>
-              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin:0 0 16px">Active ou masque la VSL sur ta landing page sans perdre tes réglages vidéo.</p>
+              <p style="font-size:12px;color:rgba(255,255,255,0.35);margin:0 0 16px">Show or hide the VSL on your landing page without losing your video settings.</p>
               <template v-if="form.vsl_enabled">
                 <p style="font-size:11px;font-weight:700;color:rgba(252,161,161,0.55);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 10px">Position</p>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-                  <button v-for="pos in [{id:'top',label:'Haut',desc:'Avant le profil'},{id:'middle',label:'Milieu',desc:'Après la bio'},{id:'bottom',label:'Bas',desc:'Après les liens'}]" :key="pos.id"
+                  <button v-for="pos in [{id:'top',label:'Top',desc:'Before the profile'},{id:'middle',label:'Middle',desc:'After the bio'},{id:'bottom',label:'Bottom',desc:'After the links'}]" :key="pos.id"
                     @click="form.vsl_position=pos.id"
                     :style="{padding:'12px 8px',border:'2px solid',borderRadius:'12px',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:600,transition:'all 0.15s',textAlign:'center',lineHeight:1.5,background:form.vsl_position===pos.id?'rgba(239,68,68,0.15)':'rgba(255,255,255,0.04)',borderColor:form.vsl_position===pos.id?'#ef4444':'rgba(255,255,255,0.1)',color:form.vsl_position===pos.id?'#fca5a5':'rgba(255,255,255,0.6)'}">
                     {{ pos.label }}<br/><span style="font-weight:400;font-size:10px;opacity:0.7">{{ pos.desc }}</span>
@@ -338,16 +338,16 @@
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
                 <div>
-                  <p style="font-weight:700;font-size:14px;color:#fff;margin:0;line-height:1">Apparition du CTA</p>
-                  <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:3px 0 0">Le bouton apparaît après X secondes de vidéo. Vide = immédiat.</p>
+                  <p style="font-weight:700;font-size:14px;color:#fff;margin:0;line-height:1">CTA reveal</p>
+                  <p style="font-size:11px;color:rgba(255,255,255,0.35);margin:3px 0 0">The button appears after X seconds of video. Empty = immediately.</p>
                 </div>
               </div>
               <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
-                <input v-model.number="form.cta_reveal_at" type="number" min="0" max="600" placeholder="ex: 30"
+                <input v-model.number="form.cta_reveal_at" type="number" min="0" max="600" placeholder="e.g. 30"
                   style="width:90px;border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;outline:none;box-sizing:border-box;background:rgba(239,68,68,0.08);color:#fca5a5;text-align:center;font-family:inherit" />
-                <span style="font-size:13px;color:rgba(255,255,255,0.45)">secondes après le début de la vidéo</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.45)">seconds after the video starts</span>
                 <button v-if="form.cta_reveal_at" @click="form.cta_reveal_at = null"
-                  style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;padding:0">Retirer ✕</button>
+                  style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;padding:0">Remove ✕</button>
               </div>
             </div>
 
@@ -357,7 +357,7 @@
                   <div style="width:30px;height:30px;background:rgba(239,68,68,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                   </div>
-                  <p style="font-weight:700;font-size:14px;color:#fff;margin:0">Guide script VSL</p>
+                  <p style="font-weight:700;font-size:14px;color:#fff;margin:0">VSL script guide</p>
                 </div>
                 <span style="font-size:10px;font-weight:700;color:#fca5a5;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);border-radius:999px;padding:3px 10px">45s</span>
               </div>
@@ -522,7 +522,7 @@
             <div class="card" style="margin-top:16px">
               <p style="font-weight:600;font-size:14px;color:#fff;margin-bottom:6px">Promo text</p>
               <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:12px">Text displayed below bio</p>
-              <input v-model="form.promo_text" placeholder="-50% ce weekend seulement !" class="field-input" />
+              <input v-model="form.promo_text" placeholder="-50% this weekend only!" class="field-input" />
             </div>
             <div class="card" style="margin-top:16px">
               <p style="font-weight:600;font-size:14px;color:#fff;margin-bottom:6px">Countdown</p>
@@ -626,7 +626,7 @@
             <div class="card" style="margin-top:16px">
               <p style="font-weight:600;font-size:14px;color:#fff;margin-bottom:6px">Custom domain</p>
               <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:12px">Pro plan required. Point your CNAME to <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;font-size:11px;color:rgba(255,255,255,0.7)">pages.mysocialvsl.com</code></p>
-              <input v-model="form.custom_domain" placeholder="links.tonsite.com" class="field-input" />
+              <input v-model="form.custom_domain" placeholder="links.yoursite.com" class="field-input" />
             </div>
             <div class="card" style="margin-top:16px">
               <p style="font-weight:600;font-size:14px;color:#fff;margin-bottom:16px">Page status</p>
@@ -893,14 +893,14 @@ const form = ref({
 })
 
 const vslScriptGuide = [
-  { time: '0–5s',   title: 'Hook',            desc: "Attrape l'attention immédiatement. Pose une question ou révèle quelque chose d'exclusif." },
-  { time: '5–30s',  title: 'Valeur + tension', desc: "Montre ce qu'ils vont obtenir. Crée une tension avec ce qu'ils ratent." },
-  { time: '30–45s', title: 'CTA direct',       desc: 'Dis "clique en dessous" ou "le bouton juste là". Simple, direct, sans hésitation.' },
+  { time: '0–5s',   title: 'Hook',             desc: "Grab attention immediately. Ask a question or reveal something exclusive." },
+  { time: '5–30s',  title: 'Value + tension',  desc: "Show what they'll get. Build tension around what they're missing out on." },
+  { time: '30–45s', title: 'Direct CTA',       desc: 'Say "tap below" or "the button right there". Simple, direct, no hesitation.' },
 ]
 
 const tabs = [
   { id: 'general',   icon: 'gear',           label: 'General',   desc: 'Name, URL and template of your page' },
-  { id: 'vsl',       icon: 'play-btn',       label: 'VSL',       desc: 'Votre vidéo de vente' },
+  { id: 'vsl',       icon: 'play-btn',       label: 'VSL',       desc: 'Your sales video' },
   { id: 'profile',   icon: 'person',         label: 'Profile',   desc: 'Photo, bio and colors' },
   { id: 'content',   icon: 'link-45deg',     label: 'Content',   desc: 'Links, buttons and cards' },
   { id: 'social',    icon: 'phone',          label: 'Social',    desc: 'Add your social networks' },

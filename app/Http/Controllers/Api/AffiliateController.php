@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class AffiliateController extends Controller
 {
-    // GET /affiliate — code, lien, referrals et estimation
+    // GET /affiliate — code, link, referrals and estimate
     public function show(Request $request)
     {
         $user = $request->user();
@@ -29,7 +29,7 @@ class AffiliateController extends Controller
             'affiliate_link'    => rtrim(config('app.frontend_url', config('app.url')), '/') . '/register?ref=' . $user->affiliate_code,
             'referrals_count'   => $referrals->count(),
             'paying_referrals'  => $paying,
-            // 20% récurrent sur le plan Pro (12€/mois) — estimation simple
+            // 20% recurring on the Pro plan ($12/mo) — rough estimate
             'estimated_monthly_revenue' => round($paying * 12 * 0.20, 2),
             'payout_status'     => 'none',
         ]);

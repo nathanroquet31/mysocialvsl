@@ -3,7 +3,7 @@
     <div class="phone-wrap">
       <div class="phone" ref="phoneEl">
 
-        <!-- ── Cadre titanium ── -->
+        <!-- ── Titanium frame ── -->
         <div class="frame-top"></div>
         <div class="frame-bottom"></div>
         <div class="frame-left"></div>
@@ -13,7 +13,7 @@
         <div class="frame-corner bl"></div>
         <div class="frame-corner br"></div>
 
-        <!-- ── Dos du téléphone (face arrière) ── -->
+        <!-- ── Phone back (rear face) ── -->
         <div class="phone-back">
           <div class="back-logo"></div>
           <div class="camera-module">
@@ -24,16 +24,16 @@
           </div>
         </div>
 
-        <!-- ── Face avant ── -->
+        <!-- ── Front face ── -->
         <div class="phone-front">
-          <!-- Épaisseur de l'écran (bord) -->
+          <!-- Screen thickness (edge) -->
           <div class="screen-bezel"></div>
 
-          <!-- Écran -->
+          <!-- Screen -->
           <div class="phone-screen">
             <div class="lp">
 
-              <!-- Vidéo plein écran -->
+              <!-- Full-screen video -->
               <iframe
                 :src="`https://streamable.com/e/${videoId}?autoplay=1&muted=1&loop=1`"
                 allow="autoplay; fullscreen"
@@ -69,13 +69,13 @@
                 </div>
               </div>
 
-              <!-- VSL badge haut-gauche -->
+              <!-- VSL badge top-left -->
               <div class="lp-vsl-badge">
                 <i class="bi bi-play-fill" style="font-size:7px"></i>
                 <span>VSL</span>
               </div>
 
-              <!-- Overlay bas : gradient + nom + CTA -->
+              <!-- Bottom overlay: gradient + name + CTA -->
               <div class="lp-overlay">
                 <div class="lp-overlay-name">{{ name }}</div>
                 <div class="lp-overlay-hdl">{{ handle }}</div>
@@ -86,11 +86,11 @@
             </div>
           </div>
 
-          <!-- Reflet écran -->
+          <!-- Screen reflection -->
           <div class="screen-glare"></div>
         </div>
 
-        <!-- Boutons latéraux -->
+        <!-- Side buttons -->
         <div class="btn-power"></div>
         <div class="btn-mute"></div>
         <div class="btn-vol1"></div>
@@ -98,7 +98,7 @@
 
       </div>
 
-      <!-- Ombre portée sol -->
+      <!-- Ground drop shadow -->
       <div class="ground-shadow"></div>
     </div>
   </div>
@@ -110,10 +110,10 @@ import { ref, onMounted, onUnmounted } from 'vue'
 defineProps({
   name:    { type: String, default: 'Karine' },
   handle:  { type: String, default: '@karinefrenchwoman' },
-  bio:     { type: String, default: 'Je partage ici ce qui me ressemble,<br>sans en faire trop' },
+  bio:     { type: String, default: 'I share what feels true to me here,<br>without overdoing it' },
   avatar:  { type: String, default: '/karine.jpg' },
   videoId: { type: String, default: '0ed1q5' },
-  cta:     { type: String, default: 'Accès privé — Rejoindre' },
+  cta:     { type: String, default: 'Private access — Join' },
 })
 
 const phoneEl = ref(null)
@@ -209,8 +209,8 @@ onUnmounted(() => {
   50%     { transform: rotateY(-22deg) rotateX(6deg) translateY(-18px); }
 }
 
-/* ── Cadre titanium ────────────────────── */
-/* Utilise des pseudo-elements pour chaque face du cadre avec du depth */
+/* ── Titanium frame ────────────────────── */
+/* Uses pseudo-elements for each frame face with depth */
 .frame-top, .frame-bottom, .frame-left, .frame-right {
   position: absolute;
   background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 40%, #3a3a3a 100%);
@@ -230,30 +230,30 @@ onUnmounted(() => {
 .frame-corner.bl { bottom:-3px; left:-3px; border-bottom:3px solid #353535; border-left:3px solid #353535; border-radius:0 0 0 54px; }
 .frame-corner.br { bottom:-3px; right:-3px; border-bottom:3px solid #353535; border-right:3px solid #454545; border-radius:0 0 54px 0; }
 
-/* ── Face avant ────────────────────────── */
+/* ── Front face ────────────────────────── */
 .phone-front {
   position: absolute; inset: 0; border-radius: 54px;
   background: #000;
   box-shadow:
-    /* Ombre principale profonde */
+    /* Deep main shadow */
     28px 50px 100px rgba(0,0,0,0.95),
     14px 25px 50px  rgba(0,0,0,0.7),
     6px  10px 20px  rgba(0,0,0,0.4),
-    /* Lueur bleue subtile côté droit */
+    /* Subtle blue glow on the right side */
     -4px 0 40px rgba(0,175,240,0.06),
-    /* Highlight bord gauche titanium */
+    /* Titanium left-edge highlight */
     inset 1px 1px 0 rgba(255,255,255,0.08),
     inset -1px -1px 0 rgba(0,0,0,0.4);
 }
 
-/* Bezel très fin autour de l'écran */
+/* Very thin bezel around the screen */
 .screen-bezel {
   position: absolute; inset: 1px; border-radius: 53px;
   border: 1px solid rgba(255,255,255,0.04);
   pointer-events: none; z-index: 1;
 }
 
-/* Reflet écran (glare diagonale) */
+/* Screen reflection (diagonal glare) */
 .screen-glare {
   position: absolute; inset: 0; border-radius: 54px;
   background: linear-gradient(
@@ -265,7 +265,7 @@ onUnmounted(() => {
   pointer-events: none; z-index: 30;
 }
 
-/* ── Dos (dos du phone, visible en 3D) ─── */
+/* ── Back (phone back, visible in 3D) ─── */
 .phone-back {
   position: absolute; inset: 0; border-radius: 54px;
   background: linear-gradient(160deg,
@@ -283,7 +283,7 @@ onUnmounted(() => {
   clip-path: path('M14 0 C18 0 20 3 20 3 C20 3 24 1 26 4 C28 7 26 11 26 11 C26 11 28 14 27 17 C26 20 23 22 20 22 C18 22 16 21 14 21 C12 21 10 22 8 22 C5 22 2 20 1 17 C0 14 2 11 2 11 C2 11 0 7 2 4 C4 1 8 3 8 3 C8 3 10 0 14 0 Z');
 }
 
-/* Module caméra */
+/* Camera module */
 .camera-module {
   position: absolute; top: 24px; left: 24px;
   width: 110px; height: 110px;
@@ -318,7 +318,7 @@ onUnmounted(() => {
   box-shadow: 0 0 6px rgba(255,200,50,0.3);
 }
 
-/* ── Écran ──────────────────────────────── */
+/* ── Screen ─────────────────────────────── */
 .phone-screen {
   position: absolute;
   top: 1px; left: 1px; right: 1px; bottom: 1px;
@@ -337,7 +337,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-/* Vidéo plein écran */
+/* Full-screen video */
 .lp-vid-iframe {
   position: absolute;
   inset: 0;
@@ -396,7 +396,7 @@ onUnmounted(() => {
   font-size: 8px; font-weight: 800; color: #fff; letter-spacing: 0.08em;
 }
 
-/* Overlay bas */
+/* Bottom overlay */
 .lp-overlay {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 5;
   padding: 70px 14px 16px;
@@ -436,7 +436,7 @@ onUnmounted(() => {
   align-self: center;
 }
 
-/* ── Boutons ─────────────────────────────── */
+/* ── Buttons ─────────────────────────────── */
 .btn-power {
   position: absolute; right: -4px; top: 190px;
   width: 4px; height: 82px; border-radius: 0 3px 3px 0;
@@ -462,7 +462,7 @@ onUnmounted(() => {
   box-shadow: -2px 0 4px rgba(0,0,0,0.5);
 }
 
-/* ── Ombre sol ──────────────────────────── */
+/* ── Ground shadow ──────────────────────── */
 .ground-shadow {
   position: absolute;
   bottom: -60px; left: 5%; right: 5%;

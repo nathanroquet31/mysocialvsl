@@ -521,7 +521,7 @@ const FLAGS = {FR:'🇫🇷',US:'🇺🇸',GB:'🇬🇧',DE:'🇩🇪',ES:'🇪�
 function countryFlag(c) { return FLAGS[c] || '🌍' }
 function eventIcon(t)  { return {page_view:'👁️',link_click:'⚡',age_confirmed:'✅',video_play:'▶️'}[t]||'•' }
 function eventLabel(t) { return {page_view:'Page view',link_click:'Link click',age_confirmed:'Age confirmed',video_play:'Video play'}[t]||t }
-// ── Live polling (8s, endpoint dédié) ────────────────────────────────────
+// ── Live polling (8s, dedicated endpoint) ─────────────────────────────────
 let liveTimer = null
 async function pollLive() {
   try {

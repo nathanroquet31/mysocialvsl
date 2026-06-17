@@ -3,16 +3,16 @@
 
     <div class="ot-layout">
 
-      <!-- Colonne gauche : texte + étapes -->
+      <!-- Left column: text + steps -->
       <div data-aos="fade-right" class="ot-text-col">
-        <p style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">Comment ça marche</p>
+        <p style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">How it works</p>
         <h2 style="font-weight:700;color:#fff;letter-spacing:-0.03em;line-height:1.1;font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:20px">
-          De ton lien bio<br/>à l'abonnement signé
+          From your bio link<br/>to a signed subscription
         </h2>
         <p style="color:rgba(255,255,255,0.35);font-size:0.95rem;margin-bottom:40px;line-height:1.6">
-          Clique sur une étape pour en savoir plus
+          Click a step to learn more
         </p>
-        <!-- Liste des étapes cliquables -->
+        <!-- List of clickable steps -->
         <div style="display:flex;flex-direction:column;gap:10px">
           <button
             v-for="step in steps"
@@ -33,9 +33,9 @@
         </div>
       </div>
 
-      <!-- Colonne droite : orbital -->
+      <!-- Right column: orbital -->
       <div class="ot-wrap" @click="handleBgClick">
-        <!-- Orbes décoratifs -->
+        <!-- Decorative orbs -->
         <div class="ot-orb ot-orb--1"></div>
         <div class="ot-orb ot-orb--2"></div>
         <div class="ot-orb ot-orb--3"></div>
@@ -90,7 +90,7 @@
               <p class="ot-card__body">{{ step.content }}</p>
               <div class="ot-bar-wrap">
                 <div class="ot-bar-top">
-                  <span><i class="bi bi-lightning-charge-fill"></i> Efficacité</span>
+                  <span><i class="bi bi-lightning-charge-fill"></i> Effectiveness</span>
                   <span>{{ step.energy }}%</span>
                 </div>
                 <div class="ot-bar-track">
@@ -98,7 +98,7 @@
                 </div>
               </div>
               <div v-if="step.relatedIds.length" class="ot-related">
-                <div class="ot-related__title"><i class="bi bi-link-45deg"></i> Étapes liées</div>
+                <div class="ot-related__title"><i class="bi bi-link-45deg"></i> Related steps</div>
                 <div class="ot-related__btns">
                   <button
                     v-for="relId in step.relatedIds"
@@ -127,28 +127,28 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const steps = [
   {
-    id: 1, num: 'Étape 1', title: 'Crée ta page',
-    content: "Upload ta vidéo, choisis ton thème, ajoute tes liens. En moins de 2 minutes, ta page VSL est prête à convertir.",
+    id: 1, num: 'Step 1', title: 'Create your page',
+    content: "Upload your video, pick your theme, add your links. In under 2 minutes, your VSL page is ready to convert.",
     icon: 'bi-pencil-square', relatedIds: [2], status: 'completed', energy: 100,
   },
   {
-    id: 2, num: 'Étape 2', title: 'Publie ton lien',
-    content: "Colle ton lien MySocialVSL en bio sur Instagram, TikTok, Twitter. Un seul lien pour tout gérer.",
+    id: 2, num: 'Step 2', title: 'Publish your link',
+    content: "Paste your MySocialVSL link in your bio on Instagram, TikTok, Twitter. One link to manage everything.",
     icon: 'bi-share', relatedIds: [1, 3], status: 'completed', energy: 95,
   },
   {
-    id: 3, num: 'Étape 3', title: 'La fan arrive',
-    content: "La fan tape depuis son feed. Notre système détecte l'in-app browser et bypasse le WebView instantanément.",
+    id: 3, num: 'Step 3', title: 'The fan arrives',
+    content: "The fan taps from their feed. Our system detects the in-app browser and bypasses the WebView instantly.",
     icon: 'bi-phone', relatedIds: [2, 4], status: 'completed', energy: 88,
   },
   {
-    id: 4, num: 'Étape 4', title: 'Elle voit la VSL',
-    content: "Ta vidéo se lance automatiquement, muette. Elle te voit, elle te fait confiance, elle est prête à agir.",
+    id: 4, num: 'Step 4', title: 'She sees the VSL',
+    content: "Your video plays automatically, muted. She sees you, she trusts you, she's ready to act.",
     icon: 'bi-play-circle-fill', relatedIds: [3, 5], status: 'in-progress', energy: 92,
   },
   {
-    id: 5, num: 'Étape 5', title: 'Elle convertit',
-    content: "Elle clique — l'app native s'ouvre directement. Zéro friction. Abonnement signé. Revenus encaissés.",
+    id: 5, num: 'Step 5', title: 'She converts',
+    content: "She clicks — the native app opens directly. Zero friction. Subscription signed. Revenue collected.",
     icon: 'bi-check-circle-fill', relatedIds: [4], status: 'pending', energy: 80,
   },
 ]
@@ -222,7 +222,7 @@ const handleBgClick = () => {
 
 const isRelated   = (id) => activeId.value != null && steps.find(s => s.id === activeId.value)?.relatedIds.includes(id)
 const getStep     = (id) => steps.find(s => s.id === id)
-const statusLabel = (s)  => ({ completed: 'FAIT', 'in-progress': 'EN COURS', pending: 'À VENIR' }[s])
+const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', pending: 'UPCOMING' }[s])
 </script>
 
 <style scoped>

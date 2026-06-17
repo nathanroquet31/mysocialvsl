@@ -80,7 +80,7 @@ const data = ref(null)
 const loading = ref(true)
 const copiedWhat = ref('')
 
-// Extensible — peut être déplacé en base/API plus tard
+// Extensible — can be moved to the database/API later
 const partners = ref([])
 
 const payoutLabel = computed(() => {

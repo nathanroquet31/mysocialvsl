@@ -62,11 +62,11 @@
             <!-- ====== STYLE: vsl ====== -->
             <template v-if="p.style==='vsl'">
               <div style="position:absolute;inset:0;display:flex;flex-direction:column">
-                <!-- Photo plein écran top 60% -->
+                <!-- Full-screen photo top 60% -->
                 <div style="flex:0 0 60%;position:relative;overflow:hidden">
                   <img :src="p.photo" style="width:100%;height:100%;object-fit:cover;object-position:top" />
                   <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 30%,rgba(0,0,0,0.75) 100%)"></div>
-                  <!-- Nom en overlay bas photo -->
+                  <!-- Name overlay at bottom of photo -->
                   <div style="position:absolute;bottom:6px;left:8px">
                     <div style="display:flex;align-items:center;gap:3px;margin-bottom:2px">
                       <span style="width:4px;height:4px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>
@@ -79,14 +79,14 @@
                 </div>
                 <!-- Bottom section -->
                 <div :style="{flex:1,background:p.bottomBg||'#0d0b1e',padding:'5px 7px 6px',display:'flex',flexDirection:'column',gap:'4px'}">
-                  <!-- Icônes sociales -->
+                  <!-- Social icons -->
                   <div style="display:flex;gap:3px">
                     <span v-for="s in p.socials" :key="s.c"
                       :style="{width:'12px',height:'12px',borderRadius:'3px',background:s.c,display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
                       <i :class="`bi bi-${s.i}`" :style="{fontSize:'7px',color:s.dark?'#000':'#fff'}"></i>
                     </span>
                   </div>
-                  <!-- Grille 3 tuiles photo -->
+                  <!-- Grid of 3 photo tiles -->
                   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;flex:1;min-height:0">
                     <div v-for="(t,ti) in p.thumbs" :key="ti" style="border-radius:4px;overflow:hidden;position:relative">
                       <img :src="t" style="width:100%;height:100%;object-fit:cover;display:block" />
@@ -102,7 +102,7 @@
             <!-- ====== STYLE: banner ====== -->
             <template v-else-if="p.style==='banner'">
               <div :style="{position:'absolute',inset:0,display:'flex',flexDirection:'column',background:p.bg}">
-                <!-- Bannière photo top 40% -->
+                <!-- Photo banner top 40% -->
                 <div style="flex:0 0 40%;position:relative;overflow:hidden">
                   <img :src="p.photo" style="width:100%;height:100%;object-fit:cover;object-position:top" />
                   <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(0,0,0,0.82) 100%)"></div>
@@ -115,7 +115,7 @@
                     <p style="font-size:9px;font-weight:800;color:#fff;margin:0;text-shadow:0 1px 4px rgba(0,0,0,0.7)">{{ p.name }}</p>
                   </div>
                 </div>
-                <!-- Contenu bas 60% -->
+                <!-- Bottom content 60% -->
                 <div style="flex:1;padding:5px 6px;display:flex;flex-direction:column;gap:3px;overflow:hidden">
                   <p v-if="p.bio" style="font-size:4.5px;color:rgba(255,255,255,0.45);margin:0;line-height:1.4">{{ p.bio }}</p>
                   <div style="display:flex;gap:2px">
@@ -124,7 +124,7 @@
                       <i :class="`bi bi-${s.i}`" :style="{fontSize:'6px',color:s.dark?'#000':'#fff'}"></i>
                     </span>
                   </div>
-                  <!-- Grille 2×2 -->
+                  <!-- 2×2 grid -->
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1;min-height:0">
                     <div v-for="(t,ti) in p.thumbs.slice(0,4)" :key="ti" style="border-radius:3px;overflow:hidden;position:relative">
                       <img :src="t" style="width:100%;height:100%;object-fit:cover;display:block" />
@@ -140,7 +140,7 @@
             <!-- ====== STYLE: carousel ====== -->
             <template v-else-if="p.style==='carousel'">
               <div :style="{position:'absolute',inset:0,display:'flex',flexDirection:'column',background:p.bg,padding:'22px 8px 6px',boxSizing:'border-box'}">
-                <!-- Profil compact -->
+                <!-- Compact profile -->
                 <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-shrink:0">
                   <div :style="{width:'20px',height:'20px',borderRadius:'50%',overflow:'hidden',border:`2px solid ${p.btnColor}55`,flexShrink:0}">
                     <img :src="p.photo" style="width:100%;height:100%;object-fit:cover" />
@@ -155,24 +155,24 @@
                   </div>
                 </div>
                 <p v-if="p.bio" :style="{fontSize:'4.5px',color:p.textColor==='#111827'?'rgba(0,0,0,0.5)':'rgba(255,255,255,0.45)',margin:'0 0 5px',lineHeight:1.4,flexShrink:0}">{{ p.bio }}</p>
-                <!-- Icônes sociales -->
+                <!-- Social icons -->
                 <div style="display:flex;gap:2px;margin-bottom:6px;flex-shrink:0">
                   <span v-for="s in p.socials" :key="s.c"
                     :style="{width:'11px',height:'11px',borderRadius:'3px',background:s.c,display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
                     <i :class="`bi bi-${s.i}`" :style="{fontSize:'6px',color:s.dark?'#000':'#fff'}"></i>
                   </span>
                 </div>
-                <!-- Grande photo carrousel -->
+                <!-- Large carousel photo -->
                 <div :style="{flex:1,borderRadius:'8px',overflow:'hidden',position:'relative',border:`1px solid ${p.textColor==='#111827'?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.08)'}`}">
                   <img :src="p.photo" style="width:100%;height:100%;object-fit:cover;object-position:top" />
-                  <!-- Flèches -->
+                  <!-- Arrows -->
                   <div style="position:absolute;left:4px;top:50%;transform:translateY(-50%);width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 5px rgba(0,0,0,0.3)">
                     <i class="bi bi-chevron-left" style="font-size:5px;color:#111"></i>
                   </div>
                   <div style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 5px rgba(0,0,0,0.3)">
                     <i class="bi bi-chevron-right" style="font-size:5px;color:#111"></i>
                   </div>
-                  <!-- Barre bouton bas -->
+                  <!-- Bottom button bar -->
                   <div style="position:absolute;bottom:0;left:0;right:0;height:16px;background:rgba(0,0,0,0.3);backdrop-filter:blur(2px);display:flex;align-items:center;padding:0 6px">
                     <div style="height:2.5px;background:rgba(255,255,255,0.4);border-radius:2px;width:60%"></div>
                   </div>
@@ -183,7 +183,7 @@
             <!-- ====== STYLE: classic ====== -->
             <template v-else>
               <div :style="{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',background:p.bg,padding:'22px 8px 6px',boxSizing:'border-box'}">
-                <!-- Avatar avec ring -->
+                <!-- Avatar with ring -->
                 <div :style="{width:'36px',height:'36px',borderRadius:'50%',overflow:'hidden',border:`2.5px solid ${p.btnColor}`,marginBottom:'5px',flexShrink:0,boxShadow:`0 0 12px ${p.btnColor}55`}">
                   <img :src="p.photo" style="width:100%;height:100%;object-fit:cover" />
                 </div>
@@ -194,7 +194,7 @@
                   <span :style="{fontSize:'4px',color:p.textColor==='#111827'?'rgba(0,0,0,0.4)':'rgba(255,255,255,0.4)'}"> • {{ p.location }}</span>
                 </div>
                 <p v-if="p.bio" :style="{fontSize:'4px',color:p.textColor==='#111827'?'rgba(0,0,0,0.45)':'rgba(255,255,255,0.4)',margin:'0 0 5px',textAlign:'center',lineHeight:1.5,maxWidth:'90%'}">{{ p.bio }}</p>
-                <!-- Icônes sociales -->
+                <!-- Social icons -->
                 <div style="display:flex;gap:2px;margin-bottom:8px;flex-wrap:wrap;justify-content:center">
                   <span v-for="s in p.socials" :key="s.c"
                     :style="{width:'11px',height:'11px',borderRadius:'3px',background:s.c,display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
@@ -248,11 +248,11 @@ const wh = { i:'whatsapp',          c:'#25D366' }
 const presets = [
   {
     id: 'vsl-cinema',
-    label: 'VSL Cinéma',
+    label: 'VSL Cinema',
     name: 'Karine',
     location: 'Paris, France',
-    tagline: 'Créatrice OnlyFans 🔥',
-    vibe: 'VSL plein écran',
+    tagline: 'OnlyFans creator 🔥',
+    vibe: 'Full-screen VSL',
     style: 'vsl',
     bg: '#000',
     bottomBg: '#0c0a1a',
@@ -271,7 +271,7 @@ const presets = [
     name: 'Jenna',
     location: 'London, UK',
     bio: 'Come explore my world 🌍',
-    vibe: 'Sombre élégant',
+    vibe: 'Dark & elegant',
     style: 'banner',
     bg: '#0c0c1a',
     photo: 'https://i.pravatar.cc/400?img=1',
@@ -290,7 +290,7 @@ const presets = [
     name: 'Rose',
     location: 'Milan',
     tagline: '20 🌙 | Influencer',
-    vibe: 'Cinématique rose',
+    vibe: 'Pink cinematic',
     style: 'vsl',
     bg: '#000',
     bottomBg: '#12000a',

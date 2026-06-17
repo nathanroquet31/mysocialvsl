@@ -177,7 +177,7 @@ class StripeController extends Controller
         $user = $request->user();
 
         if (!$user->stripe_subscription_id || $user->plan === 'free') {
-            return response()->json(['error' => 'Abonnement payant requis pour ajouter des packs.'], 400);
+            return response()->json(['error' => 'A paid subscription is required to add packs.'], 400);
         }
 
         $subscription = \Stripe\Subscription::retrieve([

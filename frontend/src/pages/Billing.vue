@@ -153,7 +153,7 @@
         <p :style="{fontSize:'14px',fontWeight:600,color:text,margin:0}">Extra packs</p>
         <span style="background:#EEE9FF;border:1px solid #C7BBFF;color:#6D4EE8;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600">Pro add-on</span>
       </div>
-      <p :style="{fontSize:'13px',color:sub,margin:'0 0 24px'}">Ajoute des packs de 100 pages ou 100 liens directs supplémentaires, facturés en complément de ton abonnement Pro. La différence est prélevée au prorata immédiatement.</p>
+      <p :style="{fontSize:'13px',color:sub,margin:'0 0 24px'}">Add packs of 100 extra pages or 100 extra direct links, billed on top of your Pro subscription. The difference is charged pro rata right away.</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
 
@@ -165,11 +165,11 @@
             </div>
             <div>
               <p :style="{fontSize:'13px',fontWeight:600,color:text,margin:0}">VSL Pages</p>
-              <p :style="{fontSize:'11px',color:muted,margin:0}">+100 pages / pack — $9/mois</p>
+              <p :style="{fontSize:'11px',color:muted,margin:0}">+100 pages / pack — $9/mo</p>
             </div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <span :style="{fontSize:'12px',color:sub}">Packs actifs</span>
+            <span :style="{fontSize:'12px',color:sub}">Active packs</span>
             <div style="display:flex;align-items:center;gap:0;border-radius:8px;overflow:hidden;border:'1px solid #E5E7EB'" :style="{border:`1px solid ${border}`}">
               <button @click="pagesPacks = Math.max(0, pagesPacks - 1)"
                 :style="{width:'32px',height:'32px',border:'none',background:theme.dark?'rgba(255,255,255,0.08)':'#F3F4F6',color:text,fontWeight:700,cursor:'pointer',fontSize:'16px',fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center'}">
@@ -183,7 +183,7 @@
             </div>
           </div>
           <div :style="{background:theme.dark?'rgba(109,78,232,0.12)':'#F3F0FF',borderRadius:'8px',padding:'10px 12px',display:'flex',alignItems:'center',justifyContent:'space-between'}">
-            <span :style="{fontSize:'12px',color:'#6D4EE8',fontWeight:500}">Limite après</span>
+            <span :style="{fontSize:'12px',color:'#6D4EE8',fontWeight:500}">New limit</span>
             <span :style="{fontSize:'14px',fontWeight:700,color:'#6D4EE8'}">{{ pagesPacks === 0 ? '5' : newPageLimit }} pages</span>
           </div>
         </div>
@@ -196,11 +196,11 @@
             </div>
             <div>
               <p :style="{fontSize:'13px',fontWeight:600,color:text,margin:0}">Direct Links</p>
-              <p :style="{fontSize:'11px',color:muted,margin:0}">+100 liens / pack — $9/mois</p>
+              <p :style="{fontSize:'11px',color:muted,margin:0}">+100 links / pack — $9/mo</p>
             </div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <span :style="{fontSize:'12px',color:sub}">Packs actifs</span>
+            <span :style="{fontSize:'12px',color:sub}">Active packs</span>
             <div style="display:flex;align-items:center;gap:0;border-radius:8px;overflow:hidden" :style="{border:`1px solid ${border}`}">
               <button @click="linksPacks = Math.max(0, linksPacks - 1)"
                 :style="{width:'32px',height:'32px',border:'none',background:theme.dark?'rgba(255,255,255,0.08)':'#F3F4F6',color:text,fontWeight:700,cursor:'pointer',fontSize:'16px',fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center'}">
@@ -214,8 +214,8 @@
             </div>
           </div>
           <div :style="{background:theme.dark?'rgba(109,78,232,0.12)':'#F3F0FF',borderRadius:'8px',padding:'10px 12px',display:'flex',alignItems:'center',justifyContent:'space-between'}">
-            <span :style="{fontSize:'12px',color:'#6D4EE8',fontWeight:500}">Limite après</span>
-            <span :style="{fontSize:'14px',fontWeight:700,color:'#6D4EE8'}">{{ linksPacks === 0 ? '2' : newLinkLimit }} liens</span>
+            <span :style="{fontSize:'12px',color:'#6D4EE8',fontWeight:500}">New limit</span>
+            <span :style="{fontSize:'14px',fontWeight:700,color:'#6D4EE8'}">{{ linksPacks === 0 ? '2' : newLinkLimit }} links</span>
           </div>
         </div>
 
@@ -224,16 +224,16 @@
       <!-- Total + confirm -->
       <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px',background:theme.dark?'rgba(255,255,255,0.04)':'#F9FAFB',borderRadius:'12px',border:`1px solid ${border}`}">
         <div>
-          <p :style="{fontSize:'12px',color:muted,margin:'0 0 2px'}">Add-on mensuel</p>
+          <p :style="{fontSize:'12px',color:muted,margin:'0 0 2px'}">Monthly add-on</p>
           <div style="display:flex;align-items:baseline;gap:4px">
             <span :style="{fontSize:'22px',fontWeight:800,color:text}">+${{ addonTotal }}</span>
-            <span :style="{fontSize:'13px',color:muted}">/mois</span>
+            <span :style="{fontSize:'13px',color:muted}">/mo</span>
           </div>
-          <p :style="{fontSize:'11px',color:muted,margin:'2px 0 0'}">En plus de tes $19 Pro <i class="bi bi-arrow-right" style="font-size:10px"></i> <strong :style="{color:text}">${{ 19 + addonTotal }}/mois total</strong></p>
+          <p :style="{fontSize:'11px',color:muted,margin:'2px 0 0'}">On top of your $19 Pro <i class="bi bi-arrow-right" style="font-size:10px"></i> <strong :style="{color:text}">${{ 19 + addonTotal }}/mo total</strong></p>
         </div>
         <button @click="saveAddons" :disabled="addonsLoading"
           :style="{background:addonsSaved?'#16A34A':'#6D4EE8',color:'#fff',border:'none',borderRadius:'10px',padding:'11px 24px',fontSize:'13px',fontWeight:600,cursor:addonsLoading?'wait':'pointer',fontFamily:'Inter,sans-serif',opacity:addonsLoading?0.7:1,transition:'background 0.2s',minWidth:'160px'}">
-          <i v-if="addonsSaved" class="bi bi-check" style="margin-right:4px"></i>{{ addonsSaved ? 'Sauvegardé' : addonsLoading ? 'En cours…' : 'Confirmer les packs' }}
+          <i v-if="addonsSaved" class="bi bi-check" style="margin-right:4px"></i>{{ addonsSaved ? 'Saved' : addonsLoading ? 'Saving…' : 'Confirm packs' }}
         </button>
       </div>
     </div>
@@ -379,7 +379,7 @@ async function checkout(plan) {
     // Updated in place (existing subscriber) — refresh instead of redirecting to undefined.
     await auth.fetchMe()
     checkoutLoading.value = null
-    alert('Plan mis à jour ✓')
+    alert('Plan updated ✓')
   } catch {
     alert('Error creating checkout. Please try again.')
     checkoutLoading.value = null
@@ -392,10 +392,10 @@ async function checkoutAgency({ pages, links, price, billing: b }) {
   const lLabel = links === Infinity ? '∞' : links
   const isUpdate = currentPlan.value === 'agency'
   const tail = isUpdate
-    ? 'La différence sera prélevée au prorata sur ta carte enregistrée.'
-    : 'Tu seras redirigé vers Stripe pour saisir ta carte et payer.'
+    ? 'The difference will be charged pro rata to your saved card.'
+    : 'You will be redirected to Stripe to enter your card and pay.'
   const confirmed = window.confirm(
-    `Confirmer le plan Agency : ${pLabel} landing pages / ${lLabel} liens directs — $${price}/mois ?\n\n${tail}`
+    `Confirm the Agency plan: ${pLabel} landing pages / ${lLabel} direct links — $${price}/mo?\n\n${tail}`
   )
   if (!confirmed) return
 
@@ -415,7 +415,7 @@ async function checkoutAgency({ pages, links, price, billing: b }) {
     // Already subscribed → subscription updated in place (proration). Refresh and confirm.
     await auth.fetchMe()
     checkoutLoading.value = null
-    alert('Plan Agency mis à jour ✓')
+    alert('Agency plan updated ✓')
   } catch {
     alert('Error creating checkout. Please try again.')
     checkoutLoading.value = null
@@ -448,7 +448,7 @@ async function saveAddons() {
     addonsSaved.value = true
     setTimeout(() => { addonsSaved.value = false }, 3000)
   } catch {
-    alert('Erreur lors de la mise à jour. Réessaie.')
+    alert('Update failed. Please try again.')
   } finally {
     addonsLoading.value = false
   }
