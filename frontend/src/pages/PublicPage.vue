@@ -15,10 +15,10 @@
   <!-- ─── VSL PAGE ─────────────────────────────────────────────────────────────── -->
   <div v-else style="background:#0d0d0d;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif">
 
-    <!-- Conteneur vidéo 9:16 -->
+    <!-- 9:16 video container -->
     <div style="position:relative;width:100%;max-width:380px;border-radius:20px;overflow:hidden;background:#000;aspect-ratio:9/16">
 
-      <!-- Vidéo locale (upload direct) -->
+      <!-- Local video (direct upload) -->
       <video v-if="vslActive && isLocalVideo" ref="videoEl" :src="page.video_url"
         autoplay muted loop playsinline preload="auto"
         @play="onVideoPlay" @timeupdate="onVideoTimeUpdate"
@@ -30,7 +30,7 @@
           style="width:100%;height:100%;border:none;pointer-events:none" />
       </div>
 
-      <!-- Pas de vidéo : placeholder sombre -->
+      <!-- No video: dark placeholder -->
       <div v-else style="position:absolute;inset:0;background:linear-gradient(135deg,#1a0a2e,#000);display:flex;align-items:center;justify-content:center">
         <i class="bi bi-play-btn" style="font-size:48px;color:rgba(255,255,255,0.15)"></i>
       </div>
@@ -65,7 +65,7 @@
           <p v-if="page.model_handle" style="font-size:13px;color:rgba(255,255,255,0.62);text-shadow:0 1px 6px rgba(0,0,0,0.6);margin:0">{{ page.model_handle }}</p>
         </div>
 
-        <!-- Bouton CTA (bounce) — masqué pour vsl-popup (le popup remplace le CTA) -->
+        <!-- CTA button (bounce) — hidden for vsl-popup (the popup replaces the CTA) -->
         <button v-if="ctaVisible && primaryLink && !isPopup" @click="handleLinkClick(primaryLink)"
           class="btn-bounce cta-appear"
           :style="{
@@ -79,7 +79,7 @@
           {{ primaryLink.label || 'Rejoindre' }}
         </button>
 
-        <!-- vsl-popup : bouton de réouverture, une fois le popup fermé (le lien reste toujours accessible) -->
+        <!-- vsl-popup: reopen button, once the popup is closed (the link stays always accessible) -->
         <button v-else-if="isPopup && popupShownOnce && !popupVisible && primaryLink" @click="openPopup"
           class="btn-bounce cta-appear"
           :style="{
@@ -95,7 +95,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
 
-        <!-- CTA pas encore révélé : barre de progression -->
+        <!-- CTA not revealed yet: progress bar -->
         <div v-else-if="!ctaVisible && page.cta_reveal_at && primaryLink && !isPopup" style="padding:4px 0">
           <div style="width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;margin-bottom:8px">
             <div :style="{height:'100%',background:btnColor,borderRadius:'999px',width:ctaProgress+'%',transition:'width 1s linear'}"></div>
@@ -103,7 +103,7 @@
           <p style="font-size:11px;color:rgba(255,255,255,0.3);margin:0;text-align:center;letter-spacing:0.02em">Continue watching...</p>
         </div>
 
-        <!-- Bandeau handle — visible uniquement si template vsl-bandeau et liens suppl. -->
+        <!-- Handle banner — only visible if vsl-bandeau template and extra links -->
         <div v-if="isBandeau && additionalLinks.length > 0"
           @click="drawerOpen = true"
           class="drawer-handle"
@@ -112,7 +112,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
           </div>
           <span style="font-size:13px;font-weight:700;letter-spacing:0.01em;color:#fff;display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(6px)">
-            Tous mes liens
+            All my links
             <span :style="{fontSize:'11px',fontWeight:800,background:btnColor,color:'#fff',borderRadius:'999px',padding:'1px 8px',minWidth:'18px',textAlign:'center'}">{{ additionalLinks.length }}</span>
           </span>
         </div>
@@ -131,7 +131,7 @@
             <div style="width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:999px"></div>
           </div>
 
-          <!-- ── Liens money (OnlyFans / MYM) — mis en avant ── -->
+          <!-- ── Money links (OnlyFans / MYM) — highlighted ── -->
           <div v-if="drawerMoneyLinks.length > 0" style="display:flex;flex-direction:column;gap:11px;margin-bottom:22px">
             <button v-for="link in drawerMoneyLinks" :key="link.id ?? link.type"
               @click="handleLinkClick(link); drawerOpen = false"
@@ -145,7 +145,7 @@
               <span v-html="PLATFORM_SVG[linkPlatform(link)] || ''" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0"></span>
               <span style="flex:1;text-align:left;display:flex;flex-direction:column;gap:1px">
                 <span style="font-size:15px;font-weight:800;color:#fff;line-height:1.15">{{ link.label || PLATFORM_SHORT[linkPlatform(link)] }}</span>
-                <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.82)">Accès exclusif →</span>
+                <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.82)">Exclusive access →</span>
               </span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.9"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
@@ -154,7 +154,7 @@
           <!-- ── Titre ── -->
           <p v-if="drawerSocialLinks.length > 0" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px">Retrouve-moi sur</p>
 
-          <!-- ── Carrés réseaux sociaux (style iOS) ── -->
+          <!-- ── Social media squares (iOS style) ── -->
           <div v-if="drawerSocialLinks.length > 0" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
             <button v-for="link in drawerSocialLinks" :key="link.id ?? link.type"
               @click="handleLinkClick(link); drawerOpen = false"
@@ -195,7 +195,7 @@
             </button>
           </div>
 
-          <!-- ── Liens classiques (icône auto-détectée + chevron) ── -->
+          <!-- ── Standard links (auto-detected icon + chevron) ── -->
           <div v-if="drawerClassicLinks.length > 0" style="display:flex;flex-direction:column;gap:10px">
             <button v-for="link in drawerClassicLinks" :key="link.id ?? link.type"
               @click="handleLinkClick(link); drawerOpen = false"
@@ -235,7 +235,7 @@
       @click.self="popupVisible = false">
       <div style="position:relative;background:#13101f;border-radius:24px;padding:0;max-width:330px;width:100%;border:1px solid rgba(255,255,255,0.09);box-shadow:0 32px 80px rgba(0,0,0,0.7);overflow:hidden;animation:popup-bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both">
 
-        <!-- Fermeture (X) discrète en coin -->
+        <!-- Discreet close (X) in the corner -->
         <button @click="popupVisible = false" aria-label="Fermer"
           style="position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:0">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
@@ -253,25 +253,25 @@
         </div>
 
         <div style="padding:18px 20px 22px">
-          <!-- Nom (fallback si pas d'image) -->
+          <!-- Name (fallback if no image) -->
           <p v-if="!page.popup_image_url && page.model_name" style="font-size:18px;font-weight:800;color:#fff;margin:0 0 10px">{{ page.model_name }}</p>
 
-          <!-- Cadrage "DM entrant" : en ligne + indicateur d'écriture animé -->
+          <!-- "Incoming DM" framing: online + animated typing indicator -->
           <div v-if="page.online_status" style="display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap">
             <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.25);border-radius:999px;padding:4px 11px">
               <span class="online-dot"></span>
-              <span style="font-size:11px;font-weight:700;color:#10b981;letter-spacing:0.02em">En ligne</span>
+              <span style="font-size:11px;font-weight:700;color:#10b981;letter-spacing:0.02em">Online</span>
             </div>
             <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-style:italic;color:rgba(255,255,255,0.5)">
-              {{ page.model_name || 'Elle' }} t'écrit
+              {{ page.model_name || 'She' }} is typing
               <span class="pp-typing"><i></i><i></i><i></i></span>
             </span>
           </div>
 
-          <!-- Texte -->
+          <!-- Text -->
           <p v-if="page.popup_text" style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.55;margin:0 0 16px">{{ page.popup_text }}</p>
 
-          <!-- CTA bounce + flèche -->
+          <!-- CTA bounce + arrow -->
           <button v-if="primaryLink" @click="handleLinkClick(primaryLink); popupVisible = false"
             class="btn-bounce pp-cta-shine"
             :style="{
@@ -399,7 +399,7 @@ const PLATFORM_SVG: Record<string,string> = {
   snapchat: `<svg viewBox="0 0 24 24" fill="#000" width="22" height="22"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.243.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z"/></svg>`,
 }
 
-// Versions dark (pour fond blanc) des icônes réseaux sociaux
+// Dark versions (for white background) of the social media icons
 const PLATFORM_SVG_DARK: Record<string,string> = {
   onlyfans: `<svg viewBox="0 0 24 24" fill="#00AFF0" width="26" height="26"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 5.838a6.162 6.162 0 1 1 0 12.324A6.162 6.162 0 0 1 12 5.838zm0 2.456a3.706 3.706 0 1 0 0 7.412 3.706 3.706 0 0 0 0-7.412z"/></svg>`,
   mym: `<svg viewBox="0 0 24 24" fill="none" width="26" height="26"><text x="3" y="18" font-size="15" font-weight="900" fill="#222" font-family="Arial">M</text></svg>`,
@@ -417,8 +417,8 @@ const PLATFORM_SHORT: Record<string,string> = {
   twitter: 'X', telegram: 'Telegram', youtube: 'YouTube', twitch: 'Twitch', snapchat: 'Snapchat',
 }
 
-// Liens "money" (plateformes payantes) — mis en avant en haut du tiroir.
-// Détectés par type OU par label (ex: un lien custom "Mon OF" devient un bouton money).
+// "money" links (paid platforms) — highlighted at the top of the drawer.
+// Detected by type OR by label (e.g. a custom link "Mon OF" becomes a money button).
 const drawerMoneyLinks = computed(() =>
   additionalLinks.value.filter(isMoneyLink)
 )
@@ -432,14 +432,14 @@ const drawerClassicLinks = computed(() =>
   additionalLinks.value.filter(l => !SOCIAL_TYPES.has(l.type) && !l.image_url && l.type !== 'image_button' && !isMoneyLink(l))
 )
 
-// Un lien est "money" si sa plateforme détectée est OnlyFans ou MYM
+// A link is "money" if its detected platform is OnlyFans or MYM
 function isMoneyLink(link: any): boolean {
   const p = linkPlatform(link)
   return p === 'onlyfans' || p === 'mym'
 }
 
-// Devine la plateforme d'un lien custom à partir de son type ou de son label
-// (ex: "Mon Instagram" → instagram) pour afficher la bonne icône de marque.
+// Guess a custom link's platform from its type or label
+// (e.g. "Mon Instagram" → instagram) to show the right brand icon.
 function linkPlatform(link: any): string | null {
   if (link.type && PLATFORM_SHORT[link.type]) return link.type
   const s = (link.label || '').toLowerCase()
@@ -506,7 +506,7 @@ function withUtm(url) {
   } catch { return url }
 }
 
-// ─── Vidéo ─────────────────────────────────────────────────────────────────────
+// ─── Video ─────────────────────────────────────────────────────────────────────
 const videoEl = ref(null)
 const videoMuted = ref(true)
 const videoPlayTracked = ref(false)
@@ -536,12 +536,12 @@ function onVideoTimeUpdate() {
     api.post(`/p/${slug}/event`, { type: 'video_position', value: bucket * 10 }).catch(() => {})
   }
 
-  // Révélation du CTA
+  // CTA reveal
   if (!ctaVisible.value && page.value?.cta_reveal_at && current >= page.value.cta_reveal_at) {
     ctaVisible.value = true
   }
 
-  // Milestones (compatibilité analytics)
+  // Milestones (analytics compatibility)
   const pct = Math.floor((current / el.duration) * 100)
   for (const milestone of [25, 50, 75, 100]) {
     if (pct >= milestone && !watchMilestonesTracked.value.has(milestone)) {

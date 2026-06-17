@@ -15,9 +15,7 @@
       <!-- Logo + collapse -->
       <div :style="{padding:'0 12px',display:'flex',alignItems:'center',justifyContent:'space-between',borderBottom:`1px solid ${border}`,height:'60px',flexShrink:0}">
         <div style="display:flex;align-items:center;gap:9px;min-width:0;overflow:hidden">
-          <div style="width:28px;height:28px;background:#6D4EE8;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <span style="color:#fff;font-weight:900;font-size:10px;letter-spacing:-0.03em">VSL</span>
-          </div>
+          <LogoMark :size="28" />
           <span v-if="!collapsed" :style="{fontWeight:700,color:theme.dark?'#fff':'#0F0A3C',fontSize:'14px',letterSpacing:'-0.01em',whiteSpace:'nowrap'}">MySocialVSL</span>
         </div>
         <button @click="collapsed=!collapsed"
@@ -224,6 +222,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import NavItem from '@/components/NavItem.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import LogoMark from '@/components/LogoMark.vue'
 
 const props = defineProps({
   title: { type: String, default: 'Dashboard' },

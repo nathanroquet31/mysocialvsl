@@ -7,9 +7,7 @@
 
         <!-- Logo -->
         <RouterLink to="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-          <div style="width:30px;height:30px;background:linear-gradient(135deg,#6D4EE8,#8B6FF0);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(109,78,232,0.4)">
-            <span style="color:#fff;font-weight:900;font-size:9px;letter-spacing:-0.05em">VSL</span>
-          </div>
+          <LogoMark :size="30" />
           <span style="font-weight:700;color:#fff;font-size:15px;letter-spacing:-0.02em">MySocialVSL</span>
         </RouterLink>
 
@@ -43,9 +41,7 @@
               <!-- Header drawer -->
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
                 <div style="display:flex;align-items:center;gap:8px">
-                  <div style="width:26px;height:26px;background:linear-gradient(135deg,#6D4EE8,#8B6FF0);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                    <span style="color:#fff;font-weight:900;font-size:8px">VSL</span>
-                  </div>
+                  <LogoMark :size="26" />
                   <span style="font-weight:700;color:#fff;font-size:14px">MySocialVSL</span>
                 </div>
                 <button @click="mobileMenuOpen = false" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);padding:4px">
@@ -133,7 +129,7 @@
               name="Karine"
               handle="@karinefrenchwoman"
               video-id="0ed1q5"
-              cta="Accès privé — Rejoindre"
+              cta="Private access — Join"
             />
           </div>
         </div>
@@ -147,7 +143,7 @@
       <OrbitalTimeline />
     </div>
 
-    <!-- FEATURE 1 — Vidéo -->
+    <!-- FEATURE 1 — Video -->
     <section id="features" style="padding:96px 24px;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden">
       <div style="position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(ellipse 80% 60% at 90% 40%,rgba(109,78,232,0.06),transparent 70%);pointer-events:none"></div>
       <div style="max-width:1152px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
@@ -174,20 +170,20 @@
           </div>
         </div>
 
-        <!-- Right — Mockup réaliste du vrai produit -->
+        <!-- Right — Realistic mockup of the actual product -->
         <div data-aos="fade-left" data-aos-delay="100"
           style="position:relative;display:flex;align-items:center;justify-content:center;padding:40px 0">
 
-          <!-- Ambient glow derrière le téléphone -->
+          <!-- Ambient glow behind the phone -->
           <div style="position:absolute;width:260px;height:260px;background:radial-gradient(circle,rgba(109,78,232,0.15),transparent 70%);filter:blur(40px);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
 
-          <!-- Téléphone -->
+          <!-- Phone -->
           <div style="position:relative;width:210px;flex-shrink:0">
 
             <!-- Cadre phone -->
             <div style="background:#0a0a0a;border-radius:40px;padding:3px;box-shadow:0 0 0 1px rgba(255,255,255,0.12),0 40px 80px rgba(0,0,0,0.85),0 16px 40px rgba(0,0,0,0.6);overflow:hidden">
 
-              <!-- Écran -->
+              <!-- Screen -->
               <div style="border-radius:37px;overflow:hidden;background:#000;position:relative;aspect-ratio:9/16">
 
                 <!-- Dynamic Island -->
@@ -209,7 +205,7 @@
                   </div>
                 </div>
 
-                <!-- Vraie vidéo en boucle -->
+                <!-- Real looping video -->
                 <iframe
                   src="https://streamable.com/e/0ed1q5?autoplay=1&muted=1&loop=1&nocontrols=1"
                   allow="autoplay; fullscreen"
@@ -228,10 +224,10 @@
                   <i class="bi bi-volume-mute-fill" style="color:rgba(255,255,255,0.6);font-size:9px"></i>
                 </div>
 
-                <!-- Overlay bas — copie exacte de l'UI réelle -->
+                <!-- Bottom overlay — exact copy of the real UI -->
                 <div style="position:absolute;bottom:0;left:0;right:0;padding:56px 14px 0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.6) 55%,transparent 100%)">
 
-                  <!-- Profil créatrice -->
+                  <!-- Creator profile -->
                   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
                     <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4)">🌸</div>
                     <div>
@@ -240,9 +236,9 @@
                     </div>
                   </div>
 
-                  <!-- Bouton CTA — identique au vrai produit -->
+                  <!-- CTA button — identical to the real product -->
                   <div style="background:#00aff0;border-radius:12px;padding:10px 12px;text-align:center;box-shadow:0 4px 20px rgba(0,175,240,0.5);margin-bottom:10px;animation:cta-pulse 3s ease-in-out infinite">
-                    <span style="color:#fff;font-size:9.5px;font-weight:800;letter-spacing:0.02em">🔐 Mon OnlyFans — Accès privé</span>
+                    <span style="color:#fff;font-size:9.5px;font-weight:800;letter-spacing:0.02em">🔐 My OnlyFans — Private access</span>
                   </div>
 
                   <!-- Home indicator -->
@@ -252,7 +248,7 @@
               </div>
             </div>
 
-            <!-- Boutons latéraux -->
+            <!-- Side buttons -->
             <div style="position:absolute;right:-4px;top:130px;width:3px;height:72px;background:linear-gradient(180deg,#333,#222,#333);border-radius:0 3px 3px 0;box-shadow:2px 0 4px rgba(0,0,0,0.5)"></div>
             <div style="position:absolute;left:-4px;top:100px;width:3px;height:26px;background:linear-gradient(180deg,#333,#222,#333);border-radius:3px 0 0 3px;box-shadow:-2px 0 4px rgba(0,0,0,0.4)"></div>
             <div style="position:absolute;left:-4px;top:142px;width:3px;height:46px;background:linear-gradient(180deg,#333,#222,#333);border-radius:3px 0 0 3px;box-shadow:-2px 0 4px rgba(0,0,0,0.4)"></div>
@@ -606,7 +602,7 @@
       <div style="max-width:1100px;margin:0 auto">
         <div data-aos="fade-up" class="cta-box">
 
-          <!-- Orbes déco -->
+          <!-- Decorative orbs -->
           <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(109,78,232,0.18),transparent 70%);top:-80px;right:-60px;pointer-events:none;filter:blur(40px)"></div>
           <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.12),transparent 70%);bottom:-60px;left:-40px;pointer-events:none;filter:blur(30px)"></div>
 
@@ -642,7 +638,7 @@
     <footer style="position:relative;border-top:1px solid rgba(255,255,255,0.06);background:linear-gradient(to bottom,#080810,#0a0814);font-family:Inter,sans-serif">
       <div style="max-width:1152px;margin:0 auto;padding:64px 24px 0">
 
-        <!-- Orb déco -->
+        <!-- Decorative orb -->
         <div style="position:absolute;top:0;right:5%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(109,78,232,0.08),transparent 70%);pointer-events:none"></div>
 
         <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:56px">
@@ -651,17 +647,15 @@
           <div style="position:relative">
             <!-- Logo -->
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-              <div style="width:28px;height:28px;background:linear-gradient(135deg,#6D4EE8,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center">
-                <span style="color:#fff;font-weight:900;font-size:13px;letter-spacing:-0.05em">V</span>
-              </div>
+              <LogoMark :size="28" />
               <span style="font-weight:700;color:#fff;font-size:15px;letter-spacing:-0.02em">MySocialVSL</span>
             </div>
             <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.65;margin:0 0 20px;max-width:240px">
-              Le link-in-bio VSL qui convertit tes fans en abonnés payants.
+              The VSL link-in-bio that turns your fans into paying subscribers.
             </p>
             <!-- Newsletter -->
             <div style="position:relative;max-width:280px">
-              <input type="email" placeholder="Ton adresse email"
+              <input type="email" placeholder="Your email address"
                 style="width:100%;padding:10px 44px 10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;backdrop-filter:blur(8px)"
                 @focus="e => e.target.style.borderColor='rgba(109,78,232,0.5)'"
                 @blur="e => e.target.style.borderColor='rgba(255,255,255,0.1)'" />
@@ -673,32 +667,32 @@
             <div style="position:absolute;right:-20px;top:-10px;width:120px;height:120px;border-radius:50%;background:rgba(109,78,232,0.06);filter:blur(30px);pointer-events:none"></div>
           </div>
 
-          <!-- Col 2 — Produit -->
+          <!-- Col 2 — Product -->
           <div>
-            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Produit</h3>
+            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Product</h3>
             <nav style="display:flex;flex-direction:column;gap:10px">
-              <a href="#features" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Fonctionnalités</a>
+              <a href="#features" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Features</a>
               <a href="#pricing" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Pricing</a>
               <a href="#faq" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">FAQ</a>
-              <RouterLink to="/register" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Créer un compte</RouterLink>
-              <RouterLink to="/login" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Se connecter</RouterLink>
+              <RouterLink to="/register" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Create an account</RouterLink>
+              <RouterLink to="/login" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Log in</RouterLink>
             </nav>
           </div>
 
-          <!-- Col 3 — Ressources -->
+          <!-- Col 3 — Resources -->
           <div>
-            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Ressources</h3>
+            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Resources</h3>
             <nav style="display:flex;flex-direction:column;gap:10px">
               <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Blog</a>
-              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Documentation API</a>
-              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Affiliés</a>
+              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">API Documentation</a>
+              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Affiliates</a>
               <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Status</a>
             </nav>
           </div>
 
-          <!-- Col 4 — Réseaux sociaux -->
+          <!-- Col 4 — Social -->
           <div>
-            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Nous suivre</h3>
+            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Follow us</h3>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <a v-for="s in socials" :key="s.label" :href="s.href" :title="s.label"
                 style="width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.15s;color:rgba(255,255,255,0.5);font-size:15px"
@@ -713,11 +707,11 @@
 
         <!-- Bottom bar -->
         <div style="border-top:1px solid rgba(255,255,255,0.06);padding:24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <p style="font-size:12px;color:rgba(255,255,255,0.2);margin:0">© 2026 MySocialVSL. Tous droits réservés.</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.2);margin:0">© 2026 MySocialVSL. All rights reserved.</p>
           <nav style="display:flex;gap:24px">
-            <a href="#" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">Politique de confidentialité</a>
-            <a href="#" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">CGU</a>
-            <a href="#" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">Cookies</a>
+            <RouterLink to="/privacy" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='rgba(255,255,255,0.5)'" @mouseout="e => e.target.style.color='rgba(255,255,255,0.2)'">Privacy Policy</RouterLink>
+            <RouterLink to="/terms" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='rgba(255,255,255,0.5)'" @mouseout="e => e.target.style.color='rgba(255,255,255,0.2)'">Terms</RouterLink>
+            <RouterLink to="/cookies" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='rgba(255,255,255,0.5)'" @mouseout="e => e.target.style.color='rgba(255,255,255,0.2)'">Cookies</RouterLink>
           </nav>
         </div>
 
@@ -734,12 +728,13 @@ const mobileMenuOpen = ref(false)
 import AOS from 'aos'
 import PhoneDemo from '@/components/PhoneDemo.vue'
 import PricingSection from '@/components/PricingSection.vue'
+import LogoMark from '@/components/LogoMark.vue'
 import OrbitalTimeline from '@/components/OrbitalTimeline.vue'
 
 const syncGlowPointer = (e) => {
   const xp = (e.clientX / window.innerWidth).toFixed(2)
   const yp = (e.clientY / window.innerHeight).toFixed(2)
-  // Coordonnées relatives à chaque card pour que les effets soient indépendants
+  // Coordinates relative to each card so the effects stay independent
   document.querySelectorAll('[data-glow]:not([data-glow] [data-glow])').forEach(el => {
     const rect = el.getBoundingClientRect()
     el.style.setProperty('--x',  (e.clientX - rect.left).toFixed(2))
@@ -768,10 +763,10 @@ const heroStats = [
 ]
 
 const stats = [
-  { label: 'Vues ce mois',     value: '1 860', sub: '↑ +52% vs mois dernier', up: true },
+  { label: 'Views this month', value: '1,860', sub: '↑ +52% vs last month',  up: true },
   { label: 'Conversion',       value: '41.7%', sub: '↑ +80% vs Linktree',     up: true },
-  { label: 'Clics liens',      value: '775',   sub: '↑ +44% ce mois',         up: true },
-  { label: 'Deep link bypass', value: '94%',   sub: 'Ouverture app native',   up: false },
+  { label: 'Link clicks',      value: '775',   sub: '↑ +44% this month',      up: true },
+  { label: 'Deep link bypass', value: '94%',   sub: 'Native app open',        up: false },
 ]
 
 const platformLogos = [
@@ -840,7 +835,7 @@ const faqs = [
     a: "Shield Protection™ detects 30+ known crawlers and Instagram's internal scanner. When a bot visits, it sees a harmless decoy page instead of your real links — so your page stays safe and never gets flagged." },
 ]
 
-// Zigzag symétrique 5+5 : outer(8%) et inner(22%) alternés toutes les 140px
+// Symmetric 5+5 zigzag: outer(8%) and inner(22%) alternating every 140px
 const deepLinkFloatingIcons = [
   // ── Gauche ──────────────────────────────────────────────────────────
   { name: 'Instagram', duration: 6,   delay: 0,   biClass: 'bi-instagram', iconColor: 'white',

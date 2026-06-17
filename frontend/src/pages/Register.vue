@@ -1,46 +1,56 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-    <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
-        <RouterLink to="/" class="inline-flex items-center gap-2 justify-center mb-6">
-          <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-sm">V</span>
-          </div>
-          <span class="font-bold text-gray-900 text-lg">VSLpages</span>
-        </RouterLink>
-        <h1 class="text-2xl font-bold text-gray-900">Créer un compte</h1>
-        <p class="text-gray-500 text-sm mt-1">Déjà inscrit ? <RouterLink to="/login" class="text-violet-600 font-medium">Se connecter</RouterLink></p>
+  <div class="auth-root">
+
+    <SmokeyBackground />
+
+    <!-- Glassmorphism sign-up card -->
+    <div class="auth-card">
+
+      <RouterLink to="/" class="brand">
+        <LogoMark :size="34" />
+        <span class="brand-name">MySocialVSL</span>
+      </RouterLink>
+
+      <div class="auth-head">
+        <h2>Create your account</h2>
+        <p>Start converting in minutes</p>
       </div>
 
-      <form @submit.prevent="submit" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
-        <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">{{ error }}</div>
+      <div v-if="error" class="auth-error">{{ error }}</div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-          <input v-model="form.name" type="text" required placeholder="Ton nom"
-            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+      <form class="auth-form" @submit.prevent="submit">
+        <div class="field">
+          <input v-model="form.name" type="text" id="reg_name" class="field-input" placeholder=" " required />
+          <label for="reg_name" class="field-label"><i class="bi bi-person"></i> Name</label>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input v-model="form.email" type="email" required placeholder="ton@email.com"
-            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+
+        <div class="field">
+          <input v-model="form.email" type="email" id="reg_email" class="field-input" placeholder=" " required />
+          <label for="reg_email" class="field-label"><i class="bi bi-envelope"></i> Email Address</label>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-          <input v-model="form.password" type="password" required placeholder="8 caractères min"
-            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+
+        <div class="field">
+          <input v-model="form.password" type="password" id="reg_password" class="field-input" placeholder=" " required />
+          <label for="reg_password" class="field-label"><i class="bi bi-lock"></i> Password</label>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
-          <input v-model="form.password_confirmation" type="password" required placeholder="••••••••"
-            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
+
+        <div class="field">
+          <input v-model="form.password_confirmation" type="password" id="reg_password2" class="field-input" placeholder=" " required />
+          <label for="reg_password2" class="field-label"><i class="bi bi-shield-lock"></i> Confirm Password</label>
         </div>
-        <button type="submit" :disabled="loading"
-          class="w-full bg-violet-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-violet-700 transition disabled:opacity-50">
-          {{ loading ? 'Création...' : 'Créer mon compte' }}
+
+        <button type="submit" :disabled="loading" class="auth-submit">
+          {{ loading ? 'Creating...' : 'Create my account' }}
+          <i v-if="!loading" class="bi bi-arrow-right"></i>
         </button>
       </form>
+
+      <p class="auth-foot">
+        Already have an account?
+        <RouterLink to="/login">Sign in</RouterLink>
+      </p>
     </div>
+
   </div>
 </template>
 
@@ -48,6 +58,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import SmokeyBackground from '@/components/SmokeyBackground.vue'
+import LogoMark from '@/components/LogoMark.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -63,9 +75,11 @@ async function submit() {
     router.push('/dashboard')
   } catch (e) {
     const errors = e.response?.data?.errors
-    error.value = errors ? Object.values(errors).flat().join(' ') : 'Erreur lors de l\'inscription.'
+    error.value = errors ? Object.values(errors).flat().join(' ') : 'Something went wrong during sign up.'
   } finally {
     loading.value = false
   }
 }
 </script>
+
+<style scoped src="@/assets/auth.css"></style>

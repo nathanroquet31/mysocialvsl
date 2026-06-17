@@ -1,0 +1,129 @@
+/* Shared styles for the auth pages (Login + Register) — glassmorphism card over the smokey shader background. */
+
+.auth-root {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #0a0a0f;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+.auth-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 400px;
+  padding: 36px 32px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+.brand-logo {
+  width: 34px; height: 34px;
+  background: #6D4EE8;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(109, 78, 232, 0.5);
+}
+.brand-logo span { color: #fff; font-weight: 900; font-size: 11px; letter-spacing: -0.05em; }
+.brand-name { font-weight: 700; color: #fff; font-size: 16px; }
+
+.auth-head h2 { font-size: 26px; font-weight: 800; color: #fff; margin: 0 0 6px; }
+.auth-head p { font-size: 14px; color: rgba(255, 255, 255, 0.55); margin: 0 0 28px; }
+
+.auth-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 13px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 22px;
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 30px; }
+
+/* Floating-label field */
+.field { position: relative; }
+.field-input {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #fff !important;
+  background: transparent !important;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3) !important;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.field-input:focus { border-bottom-color: #A78BFA !important; }
+.field-label {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+  transform-origin: 0 0;
+  transition: transform 0.25s, color 0.25s;
+}
+.field-label i { margin-right: 6px; }
+/* Float up when focused or filled (placeholder is a single space → :not(:placeholder-shown)) */
+.field-input:focus + .field-label,
+.field-input:not(:placeholder-shown) + .field-label {
+  transform: translateY(-22px) scale(0.78);
+  color: #A78BFA;
+}
+
+.auth-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  font-family: inherit;
+  background: linear-gradient(135deg, #6D4EE8, #8B6FF0);
+  box-shadow: 0 4px 20px rgba(109, 78, 232, 0.45);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.auth-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(109, 78, 232, 0.6); }
+.auth-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.auth-submit .bi-arrow-right { transition: transform 0.2s; }
+.auth-submit:hover:not(:disabled) .bi-arrow-right { transform: translateX(3px); }
+
+/* Secondary row (e.g. "Forgot password?") */
+.auth-row { display: flex; justify-content: flex-end; margin-top: -14px; }
+.auth-row a { font-size: 12px; color: rgba(255, 255, 255, 0.5); text-decoration: none; transition: color 0.15s; }
+.auth-row a:hover { color: #fff; }
+
+.auth-foot {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 24px;
+}
+.auth-foot a { color: #A78BFA; font-weight: 600; text-decoration: none; }
+.auth-foot a:hover { color: #C4B5FD; }
