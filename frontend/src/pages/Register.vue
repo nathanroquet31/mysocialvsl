@@ -72,7 +72,7 @@ async function submit() {
   error.value = ''
   try {
     await auth.register(form.value.name, form.value.email, form.value.password, form.value.password_confirmation)
-    router.push('/dashboard')
+    router.push('/dashboard/links')
   } catch (e) {
     const errors = e.response?.data?.errors
     error.value = errors ? Object.values(errors).flat().join(' ') : 'Something went wrong during sign up.'

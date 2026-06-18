@@ -45,7 +45,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const auth = useAuthStore()
   if (to.meta.auth && !auth.isLoggedIn()) return '/login'
-  if (to.meta.guest && auth.isLoggedIn() && to.path !== '/') return '/dashboard'
+  if (to.meta.guest && auth.isLoggedIn() && to.path !== '/') return '/dashboard/links'
 })
 
 export default router

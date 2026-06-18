@@ -69,7 +69,7 @@ async function submit() {
   error.value = ''
   try {
     await auth.login(form.value.email, form.value.password)
-    router.push('/dashboard')
+    router.push('/dashboard/links')
   } catch (e) {
     error.value = e.response?.data?.message ?? 'Incorrect email or password.'
   } finally {

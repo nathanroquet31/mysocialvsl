@@ -17,6 +17,66 @@
     </div>
 
     <template v-else>
+      <!-- ─── Brand-new creator → welcoming, VSL-first empty state ─── -->
+      <div v-if="pages.length === 0" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:52px 24px 64px;max-width:680px;margin:0 auto">
+
+        <!-- Video/VSL hero icon -->
+        <div style="position:relative;width:84px;height:84px;margin-bottom:26px">
+          <div style="position:absolute;inset:-6px;background:radial-gradient(circle,rgba(109,78,232,0.4),transparent 70%);filter:blur(10px)"></div>
+          <div style="position:relative;width:84px;height:84px;border-radius:22px;background:linear-gradient(145deg,#6D4EE8,#4c1d95);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 32px rgba(109,78,232,0.4)">
+            <i class="bi bi-play-fill" style="font-size:42px;color:#fff;margin-left:4px"></i>
+          </div>
+        </div>
+
+        <h1 style="font-size:34px;font-weight:800;letter-spacing:-0.03em;color:#fff;margin:0 0 14px;line-height:1.12">
+          Your bio link, but it <span style="background:linear-gradient(90deg,#A78BFA,#6D4EE8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">sells</span>.
+        </h1>
+        <p style="font-size:15px;color:rgba(255,255,255,0.45);margin:0 0 32px;line-height:1.6;max-width:490px">
+          A short video that hooks your visitors and sends them straight to your OnlyFans — that's a <strong style="color:rgba(255,255,255,0.72);font-weight:600">VSL</strong>. It converts far better than a plain list of links. Build yours in under a minute.
+        </p>
+
+        <!-- CTAs -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center">
+          <RouterLink to="/pages/new" style="display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:#6D4EE8;color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;transition:all 0.15s;box-shadow:0 8px 24px rgba(109,78,232,0.35)"
+            onmouseover="this.style.background='#5d3ed4';this.style.transform='translateY(-1px)'"
+            onmouseout="this.style.background='#6D4EE8';this.style.transform='none'">
+            Create my first VSL <i class="bi bi-arrow-right"></i>
+          </RouterLink>
+          <button @click="watchExample" style="display:inline-flex;align-items:center;gap:8px;padding:13px 22px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.12);border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s"
+            onmouseover="this.style.background='rgba(255,255,255,0.09)'"
+            onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+            <i class="bi bi-play-circle"></i> Watch a live example
+          </button>
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,0.3);margin:14px 0 0;display:flex;align-items:center;gap:5px">
+          <i class="bi bi-lightning-charge-fill" style="color:#fb923c"></i> Takes less than 30 seconds
+        </p>
+
+        <!-- Feature cards -->
+        <div style="width:100%;margin-top:52px">
+          <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.14em;margin:0 0 18px">Everything you need to convert</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(167,139,250,0.14);color:#A78BFA"><i class="bi bi-box-arrow-up-right"></i></div>
+              <p class="feat-title">Deeplink Bypass</p>
+              <p class="feat-desc">Escapes Instagram's in-app browser so your links open in real Safari &amp; Chrome.</p>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(34,211,238,0.14);color:#22d3ee"><i class="bi bi-shield-fill-check"></i></div>
+              <p class="feat-title">Bot Protection</p>
+              <p class="feat-desc">Cloaks your real page from Meta's crawlers — bots see a safe decoy, humans see you.</p>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon" style="background:rgba(74,222,128,0.14);color:#4ade80"><i class="bi bi-graph-up-arrow"></i></div>
+              <p class="feat-title">Real-time Analytics</p>
+              <p class="feat-desc">Every view, click &amp; video play tracked live — see exactly what converts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Has pages → full dashboard ─── -->
+      <template v-else>
       <!-- Stats summary row -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
         <div class="kpi-card">
@@ -201,6 +261,7 @@
         </div>
 
       </div>
+      </template>
     </template>
 
     <!-- ─── Quick View Modal ─── -->
@@ -358,6 +419,13 @@ const newGroupInput = ref(null)
 const selectedPage = ref(null)
 const copiedLink = ref('')
 
+// "Watch a live example" → opens a real public VSL page that showcases the product.
+// Create a public page with the slug "demo" to back this button.
+const DEMO_VSL_URL = 'https://mysocialvsl.com/p/demo'
+function watchExample() {
+  window.open(DEMO_VSL_URL, '_blank')
+}
+
 function openModal(page) {
   selectedPage.value = page
 }
@@ -500,6 +568,13 @@ async function duplicatePage(page) {
 .kpi-card-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
 .kpi-card-value { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin: 0; }
 .kpi-card-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin: 6px 0 0; }
+
+/* Empty-state feature cards */
+.feat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 18px 16px; text-align: left; transition: border-color 0.15s, background 0.15s, transform 0.15s; }
+.feat-card:hover { border-color: rgba(109,78,232,0.3); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+.feat-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 12px; }
+.feat-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 5px; }
+.feat-desc { font-size: 12px; color: rgba(255,255,255,0.4); margin: 0; line-height: 1.5; }
 
 .modal-action-btn {
   display: flex;
