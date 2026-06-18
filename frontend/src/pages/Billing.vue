@@ -301,6 +301,54 @@
       </div>
     </div>
 
+    <!-- Agency plan confirmation modal (replaces the native confirm popup) -->
+    <Teleport to="body">
+      <div v-if="agencyConfirm" @click.self="cancelAgency"
+        style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px">
+        <div style="background:#13101f;border:1px solid rgba(255,255,255,0.1);border-radius:18px;max-width:400px;width:100%;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,0.6);font-family:Inter,sans-serif">
+          <h3 style="font-size:17px;font-weight:800;color:#fff;margin:0 0 6px">{{ agencyConfirm.isUpdate ? 'Update your Agency plan' : 'Confirm Agency plan' }}</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:0 0 18px;line-height:1.5">Review your new plan before confirming.</p>
+
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Landing pages</span>
+              <span style="font-size:14px;font-weight:700;color:#fff">{{ agencyConfirm.pages === Infinity ? '∞' : agencyConfirm.pages }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Direct links</span>
+              <span style="font-size:14px;font-weight:700;color:#fff">{{ agencyConfirm.links === Infinity ? '∞' : agencyConfirm.links }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Price</span>
+              <span style="font-size:18px;font-weight:800;color:#fff">${{ agencyConfirm.price }}<span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.5)">/mo</span></span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:flex-start;background:rgba(109,78,232,0.1);border:1px solid rgba(109,78,232,0.25);border-radius:10px;padding:11px 13px;margin-bottom:18px">
+            <i class="bi bi-info-circle" style="color:#A78BFA;font-size:14px;margin-top:1px"></i>
+            <p style="font-size:12px;color:rgba(255,255,255,0.7);margin:0;line-height:1.5">
+              {{ agencyConfirm.isUpdate
+                ? 'The prorated difference for the rest of this billing period is charged to your saved card now. If the payment fails, your plan stays unchanged.'
+                : 'You\'ll be redirected to Stripe to enter your card and pay.' }}
+            </p>
+          </div>
+
+          <p v-if="agencyError" style="font-size:12px;color:#F87171;margin:0 0 14px;text-align:center;line-height:1.5">{{ agencyError }}</p>
+
+          <div style="display:flex;gap:10px">
+            <button @click="cancelAgency" :disabled="checkoutLoading==='agency-custom'"
+              style="flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:rgba(255,255,255,0.8);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">
+              Cancel
+            </button>
+            <button @click="proceedAgency" :disabled="checkoutLoading==='agency-custom'"
+              :style="{flex:1,padding:'11px',borderRadius:'10px',border:'none',background:'#6D4EE8',color:'#fff',fontSize:'13px',fontWeight:700,cursor:checkoutLoading==='agency-custom'?'wait':'pointer',fontFamily:'Inter,sans-serif',opacity:checkoutLoading==='agency-custom'?0.7:1}">
+              {{ checkoutLoading==='agency-custom' ? 'Processing…' : agencyConfirm.isUpdate ? 'Confirm & pay' : 'Continue' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
   </DashboardLayout>
 </template>
 
@@ -316,6 +364,8 @@ const auth = useAuthStore()
 const theme = useThemeStore()
 const checkoutLoading = ref(null)
 const portalLoading = ref(false)
+const agencyConfirm = ref(null)   // pending Agency change shown in the confirm modal
+const agencyError = ref('')       // error surfaced inside the modal (e.g. prorated charge failed)
 const billing = ref('monthly')
 const promoCode = ref('')
 const invoices = ref([])
@@ -386,19 +436,24 @@ async function checkout(plan) {
   }
 }
 
-async function checkoutAgency({ pages, links, price, billing: b }) {
-  // Explicit consent before committing — avoids an accidental click charging the customer.
-  const pLabel = pages === Infinity ? '∞' : pages
-  const lLabel = links === Infinity ? '∞' : links
-  const isUpdate = currentPlan.value === 'agency'
-  const tail = isUpdate
-    ? 'The difference will be charged pro rata to your saved card.'
-    : 'You will be redirected to Stripe to enter your card and pay.'
-  const confirmed = window.confirm(
-    `Confirm the Agency plan: ${pLabel} landing pages / ${lLabel} direct links — $${price}/mo?\n\n${tail}`
-  )
-  if (!confirmed) return
+// Open the confirmation modal (replaces the raw window.confirm) — explicit consent
+// before anything is charged.
+function checkoutAgency({ pages, links, price, billing: b }) {
+  agencyError.value = ''
+  agencyConfirm.value = { pages, links, price, billing: b, isUpdate: currentPlan.value === 'agency' }
+}
 
+function cancelAgency() {
+  if (checkoutLoading.value === 'agency-custom') return
+  agencyConfirm.value = null
+}
+
+// Confirmed in the modal → create the Stripe checkout, or update the subscription
+// in place (the server charges the prorated difference immediately and only then
+// grants the new limits; a failed charge returns 402 and changes nothing).
+async function proceedAgency() {
+  const { pages, links, billing: b } = agencyConfirm.value
+  agencyError.value = ''
   checkoutLoading.value = 'agency-custom'
   try {
     // Price is recomputed server-side from the chosen tiers — never sent by the client.
@@ -412,13 +467,13 @@ async function checkoutAgency({ pages, links, price, billing: b }) {
       window.location.href = data.url
       return
     }
-    // Already subscribed → subscription updated in place (proration). Refresh and confirm.
+    // Already subscribed → updated in place. Refresh limits and close.
     await auth.fetchMe()
     checkoutLoading.value = null
-    alert('Agency plan updated ✓')
-  } catch {
-    alert('Error creating checkout. Please try again.')
+    agencyConfirm.value = null
+  } catch (e) {
     checkoutLoading.value = null
+    agencyError.value = e.response?.data?.message || 'Something went wrong. Your plan was not changed.'
   }
 }
 
@@ -447,8 +502,9 @@ async function saveAddons() {
     auth.user.link_limit  = data.link_limit
     addonsSaved.value = true
     setTimeout(() => { addonsSaved.value = false }, 3000)
-  } catch {
-    alert('Update failed. Please try again.')
+  } catch (e) {
+    // 402 = the prorated charge for the added packs failed; nothing was changed.
+    alert(e.response?.data?.message || 'Update failed. Please try again.')
   } finally {
     addonsLoading.value = false
   }

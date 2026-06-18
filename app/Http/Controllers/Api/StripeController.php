@@ -144,10 +144,22 @@ class StripeController extends Controller
         }
 
         if (!empty($items)) {
-            \Stripe\Subscription::update($subscription->id, [
-                'items'              => $items,
-                'proration_behavior' => 'create_prorations',
-            ]);
+            try {
+                \Stripe\Subscription::update($subscription->id, [
+                    'items'              => $items,
+                    'proration_behavior' => 'always_invoice',     // invoice the prorated difference NOW
+                    'payment_behavior'   => 'error_if_incomplete', // fail the update if it can't be paid
+                    'off_session'        => true,                  // charge the saved card without user interaction
+                ]);
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                // The prorated charge could not be collected (declined card, SCA required, etc.).
+                // Stripe did NOT apply the change, so we must NOT grant access — the user keeps
+                // their previous plan/limits. This is the guard against "access without paying".
+                return response()->json([
+                    'error'   => 'payment_failed',
+                    'message' => 'We could not charge the prorated difference to your card. Your plan was not changed.',
+                ], 402);
+            }
         }
 
         $user->update([
@@ -210,10 +222,22 @@ class StripeController extends Controller
         }
 
         if (!empty($itemsToUpdate)) {
-            \Stripe\Subscription::update($subscription->id, [
-                'items'              => $itemsToUpdate,
-                'proration_behavior' => 'create_prorations',
-            ]);
+            // Adding packs charges the prorated difference immediately; removing packs is a
+            // credit (no charge). error_if_incomplete + off_session guarantees we only apply
+            // the change locally when the proration is actually paid.
+            try {
+                \Stripe\Subscription::update($subscription->id, [
+                    'items'              => $itemsToUpdate,
+                    'proration_behavior' => 'always_invoice',
+                    'payment_behavior'   => 'error_if_incomplete',
+                    'off_session'        => true,
+                ]);
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                return response()->json([
+                    'error'   => 'payment_failed',
+                    'message' => 'We could not charge the prorated difference to your card. Your add-ons were not changed.',
+                ], 402);
+            }
         }
 
         $user->update([
