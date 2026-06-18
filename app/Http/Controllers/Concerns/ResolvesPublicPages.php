@@ -67,11 +67,19 @@ trait ResolvesPublicPages
             }
         }
 
-        // Direct link — immediate redirect.
+        // Direct link — serve a tiny HTML bounce page instead of a raw 302.
+        // A 302 inside the Instagram/TikTok in-app webview just navigates the
+        // webview itself, trapping the visitor. The bounce page mirrors the
+        // SPA's deep-link bypass (intent:// on Android, extbrowser on iOS) so a
+        // direct link escapes the in-app browser. Non in-app visitors are
+        // redirected immediately, so the "direct" feel is preserved.
         if ($page->page_type === 'direct' && $page->direct_url) {
             $page->analytics()->create(['type' => 'page_view', 'device' => $device, 'country' => $country]);
 
-            return redirect()->away($page->direct_url);
+            return response()->view('direct-redirect', [
+                'url' => $page->direct_url,
+                'deepLink' => $page->deep_link_enabled,
+            ])->header('X-Robots-Tag', 'noindex, nofollow');
         }
 
         return null;
