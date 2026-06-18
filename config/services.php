@@ -42,22 +42,22 @@ return [
         // Price IDs are not secrets (they are exposed client-side at checkout).
         'agency_tiers' => [
             'pages' => [
-                50  => 'price_1TijAnJwVNWAqZsCakwQ2oma',
-                100 => 'price_1TijAoJwVNWAqZsCJaIYPhZf',
-                200 => 'price_1TijAoJwVNWAqZsCth8uHijC',
-                400 => 'price_1TijApJwVNWAqZsCaBWdtatQ',
-                600 => 'price_1TijAqJwVNWAqZsCqp64AIWo',
-                800 => 'price_1TijArJwVNWAqZsCQ3jmRwKY',
-                0   => 'price_1TijAsJwVNWAqZsCLM4FbxlK', // unlimited
+                50  => 'price_1TjoaEJwVNWAqZsCZM4miz5l',
+                100 => 'price_1TjoaFJwVNWAqZsCHLftDaO9',
+                200 => 'price_1TjoaGJwVNWAqZsCGbHkjCJp',
+                400 => 'price_1TjoaIJwVNWAqZsCm2bggkuz',
+                600 => 'price_1TjoaJJwVNWAqZsCAFp9iuKd',
+                800 => 'price_1TjoaKJwVNWAqZsCd4GB8nri',
+                0   => 'price_1TjoaMJwVNWAqZsC0XODf3x0', // unlimited
             ],
             'links' => [
-                50  => 'price_1TijAsJwVNWAqZsCu0F4CLbj',
-                100 => 'price_1TijAtJwVNWAqZsCWCR1k97Q',
-                200 => 'price_1TijAuJwVNWAqZsCmNXN4oZH',
-                400 => 'price_1TijAvJwVNWAqZsC3rhaqPHm',
-                600 => 'price_1TijAwJwVNWAqZsCaodlRypM',
-                800 => 'price_1TijAwJwVNWAqZsCvj6eY4nW',
-                0   => 'price_1TijAxJwVNWAqZsCLrbmBCjN', // unlimited
+                50  => 'price_1TjoaNJwVNWAqZsCywmNDsJd',
+                100 => 'price_1TjoaPJwVNWAqZsCYyGohkry',
+                200 => 'price_1TjoaQJwVNWAqZsCPBR6IeTx',
+                400 => 'price_1TjoaRJwVNWAqZsCm5BVgtag',
+                600 => 'price_1TjoaSJwVNWAqZsCmWMlPhOS',
+                800 => 'price_1TjoaTJwVNWAqZsCwig1x2VU',
+                0   => 'price_1TjoaUJwVNWAqZsCUhBOlTm7', // unlimited
             ],
         ],
 
