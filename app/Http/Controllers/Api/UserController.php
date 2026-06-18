@@ -17,7 +17,7 @@ class UserController extends Controller
             'name'        => 'sometimes|string|max:255',
             'email'       => 'sometimes|email|unique:users,email,' . $user->id,
             'timezone'    => 'sometimes|string|timezone:all',
-            'avatar_url'  => 'sometimes|nullable|url',
+            'avatar_url'  => 'sometimes|nullable|url:http,https',
             'preferences' => 'sometimes|array',
         ]);
 

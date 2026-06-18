@@ -28,6 +28,12 @@
       (function () {
         var url = @json($url);
         var deepLink = @json((bool) $deepLink);
+
+        // Defense in depth: only ever navigate to http/https. The server already
+        // validates direct_url as url:http,https, so this just guarantees the
+        // bounce page can never become a javascript:/data: sink if that ever regresses.
+        if (!/^https?:\/\//i.test(url)) { return; }
+
         var ua = navigator.userAgent || '';
         var isInApp = /Instagram|FBAN|FBAV|TikTok/.test(ua);
         var isAndroid = /Android/.test(ua);

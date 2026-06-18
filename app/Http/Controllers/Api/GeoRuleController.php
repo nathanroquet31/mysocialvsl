@@ -21,7 +21,7 @@ class GeoRuleController extends Controller
         $request->validate([
             'rules'                  => 'required|array',
             'rules.*.country_code'   => 'required|string|size:2',
-            'rules.*.redirect_url'   => 'required|url',
+            'rules.*.redirect_url'   => 'required|url:http,https',
         ]);
 
         $page->geoRules()->delete();
