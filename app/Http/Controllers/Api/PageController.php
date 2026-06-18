@@ -121,7 +121,7 @@ class PageController extends Controller
             'response_time' => $request->response_time,
             'countdown_end' => $request->countdown_end,
             'promo_text'    => $request->promo_text,
-            'bot_protection'=> $request->bot_protection ?? false,
+            'bot_protection'=> $request->bot_protection ?? true,
             'deep_link_enabled'    => $request->deep_link_enabled ?? true,
             'strict_deep_link'     => $request->strict_deep_link ?? false,
             'link_preview_enabled' => $request->link_preview_enabled ?? true,
