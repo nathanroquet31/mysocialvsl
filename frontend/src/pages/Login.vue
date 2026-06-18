@@ -17,6 +17,7 @@
       </div>
 
       <div v-if="error" class="auth-error">{{ error }}</div>
+      <div v-if="justReset" class="auth-success">Your password has been reset. Sign in with your new password.</div>
 
       <form class="auth-form" @submit.prevent="submit">
         <div class="field">
@@ -27,6 +28,10 @@
         <div class="field">
           <input v-model="form.password" type="password" id="login_password" class="field-input" placeholder=" " required />
           <label for="login_password" class="field-label"><i class="bi bi-lock"></i> Password</label>
+        </div>
+
+        <div style="text-align:right;margin-top:-16px">
+          <RouterLink to="/forgot-password" style="font-size:12px;color:#A78BFA;text-decoration:none">Forgot password?</RouterLink>
         </div>
 
         <button type="submit" :disabled="loading" class="auth-submit">
@@ -46,16 +51,18 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import SmokeyBackground from '@/components/SmokeyBackground.vue'
 import LogoMark from '@/components/LogoMark.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const form = ref({ email: '', password: '' })
 const error = ref('')
 const loading = ref(false)
+const justReset = ref(route.query.reset === '1')
 
 async function submit() {
   loading.value = true
