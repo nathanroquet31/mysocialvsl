@@ -117,31 +117,7 @@ class StripeController extends Controller
             'expand' => ['items.data.price'],
         ]);
 
-        // Map every known agency price id so we can recognise / remove stale tier items.
-        $managedPrices = [config('services.stripe.price_agency')];
-        foreach (config('services.stripe.agency_tiers') as $dimTiers) {
-            $managedPrices = array_merge($managedPrices, array_values($dimTiers));
-        }
-
-        $desiredPrices = array_column($desiredLineItems, 'price');
-        $existing      = [];
-        foreach ($subscription->items->data as $item) {
-            $existing[$item->price->id] = $item->id;
-        }
-
-        $items = [];
-        // Add anything desired that isn't already present.
-        foreach ($desiredPrices as $priceId) {
-            if (!isset($existing[$priceId])) {
-                $items[] = ['price' => $priceId, 'quantity' => 1];
-            }
-        }
-        // Delete managed items we no longer want (old tier / pro packs left over).
-        foreach ($existing as $priceId => $itemId) {
-            if (in_array($priceId, $managedPrices, true) && !in_array($priceId, $desiredPrices, true)) {
-                $items[] = ['id' => $itemId, 'deleted' => true];
-            }
-        }
+        $items = $this->agencyDiffItems($subscription, $desiredLineItems);
 
         if (!empty($items)) {
             try {
@@ -176,6 +152,99 @@ class StripeController extends Controller
             'page_limit' => $user->pageLimit(),
             'link_limit' => $user->linkLimit(),
         ]);
+    }
+
+    /**
+     * Diff the desired agency line items against an existing subscription, returning the
+     * minimal items payload Stripe expects: additions by price, removals by id+deleted.
+     * Shared by the in-place update and the proration preview so they can never diverge.
+     */
+    private function agencyDiffItems(\Stripe\Subscription $subscription, array $desiredLineItems): array
+    {
+        // Every price we manage, so we only ever add/remove our own items.
+        $managedPrices = [config('services.stripe.price_agency')];
+        foreach (config('services.stripe.agency_tiers') as $dimTiers) {
+            $managedPrices = array_merge($managedPrices, array_values($dimTiers));
+        }
+
+        $desiredPrices = array_column($desiredLineItems, 'price');
+        $existing      = [];
+        foreach ($subscription->items->data as $item) {
+            $existing[$item->price->id] = $item->id;
+        }
+
+        $items = [];
+        foreach ($desiredPrices as $priceId) {
+            if (!isset($existing[$priceId])) {
+                $items[] = ['price' => $priceId, 'quantity' => 1];
+            }
+        }
+        foreach ($existing as $priceId => $itemId) {
+            if (in_array($priceId, $managedPrices, true) && !in_array($priceId, $desiredPrices, true)) {
+                $items[] = ['id' => $itemId, 'deleted' => true];
+            }
+        }
+
+        return $items;
+    }
+
+    // POST /billing/preview  { custom_pages?: int|null, custom_links?: int|null }
+    // Returns the amount that would be charged immediately (prorated) for an in-place
+    // Agency change, so the confirm modal can show the exact figure before committing.
+    public function previewAgency(Request $request)
+    {
+        $request->validate([
+            'custom_pages' => 'nullable|integer',
+            'custom_links' => 'nullable|integer',
+        ]);
+
+        $user = $request->user();
+
+        // Proration only applies to an existing Agency subscription changed in place.
+        // A brand-new Agency goes through Stripe Checkout (full payment), so no preview.
+        if ($user->plan !== 'agency' || !$user->stripe_subscription_id) {
+            return response()->json(['amount_now' => null]);
+        }
+
+        $pages = $this->resolveTier('pages', $request->input('custom_pages', 25));
+        $links = $this->resolveTier('links', $request->input('custom_links', 25));
+
+        $desiredLineItems = [['price' => config('services.stripe.price_agency'), 'quantity' => 1]];
+        if ($pages['price']) $desiredLineItems[] = ['price' => $pages['price'], 'quantity' => 1];
+        if ($links['price']) $desiredLineItems[] = ['price' => $links['price'], 'quantity' => 1];
+
+        try {
+            $subscription = \Stripe\Subscription::retrieve([
+                'id'     => $user->stripe_subscription_id,
+                'expand' => ['items.data.price'],
+            ]);
+
+            $items = $this->agencyDiffItems($subscription, $desiredLineItems);
+
+            if (empty($items)) {
+                return response()->json(['amount_now' => 0]); // nothing changes
+            }
+
+            // Preview the immediate proration invoice (same items diff that the real
+            // update will apply), and report its amount due as the "charged now" figure.
+            $preview = \Stripe\Invoice::createPreview([
+                'customer'             => $user->stripe_customer_id,
+                'subscription'         => $subscription->id,
+                'subscription_details' => [
+                    'items'              => $items,
+                    'proration_behavior' => 'always_invoice',
+                    'proration_date'     => time(),
+                ],
+            ]);
+
+            return response()->json([
+                'amount_now' => max(0, $preview->amount_due) / 100,
+                'currency'   => strtoupper($preview->currency ?? 'usd'),
+            ]);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            // Best-effort UI sugar — never block the upgrade flow on the preview.
+            return response()->json(['amount_now' => null]);
+        }
     }
 
     // POST /billing/addons  { pages_packs: int, links_packs: int }

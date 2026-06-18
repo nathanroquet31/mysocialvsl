@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/upload/video', [UploadController::class, 'video']);
 
     Route::post('/billing/checkout', [StripeController::class, 'checkout']);
+    Route::post('/billing/preview',  [StripeController::class, 'previewAgency']);
     Route::post('/billing/portal',   [StripeController::class, 'portal']);
     Route::post('/billing/addons',   [StripeController::class, 'updateAddons']);
 

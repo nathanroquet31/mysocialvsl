@@ -322,6 +322,16 @@
               <span style="font-size:13px;color:rgba(255,255,255,0.6)">Price</span>
               <span style="font-size:18px;font-weight:800;color:#fff">${{ agencyConfirm.price }}<span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.5)">/mo</span></span>
             </div>
+
+            <!-- Exact prorated amount charged right now (in-place updates only) -->
+            <div v-if="agencyConfirm.isUpdate" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Charged now <span style="font-size:11px;color:rgba(255,255,255,0.4)">(pro rata)</span></span>
+              <span style="font-size:16px;font-weight:800;color:#A78BFA">
+                <template v-if="agencyPreview && agencyPreview.loading">…</template>
+                <template v-else-if="agencyPreview && agencyPreview.amount != null">${{ agencyPreview.amount.toFixed(2) }}</template>
+                <template v-else>—</template>
+              </span>
+            </div>
           </div>
 
           <div style="display:flex;gap:8px;align-items:flex-start;background:rgba(109,78,232,0.1);border:1px solid rgba(109,78,232,0.25);border-radius:10px;padding:11px 13px;margin-bottom:18px">
@@ -366,6 +376,7 @@ const checkoutLoading = ref(null)
 const portalLoading = ref(false)
 const agencyConfirm = ref(null)   // pending Agency change shown in the confirm modal
 const agencyError = ref('')       // error surfaced inside the modal (e.g. prorated charge failed)
+const agencyPreview = ref(null)   // { loading } | { amount, currency } | { amount: null } — prorated charge preview
 const billing = ref('monthly')
 const promoCode = ref('')
 const invoices = ref([])
@@ -440,12 +451,30 @@ async function checkout(plan) {
 // before anything is charged.
 function checkoutAgency({ pages, links, price, billing: b }) {
   agencyError.value = ''
-  agencyConfirm.value = { pages, links, price, billing: b, isUpdate: currentPlan.value === 'agency' }
+  agencyPreview.value = null
+  const isUpdate = currentPlan.value === 'agency'
+  agencyConfirm.value = { pages, links, price, billing: b, isUpdate }
+  // For in-place updates, ask the server the exact prorated amount to show in the modal.
+  if (isUpdate) fetchAgencyPreview(pages, links)
+}
+
+async function fetchAgencyPreview(pages, links) {
+  agencyPreview.value = { loading: true }
+  try {
+    const { data } = await api.post('/billing/preview', {
+      custom_pages: pages === Infinity ? null : pages,
+      custom_links: links === Infinity ? null : links,
+    })
+    agencyPreview.value = { amount: data.amount_now, currency: data.currency || 'USD' }
+  } catch {
+    agencyPreview.value = { amount: null } // fall back to the generic notice
+  }
 }
 
 function cancelAgency() {
   if (checkoutLoading.value === 'agency-custom') return
   agencyConfirm.value = null
+  agencyPreview.value = null
 }
 
 // Confirmed in the modal → create the Stripe checkout, or update the subscription
@@ -471,6 +500,7 @@ async function proceedAgency() {
     await auth.fetchMe()
     checkoutLoading.value = null
     agencyConfirm.value = null
+    agencyPreview.value = null
   } catch (e) {
     checkoutLoading.value = null
     agencyError.value = e.response?.data?.message || 'Something went wrong. Your plan was not changed.'
