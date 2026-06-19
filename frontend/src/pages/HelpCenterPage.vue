@@ -11,22 +11,26 @@
       </div>
     </div>
 
-    <!-- Categories -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:28px">
-      <div v-for="cat in filteredCategories" :key="cat.title" :style="card">
-        <div :style="{width:'36px',height:'36px',borderRadius:'10px',background:'#EEE9FF',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'12px'}">
-          <i :class="`bi bi-${cat.icon}`" style="color:#6D4EE8;font-size:16px"></i>
+    <!-- FAQ accordion -->
+    <div style="max-width:720px;margin:0 auto 28px;display:flex;flex-direction:column;gap:10px">
+      <div v-for="a in filtered" :key="a.q" :style="card">
+        <div @click="toggle(a.q)" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+          <div :style="{width:'34px',height:'34px',borderRadius:'9px',background:'#EEE9FF',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
+            <i :class="`bi bi-${a.icon}`" style="color:#6D4EE8;font-size:15px"></i>
+          </div>
+          <p :style="{flex:1,fontSize:'14px',fontWeight:700,color:tx,margin:0}">{{ a.q }}</p>
+          <i class="bi bi-chevron-down" :style="{color:txMuted,fontSize:'13px',transition:'transform 0.2s',transform:open===a.q?'rotate(180deg)':'rotate(0)'}"></i>
         </div>
-        <p :style="{fontSize:'14px',fontWeight:700,color:tx,margin:'0 0 4px'}">{{ cat.title }}</p>
-        <p :style="{fontSize:'12px',color:txMuted,margin:'0 0 12px',lineHeight:1.6}">{{ cat.desc }}</p>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <span v-for="a in cat.articles" :key="a" :style="{fontSize:'12px',color:'#6D4EE8',cursor:'pointer'}">{{ a }} →</span>
-        </div>
+        <div v-if="open===a.q" :style="{fontSize:'13.5px',color:txMuted,lineHeight:1.75,margin:'12px 0 2px',paddingLeft:'46px'}" v-html="a.a"></div>
       </div>
+
+      <p v-if="filtered.length === 0" :style="{textAlign:'center',color:txMuted,fontSize:'13px',padding:'24px'}">
+        No article matches “{{ search }}”. Try another term or contact support below.
+      </p>
     </div>
 
     <!-- Contact -->
-    <div :style="card" style="text-align:center">
+    <div :style="card" style="text-align:center;max-width:720px;margin:0 auto">
       <p :style="{fontSize:'14px',fontWeight:700,color:tx,margin:'0 0 6px'}">Can't find an answer?</p>
       <p :style="{fontSize:'13px',color:txMuted,margin:'0 0 14px'}">Our team usually replies within a few hours.</p>
       <RouterLink to="/dashboard/support" style="display:inline-block;background:#6D4EE8;color:#fff;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;text-decoration:none">Contact support</RouterLink>
@@ -42,36 +46,51 @@ import DashboardLayout from '@/components/DashboardLayout.vue'
 
 const theme = useThemeStore()
 const search = ref('')
+const open = ref('')
 
-const categories = [
-  { title: 'Getting started', icon: 'rocket-takeoff', desc: 'Create your first landing page or direct link in minutes.',
-    articles: ['Create your first page', 'Landing page vs Direct link', 'Publish & share your link'] },
-  { title: 'VSL & video', icon: 'camera-video', desc: 'Upload, configure and optimize your Video Sales Letter.',
-    articles: ['Upload a VSL', 'Best VSL script structure', 'Video display settings'] },
-  { title: 'Links & components', icon: 'link-45deg', desc: 'Buttons, image blocks, carousels, countdowns and more.',
-    articles: ['Add & reorder components', 'FOMO popup setup', 'Social icons & quick add'] },
-  { title: 'Analytics', icon: 'graph-up', desc: 'Understand views, clicks, CTR and video engagement.',
-    articles: ['Reading your dashboard', 'Tracking conversions', 'UTM parameters'] },
-  { title: 'Domains', icon: 'globe', desc: 'Connect a custom domain for a professional look.',
-    articles: ['Add a custom domain', 'DNS configuration', 'Verification status'] },
-  { title: 'Billing & plans', icon: 'credit-card', desc: 'Subscriptions, upgrades and the Agency plan.',
-    articles: ['Manage your subscription', 'Agency plan options', 'Invoices'] },
-  { title: 'API & integrations', icon: 'code-slash', desc: 'REST API v3, API keys and MCP integration.',
-    articles: ['Mint an API key', 'API v3 reference', 'MCP endpoint'] },
-  { title: 'Account & security', icon: 'shield-check', desc: 'Profile, sessions, and account safety.',
-    articles: ['Active sessions', 'Change password', 'Delete account'] },
+function toggle(q) { open.value = open.value === q ? '' : q }
+
+const articles = [
+  {
+    icon: 'rocket-takeoff',
+    q: 'Create your first VSL page',
+    a: 'Go to <strong>Links → New page</strong> and pick <strong>VSL Page</strong>. Then follow the 4 steps: choose a template, upload your video, set your CTA button (paste your OnlyFans link), and publish. Your page goes live instantly at <strong>mysocialvsl.com/p/your-slug</strong> — paste that link in your Instagram bio and you’re done.',
+  },
+  {
+    icon: 'camera-video',
+    q: 'Upload your video — format & tips',
+    a: 'Upload an <strong>MP4 (H.264)</strong> or WebM file — those play in every browser. iPhones record in HEVC <em>.mov</em> by default, which many browsers can’t play; switch to <strong>Settings → Camera → Formats → “Most Compatible”</strong> to record MP4-friendly video. Film <strong>vertical (9:16)</strong>, keep it short (~30–45s), and hook the viewer in the first 3 seconds — the video is what sells.',
+  },
+  {
+    icon: 'lightning-charge',
+    q: 'What is the deeplink (and why is it a paid feature)?',
+    a: 'Instagram, TikTok and Snapchat open links inside their <strong>in-app browser</strong>, where fans <strong>can’t log in to OnlyFans</strong>. The deeplink detects this and forces the link to open in Safari/Chrome, so the fan lands ready to subscribe — it’s the single biggest conversion lever. The deeplink is available on <strong>paid plans</strong>; on Free, your VSL page still works, just without the in-app browser bypass.',
+  },
+  {
+    icon: 'shield-check',
+    q: 'How does my link survive Instagram? (bot protection)',
+    a: 'When you share a link, Instagram sends a bot to scan it first. If it sees “OnlyFans”, it can flag the link. Our <strong>server-side cloaking</strong> serves that bot a clean decoy page (no OnlyFans), while real humans get your full VSL — so your link stays alive and the share preview looks innocent. It’s on by default; leave it on.',
+  },
+  {
+    icon: 'graph-up',
+    q: 'Read your analytics (views, clicks, CTR)',
+    a: 'Your dashboard shows <strong>views</strong> (page loads), <strong>clicks</strong> (taps on your OnlyFans button), and <strong>CTR = clicks ÷ views</strong>. CTR is the number that matters: it’s the % of visitors who actually head to OnlyFans. The <strong>live</strong> view shows visitors and events in the last few minutes, so you can watch a campaign in real time.',
+  },
+  {
+    icon: 'credit-card',
+    q: 'Plans & billing',
+    a: '<strong>Free</strong>: 1 VSL page, no deeplink. <strong>Pro</strong>: more pages + deeplink + analytics. <strong>Agency</strong>: 25 pages/links (scalable up to ∞), white-label (no “Powered by”), multi-model. Manage or cancel anytime from <strong>Billing</strong> — your access continues until the end of the paid period.',
+  },
 ]
 
-const filteredCategories = computed(() => {
+const filtered = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return categories
-  return categories
-    .map(c => ({ ...c, articles: c.articles.filter(a => a.toLowerCase().includes(q) || c.title.toLowerCase().includes(q)) }))
-    .filter(c => c.articles.length || c.title.toLowerCase().includes(q))
+  if (!q) return articles
+  return articles.filter(a => a.q.toLowerCase().includes(q) || a.a.toLowerCase().includes(q))
 })
 
 const tx      = computed(() => theme.dark ? '#fff' : '#111827')
-const txMuted = computed(() => theme.dark ? 'rgba(255,255,255,0.45)' : '#6B7280')
+const txMuted = computed(() => theme.dark ? 'rgba(255,255,255,0.55)' : '#6B7280')
 const bd      = computed(() => theme.dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB')
-const card    = computed(() => ({ background: theme.dark ? 'rgba(255,255,255,0.04)' : '#fff', border:`1px solid ${theme.dark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`, borderRadius:'12px', padding:'20px' }))
+const card    = computed(() => ({ background: theme.dark ? 'rgba(255,255,255,0.04)' : '#fff', border:`1px solid ${theme.dark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`, borderRadius:'12px', padding:'18px 20px' }))
 </script>
