@@ -56,13 +56,16 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import SmokeyBackground from '@/components/SmokeyBackground.vue'
 import LogoMark from '@/components/LogoMark.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+// Affiliate/coach code from /register?ref=… — drives attribution + beta trial.
+const refCode = route.query.ref || null
 const form = ref({ name: '', email: '', password: '', password_confirmation: '' })
 const error = ref('')
 const loading = ref(false)
@@ -71,7 +74,7 @@ async function submit() {
   loading.value = true
   error.value = ''
   try {
-    await auth.register(form.value.name, form.value.email, form.value.password, form.value.password_confirmation)
+    await auth.register(form.value.name, form.value.email, form.value.password, form.value.password_confirmation, refCode)
     router.push('/dashboard/links')
   } catch (e) {
     const errors = e.response?.data?.errors

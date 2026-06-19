@@ -32,6 +32,13 @@ class AuthController extends Controller
             'referred_by' => $referrer?->id,
         ]);
 
+        // Beta go-to-market: signing up through a coach/manager's affiliate code
+        // grants a card-free Agency trial. Gated on the referrer being a flagged
+        // beta partner so trials can't be self-minted by any referrer.
+        if ($referrer?->is_beta_partner) {
+            $user->startTrial('agency', 60);
+        }
+
         $token = $this->issueSessionToken($user, $request);
 
         return response()->json(['token' => $token, 'user' => $user], 201);
@@ -128,6 +135,8 @@ class AuthController extends Controller
             'direct_count' => $pages->get('direct', 0),
             'extra_pages'  => (int) ($user->extra_pages ?? 0),
             'extra_links'  => (int) ($user->extra_links ?? 0),
+            'on_trial'         => $user->onTrial(),
+            'trial_days_left'  => $user->trialDaysLeft(),
         ]));
     }
 }

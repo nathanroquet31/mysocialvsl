@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'plan', 'stripe_customer_id', 'stripe_subscription_id', 'plan_expires_at', 'extra_pages', 'extra_links', 'agency_pages', 'agency_links', 'timezone', 'preferences', 'avatar_url', 'affiliate_code', 'referred_by'])]
+#[Fillable(['name', 'email', 'password', 'plan', 'stripe_customer_id', 'stripe_subscription_id', 'plan_expires_at', 'trial_ends_at', 'trial_reminders', 'is_beta', 'extra_pages', 'extra_links', 'agency_pages', 'agency_links', 'timezone', 'preferences', 'avatar_url', 'affiliate_code', 'referred_by'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -31,6 +31,44 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    /**
+     * On an active card-free trial: the deadline is in the future and the user
+     * has not yet converted to a paid Stripe subscription.
+     */
+    public function onTrial(): bool
+    {
+        return $this->trial_ends_at !== null
+            && $this->trial_ends_at->isFuture()
+            && ! $this->stripe_subscription_id;
+    }
+
+    /** Whole days left on the trial (rounded up), or null when not on a trial. */
+    public function trialDaysLeft(): ?int
+    {
+        if (! $this->onTrial()) {
+            return null;
+        }
+
+        return (int) ceil(now()->floatDiffInDays($this->trial_ends_at, false));
+    }
+
+    /**
+     * Start a card-free beta trial: grant the plan now, set the deadline, tag the
+     * cohort, and reset reminder bookkeeping. No Stripe object is created.
+     */
+    public function startTrial(string $plan = 'agency', int $days = 60): void
+    {
+        $this->update([
+            'plan'            => $plan,
+            'trial_ends_at'   => now()->addDays($days),
+            'trial_reminders' => [],
+            'is_beta'         => true,
+            // Agency base capacity (25/25). NULL columns already resolve to 25.
+            'agency_pages'    => $plan === 'agency' ? 25 : $this->agency_pages,
+            'agency_links'    => $plan === 'agency' ? 25 : $this->agency_links,
+        ]);
     }
 
     public function pageLimit(): int
@@ -88,7 +126,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_beta' => 'boolean',
+            'is_beta_partner' => 'boolean',
             'preferences' => 'array',
+            'trial_ends_at' => 'datetime',
+            'trial_reminders' => 'array',
             'agency_pages' => 'integer',
             'agency_links' => 'integer',
         ];

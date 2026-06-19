@@ -13,8 +13,10 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('token', data.token)
   }
 
-  async function register(name, email, password, password_confirmation) {
-    const { data } = await api.post('/register', { name, email, password, password_confirmation })
+  async function register(name, email, password, password_confirmation, ref = null) {
+    // `ref` is the affiliate/coach code from /register?ref=… — it attributes the
+    // signup and, for beta-partner codes, grants the card-free trial server-side.
+    const { data } = await api.post('/register', { name, email, password, password_confirmation, ref })
     token.value = data.token
     user.value  = data.user
     localStorage.setItem('token', data.token)

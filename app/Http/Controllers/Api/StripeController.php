@@ -376,6 +376,7 @@ class StripeController extends Controller
             'plan'                    => $plan,
             'stripe_subscription_id'  => $session->subscription,
             'plan_expires_at'         => null, // active subscription, no expiry
+            'trial_ends_at'           => null, // converted to paid — trial no longer applies
         ];
 
         if ($plan === 'agency') {
@@ -403,6 +404,7 @@ class StripeController extends Controller
                 'plan'                   => $plan,
                 'stripe_subscription_id' => $subscription->id,
                 'plan_expires_at'        => null,
+                'trial_ends_at'          => null, // converted to paid — trial no longer applies
             ];
 
             if ($plan === 'agency') {

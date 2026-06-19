@@ -1,6 +1,24 @@
 <template>
   <DashboardLayout title="Billing">
 
+    <!-- Card-free trial banner -->
+    <div v-if="onTrial"
+      :style="{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'14px',marginBottom:'24px',padding:'16px 20px',borderRadius:'12px',border:`1px solid ${trialDaysLeft <= 7 ? '#F59E0B' : '#6D4EE8'}`,background: trialDaysLeft <= 7 ? 'rgba(245,158,11,0.10)' : 'rgba(109,78,232,0.10)'}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <i class="bi bi-stars" :style="{fontSize:'20px',color: trialDaysLeft <= 7 ? '#F59E0B' : '#6D4EE8'}"></i>
+        <div>
+          <p :style="{fontSize:'14px',fontWeight:700,color:text,margin:'0 0 2px'}">
+            {{ trialDaysLeft <= 1 ? 'Your free trial ends today' : `${trialDaysLeft} days left in your free trial` }}
+          </p>
+          <p :style="{fontSize:'12px',color:sub,margin:0}">You're on Agency, free. Add a card to keep your pages live when the trial ends — you won't be charged today.</p>
+        </div>
+      </div>
+      <button @click="checkout('agency')" :disabled="checkoutLoading==='agency'"
+        :style="{background:'#6D4EE8',color:'#fff',border:'none',borderRadius:'8px',padding:'10px 18px',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'Inter,sans-serif',whiteSpace:'nowrap',opacity: checkoutLoading==='agency' ? 0.7 : 1}">
+        {{ checkoutLoading==='agency' ? 'Loading…' : 'Add my card' }}
+      </button>
+    </div>
+
     <!-- Current Plan card -->
     <div :style="{background:card,border:`1px solid ${border}`,borderRadius:'12px',padding:'24px',marginBottom:'24px'}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px">
@@ -8,9 +26,11 @@
           <p :style="{fontSize:'11px',fontWeight:600,color:muted,textTransform:'uppercase',letterSpacing:'0.1em',margin:'0 0 10px'}">Current Plan</p>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span :style="{fontSize:'18px',fontWeight:700,color:text,textTransform:'capitalize'}">{{ currentPlan }}</span>
-            <span style="background:#F0FDF4;border:1px solid #BBF7D0;color:#16A34A;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600">Active</span>
+            <span v-if="onTrial" style="background:rgba(109,78,232,0.12);border:1px solid #6D4EE8;color:#6D4EE8;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600">Free trial</span>
+            <span v-else style="background:#F0FDF4;border:1px solid #BBF7D0;color:#16A34A;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600">Active</span>
           </div>
-          <p :style="{fontSize:'12px',color:sub,margin:'0 0 14px'}">Subscription Renews On: <strong :style="{color:label}">{{ renewalDate }}</strong></p>
+          <p v-if="onTrial" :style="{fontSize:'12px',color:sub,margin:'0 0 14px'}">Trial ends in <strong :style="{color:label}">{{ trialDaysLeft }} {{ trialDaysLeft === 1 ? 'day' : 'days' }}</strong></p>
+          <p v-else :style="{fontSize:'12px',color:sub,margin:'0 0 14px'}">Subscription Renews On: <strong :style="{color:label}">{{ renewalDate }}</strong></p>
           <div style="display:flex;gap:32px">
             <div>
               <p :style="{fontSize:'11px',color:muted,margin:'0 0 4px'}">Direct links</p>
@@ -23,12 +43,12 @@
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <button v-if="currentPlan !== 'free'" @click="openPortal" :disabled="portalLoading"
+          <button v-if="currentPlan !== 'free' && !onTrial" @click="openPortal" :disabled="portalLoading"
             style="background:#6D4EE8;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif"
             :style="{opacity: portalLoading ? 0.7 : 1}">
             {{ portalLoading ? 'Loading…' : 'Manage Subscription' }}
           </button>
-          <button :style="{background:'none',border:'none',fontSize:'12px',color:muted,cursor:'pointer',fontFamily:'Inter,sans-serif'}">Cancel Plan</button>
+          <button v-if="!onTrial" :style="{background:'none',border:'none',fontSize:'12px',color:muted,cursor:'pointer',fontFamily:'Inter,sans-serif'}">Cancel Plan</button>
         </div>
       </div>
     </div>
@@ -406,6 +426,9 @@ const inputBg   = computed(() => theme.dark ? 'rgba(255,255,255,0.06)' : '#fff')
 const inputBorder = computed(() => theme.dark ? 'rgba(255,255,255,0.12)' : '#E5E7EB')
 
 const currentPlan = computed(() => auth.user?.plan || 'free')
+// Card-free beta trial state (from /me).
+const onTrial = computed(() => !!auth.user?.on_trial)
+const trialDaysLeft = computed(() => auth.user?.trial_days_left ?? 0)
 // Show the real cap from the API (agency = its chosen tier, e.g. 25); ∞ only when truly unlimited.
 const fmtLimit = (n, fallback) => {
   const v = n ?? fallback
