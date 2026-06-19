@@ -118,6 +118,58 @@ class AdminController extends Controller
         );
     }
 
+    /**
+     * Grant a plan to a user — permanently, or time-limited via the card-free
+     * trial mechanism (auto-expires). Same logic as the user:set-plan command,
+     * exposed as a one-click admin action.
+     */
+    public function grantPlan(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'plan'      => 'required|in:free,pro,agency',
+            'days'      => 'nullable|integer|min:1|max:3650',
+            'unlimited' => 'boolean',
+        ]);
+
+        if (! empty($data['days'])) {
+            $user->startTrial($data['plan'], (int) $data['days']);
+        } else {
+            $user->forceFill(['plan' => $data['plan'], 'trial_ends_at' => null])->save();
+        }
+
+        if (($data['unlimited'] ?? false) && $data['plan'] === 'agency') {
+            $user->forceFill(['agency_pages' => 0, 'agency_links' => 0])->save(); // 0 = ∞
+        }
+
+        $user->loadCount('pages');
+
+        return response()->json(
+            $this->row($user, $this->activityFor(collect([$user->id]))[$user->id] ?? null)
+        );
+    }
+
+    /** A user's pages with per-page traffic — for the expandable detail row. */
+    public function userPages(User $user)
+    {
+        $pages = $user->pages()->orderByDesc('id')->get()->map(function ($p) {
+            $views  = $p->analytics()->where('type', 'page_view')->count();
+            $clicks = $p->analytics()->where('type', 'link_click')->count();
+
+            return [
+                'id'         => $p->id,
+                'slug'       => $p->slug,
+                'model_name' => $p->model_name,
+                'page_type'  => $p->page_type,
+                'is_active'  => (bool) $p->is_active,
+                'views'      => $views,
+                'clicks'     => $clicks,
+                'ctr'        => $views > 0 ? round($clicks / $views * 100, 1) : 0,
+            ];
+        });
+
+        return response()->json($pages);
+    }
+
     /** Shape a user for the admin table — ops fields + page/traffic activity. */
     private function row(User $u, ?array $activity = null): array
     {

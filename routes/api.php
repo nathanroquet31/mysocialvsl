@@ -79,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/metrics', [AdminController::class, 'metrics']);
         Route::get('/users',   [AdminController::class, 'users']);
         Route::patch('/users/{user}/beta-partner', [AdminController::class, 'toggleBetaPartner']);
+        Route::post('/users/{user}/grant-plan',    [AdminController::class, 'grantPlan']);
+        Route::get('/users/{user}/pages',          [AdminController::class, 'userPages']);
     });
 });
 
