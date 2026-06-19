@@ -351,7 +351,11 @@ class AnalyticsController extends Controller
         $views30  = (clone $q)->where('type', 'page_view')->count();
         $clicks30 = (clone $q)->where('type', 'link_click')->count();
 
+        // "Visitors now" = page loads in the last 5 min. Count page_view only:
+        // counting every event inflated it wildly, since one visitor fires ~10
+        // events per visit (video_play, 4× video_progress, unmute, click…).
         $visitorsNow = AnalyticsEvent::whereIn('page_id', $pageIds)
+            ->where('type', 'page_view')
             ->where('created_at', '>=', Carbon::now()->subMinutes(5))->count();
 
         $topCountry = (clone $q)->whereNotNull('country')
