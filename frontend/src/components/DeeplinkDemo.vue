@@ -46,7 +46,7 @@
             }" />
 
           <!-- Age gate overlay (par-dessus VSL page) -->
-          <img src="/demo/agegate.png"
+          <img :src="asset('demo/agegate.png')"
             :style="{
               position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',
               opacity: ageGateOpacity,
@@ -111,10 +111,14 @@ const PHONE_W = 240
 const SCREEN_H = Math.round(PHONE_W * 19.5 / 9)
 const PHASE_COUNT = computed(() => props.mode === 'direct' ? 2 : 4)
 
+// Resolve public/ assets against Vite's base ('/' in dev, '/app/' in build) —
+// a hard-coded '/demo/...' 404s in production where the app is served under /app/.
+const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`
+
 const SCREENS = [
-  '/demo/instagram.png',
-  '/demo/vsl.png',
-  '/demo/onlyfans.png',
+  asset('demo/instagram.png'),
+  asset('demo/vsl.png'),
+  asset('demo/onlyfans.png'),
 ]
 
 // ─── State ───────────────────────────────────────────────────────────────────
