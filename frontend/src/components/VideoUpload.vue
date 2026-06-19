@@ -16,12 +16,12 @@
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       </div>
       <p style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Drop your video here</p>
-      <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:20px">MP4, MOV, WEBM — max 100MB · 45s recommended</p>
+      <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:20px">MP4 (H.264) or WebM — max 100MB · 45s recommended</p>
       <div style="display:inline-flex;align-items:center;gap:8px;background:#6D4EE8;color:#fff;padding:11px 24px;border-radius:10px;font-size:13px;font-weight:700">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Choose a file
       </div>
-      <input ref="input" type="file" accept="video/mp4,video/quicktime,video/webm,video/avi" style="display:none" @change="onFileSelect" />
+      <input ref="input" type="file" accept="video/mp4,video/webm" style="display:none" @change="onFileSelect" />
     </div>
 
     <!-- Preview vidéo (locale dès la sélection) + overlay de progression pendant l'upload -->
@@ -104,6 +104,15 @@ function removeVideo() {
 }
 
 async function upload(file) {
+  // Only accept formats that play across all browsers. iPhones record HEVC in a
+  // .mov container by default, which Chrome/Firefox/Android can't decode — it
+  // would upload fine but show a black, unplayable video on the public page.
+  const okType = /^video\/(mp4|webm)$/i.test(file.type) || /\.(mp4|webm)$/i.test(file.name)
+  if (!okType) {
+    error.value = "This format won't play in every browser (looks like a .mov/QuickTime, often HEVC). Upload an MP4 (H.264) or WebM. iPhone tip: Settings → Camera → Formats → “Most Compatible”."
+    return
+  }
+
   const maxSize = 100 * 1024 * 1024 // 100MB
   if (file.size > maxSize) {
     error.value = 'File too large (max 100MB). Compress your video or reduce the resolution to 720p.'

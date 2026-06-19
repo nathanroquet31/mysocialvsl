@@ -43,7 +43,11 @@ class UploadController extends Controller
         set_time_limit(300); // 5 min — R2 upload can be slow for large files
 
         $request->validate([
-            'file' => 'required|file|mimes:mp4,mov,webm|max:102400', // 100MB max
+            // mp4/webm only: .mov (usually iPhone HEVC) uploads fine but won't
+            // decode in Chrome/Firefox/Android, leaving a black video for fans.
+            'file' => 'required|file|mimes:mp4,webm|max:102400', // 100MB max
+        ], [
+            'file.mimes' => "This format won't play in every browser. Please upload an MP4 (H.264) or WebM. iPhone tip: Settings → Camera → Formats → \"Most Compatible\".",
         ]);
 
         $file     = $request->file('file');
