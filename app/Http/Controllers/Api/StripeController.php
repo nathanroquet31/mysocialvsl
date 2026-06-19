@@ -433,7 +433,7 @@ class StripeController extends Controller
             // Ignore cancellation of a stale/orphan sub that isn't the user's current one.
             if ($user->stripe_subscription_id !== $subscription->id) return;
 
-            $periodEnd = $subscription->current_period_end ?? null;
+            $periodEnd = $this->subscriptionPeriodEnd($subscription);
             $user->update([
                 'plan'            => 'free',
                 'plan_expires_at' => $periodEnd ? \Carbon\Carbon::createFromTimestamp($periodEnd) : now(),
@@ -486,6 +486,26 @@ class StripeController extends Controller
         }
 
         return $caps;
+    }
+
+    /**
+     * Read a subscription's current period end as a unix timestamp, resilient to the
+     * Stripe API version. Older versions expose `current_period_end` on the subscription
+     * object; newer ones (Basil/Dahlia and later) moved it onto each subscription item.
+     */
+    private function subscriptionPeriodEnd(object $subscription): ?int
+    {
+        if (!empty($subscription->current_period_end)) {
+            return (int) $subscription->current_period_end;
+        }
+
+        foreach ($subscription->items?->data ?? [] as $item) {
+            if (!empty($item->current_period_end)) {
+                return (int) $item->current_period_end;
+            }
+        }
+
+        return null;
     }
 
     private function handlePaymentFailed(object $invoice): void
