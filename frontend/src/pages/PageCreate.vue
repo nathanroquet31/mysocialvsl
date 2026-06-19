@@ -268,9 +268,14 @@
                       <div :style="{background:'rgba(16,185,129,0.07)',border:'1px solid rgba(16,185,129,0.18)',borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                         <div>
                           <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Enable deeplink</p>
-                          <p :style="{fontSize:'11px',color:C.textDim}">Recommended — enabled by default</p>
+                          <p :style="{fontSize:'11px',color:C.textDim}">{{ isFreePlan ? 'Available on paid plans' : 'Recommended — enabled by default' }}</p>
                         </div>
-                        <div @click="form.deep_link_enabled = !form.deep_link_enabled"
+                        <div v-if="isFreePlan" @click="router.push('/billing')"
+                          :style="{display:'flex',alignItems:'center',gap:'5px',padding:'5px 12px',borderRadius:'999px',cursor:'pointer',background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.3)',flexShrink:0}">
+                          <i class="bi bi-lock-fill" style="font-size:10px;color:#F59E0B"></i>
+                          <span :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B'}">Paid</span>
+                        </div>
+                        <div v-else @click="form.deep_link_enabled = !form.deep_link_enabled"
                           :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.deep_link_enabled?'#10b981':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
                           <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.deep_link_enabled?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
                         </div>
@@ -996,10 +1001,14 @@ import VideoUpload from '@/components/VideoUpload.vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import DeeplinkDemo from '@/components/DeeplinkDemo.vue'
 import { useThemeStore } from '@/stores/theme'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const route  = useRoute()
 const theme  = useThemeStore()
+const auth   = useAuthStore()
+// Deeplink bypass is a paid feature — gate the toggle for free-plan owners.
+const isFreePlan = computed(() => { const p = (auth.user as any)?.plan; return !p || p === 'free' })
 
 const editPageId = computed(() => route.params.id as string | undefined)
 const isEditMode = computed(() => !!editPageId.value)

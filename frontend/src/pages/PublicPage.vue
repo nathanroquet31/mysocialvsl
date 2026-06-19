@@ -37,15 +37,11 @@
 
       <!-- VSL badge + bouton mute — haut-gauche -->
       <div v-if="vslActive" style="position:absolute;top:12px;left:12px;z-index:10;display:flex;align-items:center;gap:6px">
-        <div style="background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;padding:4px 10px;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.12)">
-          <i class="bi bi-play-fill" style="font-size:9px;color:#fff"></i>
-          <span style="font-size:10px;font-weight:800;color:#fff;letter-spacing:0.08em">VSL</span>
-        </div>
         <button v-if="isLocalVideo" @click="toggleMute"
           style="background:rgba(0,0,0,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.18);border-radius:999px;padding:4px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;outline:none"
           :style="{ animation: videoMuted ? 'pulse-unmute 2s ease-in-out infinite' : 'none' }">
           <i :class="videoMuted ? 'bi bi-volume-mute-fill' : 'bi bi-volume-up-fill'" style="font-size:13px;color:#fff"></i>
-          <span style="font-size:10px;font-weight:700;color:#fff">{{ videoMuted ? 'Son' : 'Muet' }}</span>
+          <span style="font-size:10px;font-weight:700;color:#fff">{{ videoMuted ? 'Tap for sound' : 'Mute' }}</span>
         </button>
       </div>
 
@@ -71,11 +67,13 @@
           :style="{
             '--btn-shadow-sm': `0 4px 22px ${btnColor}60`,
             '--btn-shadow-lg': `0 10px 40px ${btnColor}bb`,
-            width:'100%', padding:'17px 16px', borderRadius:'15px', textAlign:'center',
+            width:'100%', padding:'17px 16px', borderRadius:'15px',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:'9px',
             fontSize:'16px', fontWeight:700, letterSpacing:'0.2px',
             border:'none', cursor:'pointer',
             background:btnColor, color:'#fff', fontFamily:'inherit',
           }">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           {{ primaryLink.label || 'Rejoindre' }}
         </button>
 
@@ -221,8 +219,8 @@
       </div>
     </Teleport>
 
-    <!-- Branding -->
-    <a href="/" style="font-size:10px;color:rgba(255,255,255,0.12);margin-top:14px;text-decoration:none;letter-spacing:0.05em">
+    <!-- Branding — hidden on paid plans (white-label) -->
+    <a v-if="page.show_branding" href="/" style="font-size:10px;color:rgba(255,255,255,0.12);margin-top:14px;text-decoration:none;letter-spacing:0.05em">
       Powered by <strong style="color:rgba(255,255,255,0.2)">MySocialVSL</strong>
     </a>
 

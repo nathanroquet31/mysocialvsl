@@ -16,10 +16,27 @@ trait ResolvesPublicPages
 {
     protected function resolvePublicPage(string $slug): Page
     {
-        return Page::where('slug', $slug)
+        $page = Page::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['links', 'geoRules'])
+            ->with(['links', 'geoRules', 'user'])
             ->firstOrFail();
+
+        // Deeplink bypass (in-app browser escape) is a paid feature. Force it off
+        // for free-plan owners so neither the server bounce page nor the SPA apply
+        // it — the VSL page itself still works on the free plan.
+        if (($page->user->plan ?? 'free') === 'free') {
+            $page->deep_link_enabled = false;
+            $page->strict_deep_link = false;
+        }
+
+        // White-label: only paid plans hide the "Powered by" footer.
+        $page->setAttribute('show_branding', ($page->user->plan ?? 'free') === 'free');
+
+        // Drop the owner relation so the public JSON never leaks user data
+        // (email, Stripe ids…) — we only needed the plan above.
+        $page->unsetRelation('user');
+
+        return $page;
     }
 
     /**
