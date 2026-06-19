@@ -35,6 +35,7 @@
               <th :style="thStyle">Trial</th>
               <th :style="thStyle">Referred by</th>
               <th :style="thStyle">Joined</th>
+              <th :style="thStyle">Activity</th>
               <th :style="{...thStyle, textAlign:'right'}">Beta partner</th>
             </tr>
           </thead>
@@ -59,6 +60,13 @@
               </td>
               <td :style="{...tdStyle, color:sub}">{{ u.referred_by ?? '—' }}</td>
               <td :style="{...tdStyle, color:sub}">{{ fmtDate(u.created_at) }}</td>
+              <td :style="tdStyle">
+                <div v-if="u.pages_count > 0" :style="{display:'flex',flexDirection:'column',gap:'1px'}">
+                  <span :style="{color:text,fontWeight:600}">{{ u.pages_count }} page{{ u.pages_count > 1 ? 's' : '' }}</span>
+                  <span :style="{color:sub,fontSize:'11px'}">{{ u.views }} views · {{ u.clicks }} clicks{{ u.views > 0 ? ' · ' + u.ctr + '%' : '' }}</span>
+                </div>
+                <span v-else :style="{color:muted}">— not activated</span>
+              </td>
               <td :style="{...tdStyle, textAlign:'right'}">
                 <button @click="toggleBeta(u)" :disabled="u._saving"
                   :style="{
@@ -75,7 +83,7 @@
               </td>
             </tr>
             <tr v-if="!loading && users.length === 0">
-              <td colspan="6" :style="{...tdStyle, textAlign:'center', color:muted, padding:'32px'}">No users found.</td>
+              <td colspan="7" :style="{...tdStyle, textAlign:'center', color:muted, padding:'32px'}">No users found.</td>
             </tr>
           </tbody>
         </table>

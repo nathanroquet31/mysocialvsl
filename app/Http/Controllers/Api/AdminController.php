@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AnalyticsEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * Founder/admin ops surface. Every route here sits behind auth:sanctum + the
@@ -20,13 +22,51 @@ class AdminController extends Controller
     {
         $search = trim((string) $request->query('q', ''));
 
-        $users = User::query()
+        $paginator = User::query()
             ->when($search !== '', fn ($q) => $q->where('email', 'like', "%{$search}%"))
+            ->withCount('pages')
             ->orderByDesc('id')
-            ->paginate(25)
-            ->through(fn (User $u) => $this->row($u));
+            ->paginate(25);
 
-        return response()->json($users);
+        $activity = $this->activityFor($paginator->getCollection()->pluck('id'));
+
+        $paginator->setCollection(
+            $paginator->getCollection()->map(fn (User $u) => $this->row($u, $activity[$u->id] ?? null))
+        );
+
+        return response()->json($paginator);
+    }
+
+    /**
+     * Aggregate page views + link clicks (and last activity) across each user's
+     * pages, in a single query. Keyed by user_id.
+     *
+     * @return array<int, array{views:int, clicks:int, last_event:?string}>
+     */
+    private function activityFor(Collection $userIds): array
+    {
+        if ($userIds->isEmpty()) {
+            return [];
+        }
+
+        return AnalyticsEvent::query()
+            ->join('pages', 'analytics_events.page_id', '=', 'pages.id')
+            ->whereIn('pages.user_id', $userIds)
+            ->selectRaw(
+                'pages.user_id as user_id, '
+                . "sum(case when analytics_events.type = 'page_view'  then 1 else 0 end) as views, "
+                . "sum(case when analytics_events.type = 'link_click' then 1 else 0 end) as clicks, "
+                . 'max(analytics_events.created_at) as last_event'
+            )
+            ->groupBy('pages.user_id')
+            ->get()
+            ->keyBy('user_id')
+            ->map(fn ($r) => [
+                'views'      => (int) $r->views,
+                'clicks'     => (int) $r->clicks,
+                'last_event' => $r->last_event,
+            ])
+            ->all();
     }
 
     /** Headline counts for the dashboard cards. */
@@ -71,12 +111,19 @@ class AdminController extends Controller
 
         $user->forceFill(['is_beta_partner' => $data['is_beta_partner']])->save();
 
-        return response()->json($this->row($user));
+        $user->loadCount('pages');
+
+        return response()->json(
+            $this->row($user, $this->activityFor(collect([$user->id]))[$user->id] ?? null)
+        );
     }
 
-    /** Shape a user for the admin table — only the ops-relevant fields. */
-    private function row(User $u): array
+    /** Shape a user for the admin table — ops fields + page/traffic activity. */
+    private function row(User $u, ?array $activity = null): array
     {
+        $views  = $activity['views'] ?? 0;
+        $clicks = $activity['clicks'] ?? 0;
+
         return [
             'id'              => $u->id,
             'name'            => $u->name,
@@ -91,6 +138,12 @@ class AdminController extends Controller
             'affiliate_code'  => $u->affiliate_code,
             'referred_by'     => $u->referred_by,
             'created_at'      => $u->created_at,
+            // Activation / activity
+            'pages_count'     => (int) ($u->pages_count ?? 0),
+            'views'           => $views,
+            'clicks'          => $clicks,
+            'ctr'             => $views > 0 ? round($clicks / $views * 100, 1) : 0,
+            'last_active'     => $activity['last_event'] ?? null,
         ];
     }
 }
