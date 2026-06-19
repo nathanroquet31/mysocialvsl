@@ -20,14 +20,6 @@
         {{ legalLang === 'fr' ? 'Dernière mise à jour' : 'Last updated' }} : {{ updated }}
       </p>
 
-      <!-- Template disclaimer -->
-      <div class="legal-disclaimer">
-        <i class="bi bi-info-circle"></i>
-        <span>{{ legalLang === 'fr'
-          ? "Ces documents sont fournis à titre informatif ; une relecture par un juriste est recommandée, en particulier au vu de la nature du service."
-          : "These documents are provided for information; a review by a lawyer is recommended, especially given the nature of the service." }}</span>
-      </div>
-
       <article class="legal-content">
         <section v-for="(s, i) in sections[legalLang]" :key="i">
           <h2 v-if="s.h">{{ s.h }}</h2>
@@ -110,19 +102,6 @@ defineProps({
 .legal-main { max-width: 760px; margin: 0 auto; padding: 56px 24px 40px; }
 .legal-title { font-size: 34px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.02em; }
 .legal-updated { font-size: 13px; color: rgba(255, 255, 255, 0.4); margin: 0 0 28px; }
-
-.legal-disclaimer {
-  display: flex; align-items: flex-start; gap: 10px;
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 36px;
-  font-size: 13px;
-  color: #FBBF24;
-  line-height: 1.6;
-}
-.legal-disclaimer i { margin-top: 1px; }
 
 .legal-content section { margin-bottom: 28px; }
 .legal-content h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 0 0 12px; }
