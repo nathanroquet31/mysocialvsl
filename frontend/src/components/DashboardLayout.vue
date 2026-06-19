@@ -76,14 +76,10 @@
           </div>
           <!-- Sub-items -->
           <div v-if="analyticsOpen && !collapsed" style="padding-left:16px;margin-bottom:2px">
-            <RouterLink to="/dashboard/analytics/instagram"
-              :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 10px',borderRadius:'8px',fontSize:'12px',textDecoration:'none',
-                color: route.path==='/dashboard/analytics/instagram' ? '#6D4EE8' : textSecondary,
-                background: route.path==='/dashboard/analytics/instagram' ? '#EEE9FF' : 'transparent'}"
-              @mouseenter="e => { if(route.path!=='/dashboard/analytics/instagram') e.currentTarget.style.background=hoverBg }"
-              @mouseleave="e => { if(route.path!=='/dashboard/analytics/instagram') e.currentTarget.style.background='transparent' }">
+            <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 10px',borderRadius:'8px',fontSize:'12px',color:textMuted,cursor:'default'}">
               <span><i class="bi bi-instagram" style="font-size:11px;margin-right:6px"></i>Instagram</span>
-            </RouterLink>
+              <span :style="{fontSize:'10px',fontWeight:600,background:hoverBg,color:textMuted,borderRadius:'999px',padding:'1px 7px',border:`1px solid ${border}`}">Soon</span>
+            </div>
             <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 10px',borderRadius:'8px',fontSize:'12px',color:textMuted,cursor:'default'}">
               <span><i class="bi bi-tiktok" style="font-size:11px;margin-right:6px"></i>TikTok</span>
               <span :style="{fontSize:'10px',fontWeight:600,background:hoverBg,color:textMuted,borderRadius:'999px',padding:'1px 7px',border:`1px solid ${border}`}">Soon</span>
