@@ -29,8 +29,9 @@ trait ResolvesPublicPages
             $page->strict_deep_link = false;
         }
 
-        // White-label: only paid plans hide the "Powered by" footer.
-        $page->setAttribute('show_branding', ($page->user->plan ?? 'free') === 'free');
+        // White-label: only the Agency plan hides the "Powered by" footer
+        // (matches GetMySocial — Creator/Pro still shows branding).
+        $page->setAttribute('show_branding', ($page->user->plan ?? 'free') !== 'agency');
 
         // Drop the owner relation so the public JSON never leaks user data
         // (email, Stripe ids…) — we only needed the plan above.
