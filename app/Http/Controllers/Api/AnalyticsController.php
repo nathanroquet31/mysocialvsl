@@ -31,8 +31,9 @@ class AnalyticsController extends Controller
         try {
             $position = Location::get($request->ip());
             $country = $position ? $position->countryCode : null;
-        } catch (\Exception $e) {
-            // silently fail
+        } catch (\Throwable $e) {
+            // Geo lookup is best-effort; never break analytics on it.
+            // Catch Throwable (not Exception): location drivers can raise \TypeError/\Error.
         }
 
         AnalyticsEvent::create([

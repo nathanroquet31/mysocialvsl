@@ -53,8 +53,10 @@ trait ResolvesPublicPages
         try {
             $position = Location::get($request->ip());
             $country = $position ? $position->countryCode : null;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Geo lookup is best-effort; never block the page on it.
+            // Catch Throwable (not Exception): some location drivers raise
+            // \TypeError/\Error, which would otherwise 500 the public page.
         }
 
         // Geo-routing — redirect if a rule matches the visitor's country.
