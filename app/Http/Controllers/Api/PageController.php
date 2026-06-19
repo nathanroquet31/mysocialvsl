@@ -23,6 +23,7 @@ class PageController extends Controller
     {
         $request->validate([
             'model_name'    => 'required|string|max:100',
+            'slug'          => 'nullable|string|max:120',
             'group_name'    => 'nullable|string|max:100',
             'page_type'     => 'nullable|in:landing,direct',
             'direct_url'    => 'nullable|url:http,https|required_if:page_type,direct',
@@ -97,7 +98,13 @@ class PageController extends Controller
             }
         }
 
-        $slug = Str::slug($request->model_name) . '-' . Str::random(5);
+        // Honour the creator's chosen slug (clean links like /sofia); fall back to
+        // the model name. Only append a random suffix when it's empty or already
+        // taken, so a published link is never blocked by a collision.
+        $slug = Str::slug($request->filled('slug') ? $request->slug : $request->model_name);
+        if (! $slug || Page::where('slug', $slug)->exists()) {
+            $slug = ($slug ?: 'page') . '-' . Str::random(5);
+        }
 
         $page = $request->user()->pages()->create([
             'slug'          => $slug,
