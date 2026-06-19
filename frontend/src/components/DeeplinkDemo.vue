@@ -46,7 +46,7 @@
             }" />
 
           <!-- Age gate overlay (par-dessus VSL page) -->
-          <img :src="asset('demo/agegate.png')"
+          <img :src="asset('demo/agegate.webp')"
             :style="{
               position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',
               opacity: ageGateOpacity,
@@ -116,9 +116,9 @@ const PHASE_COUNT = computed(() => props.mode === 'direct' ? 2 : 4)
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`
 
 const SCREENS = [
-  asset('demo/instagram.png'),
-  asset('demo/vsl.png'),
-  asset('demo/onlyfans.png'),
+  asset('demo/instagram.webp'),
+  asset('demo/vsl.webp'),
+  asset('demo/onlyfans.webp'),
 ]
 
 // ─── State ───────────────────────────────────────────────────────────────────
