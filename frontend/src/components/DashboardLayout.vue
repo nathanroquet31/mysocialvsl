@@ -106,6 +106,13 @@
 
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/settings" :active="route.path==='/dashboard/settings'" label="Settings" icon="settings" />
 
+        <!-- Admin section — founder only (is_admin) -->
+        <template v-if="auth.user?.is_admin">
+          <div :style="{height:'1px',background:border,margin:'8px 2px'}"></div>
+          <p v-if="!collapsed" :style="{fontSize:'10px',fontWeight:600,color:textMuted,textTransform:'uppercase',letterSpacing:'0.1em',padding:'0 8px',margin:'8px 0 4px',whiteSpace:'nowrap'}">Admin</p>
+          <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/admin" :active="route.path==='/dashboard/admin'" label="Admin" icon="admin" />
+        </template>
+
         <!-- Help section -->
         <div :style="{height:'1px',background:border,margin:'8px 2px'}"></div>
         <p v-if="!collapsed" :style="{fontSize:'10px',fontWeight:600,color:textMuted,textTransform:'uppercase',letterSpacing:'0.1em',padding:'0 8px',margin:'8px 0 4px',whiteSpace:'nowrap'}">Help</p>

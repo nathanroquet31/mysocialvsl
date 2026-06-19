@@ -29,6 +29,7 @@
       <i v-else-if="icon==='affiliates'" class="bi bi-people"></i>
       <i v-else-if="icon==='help'"      class="bi bi-question-circle"></i>
       <i v-else-if="icon==='legacy'"    class="bi bi-archive"></i>
+      <i v-else-if="icon==='admin'"     class="bi bi-shield-lock-fill"></i>
       <i v-else                         class="bi bi-circle"></i>
     </span>
 

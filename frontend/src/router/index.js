@@ -29,6 +29,7 @@ const routes = [
   { path: '/dashboard/analytics/instagram', component: () => import('@/pages/SocialAnalyticsPage.vue'), meta: { auth: true } },
   { path: '/dashboard/help',       component: () => import('@/pages/HelpCenterPage.vue'),      meta: { auth: true } },
   { path: '/dashboard/legacy',     component: () => import('@/pages/LegacyPage.vue'),          meta: { auth: true } },
+  { path: '/dashboard/admin',      component: () => import('@/pages/AdminPage.vue'),           meta: { auth: true, admin: true } },
   { path: '/p/:slug',   component: () => import('@/pages/PublicPage.vue'), meta: {} },
 
   // Public legal pages (accessible to everyone — no guest/auth guard)
@@ -42,9 +43,14 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore()
   if (to.meta.auth && !auth.isLoggedIn()) return '/login'
+  // Role-based guards need the profile loaded; on a hard load /me may still be in flight.
+  if (to.meta.admin && auth.isLoggedIn() && !auth.user) {
+    try { await auth.fetchMe() } catch { /* fall through to the is_admin check below */ }
+  }
+  if (to.meta.admin && !auth.user?.is_admin) return '/dashboard/links'
   if (to.meta.guest && auth.isLoggedIn() && to.path !== '/') return '/dashboard/links'
 })
 

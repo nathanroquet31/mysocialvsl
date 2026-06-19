@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AffiliateController;
 use App\Http\Controllers\Api\ApiKeyController;
 use App\Http\Controllers\Api\AuthController;
@@ -72,6 +73,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/social-accounts/{id}',     [SocialAccountController::class, 'update']);
     Route::post('/social-accounts/{id}/sync', [SocialAccountController::class, 'sync']);
     Route::delete('/social-accounts/{id}',    [SocialAccountController::class, 'destroy']);
+
+    // Admin ops (founder only) — flag coaches as beta partners, see users/trials.
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/metrics', [AdminController::class, 'metrics']);
+        Route::get('/users',   [AdminController::class, 'users']);
+        Route::patch('/users/{user}/beta-partner', [AdminController::class, 'toggleBetaPartner']);
+    });
 });
 
 // REST API v3 — programmatic access via API key (Bearer), scopes v3:read / v3:write
