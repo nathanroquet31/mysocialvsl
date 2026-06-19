@@ -593,12 +593,25 @@ function confirmAge() {
   pendingLink.value = null
 }
 
+// Reliable event delivery: sendBeacon survives the immediate navigation to
+// OnlyFans, where a normal XHR gets cancelled mid-flight and the click is lost
+// — silently undercounting CTR, the metric that matters most here. The JSON
+// Blob type is required so Laravel parses the body; a plain string arrives as
+// text/plain and is dropped by validation.
+function sendEvent(type, extra = {}) {
+  const payload = JSON.stringify({ type, ...extra })
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(`/api/p/${slug}/event`, new Blob([payload], { type: 'application/json' }))
+  } else {
+    api.post(`/p/${slug}/event`, { type, ...extra }).catch(() => {})
+  }
+}
+
 function goToLink(link) {
-  api.post(`/p/${slug}/event`, {
-    type: 'link_click',
+  sendEvent('link_click', {
     page_link_id: link.id,
     value: watchSeconds.value > 0 ? watchSeconds.value : null,
-  }).catch(() => {})
+  })
   const url = withUtm(link.url)
   if (!url) return
   if (page.value?.deep_link_enabled) {
@@ -716,9 +729,7 @@ onUnmounted(() => {
   if (pageStartTime.value && page.value) {
     const secs = Math.round((Date.now() - pageStartTime.value) / 1000)
     if (secs >= 2) {
-      navigator.sendBeacon
-        ? navigator.sendBeacon(`/api/p/${slug}/event`, JSON.stringify({ type: 'time_on_page', value: secs }))
-        : api.post(`/p/${slug}/event`, { type: 'time_on_page', value: secs }).catch(() => {})
+      sendEvent('time_on_page', { value: secs })
     }
   }
 })
