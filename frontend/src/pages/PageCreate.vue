@@ -646,68 +646,6 @@
 
             <div :style="{display:'flex',flexDirection:'column',gap:'20px'}">
 
-              <!-- Button type selector -->
-              <div>
-                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Button type</label>
-                <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}">
-                  <div @click="form.cta_type='text'"
-                    :style="{
-                      padding:'14px 16px',borderRadius:'14px',cursor:'pointer',transition:'all 0.15s',
-                      border:'2px solid',
-                      borderColor:form.cta_type==='text'?'#6D4EE8':C.border,
-                      background:form.cta_type==='text'?'rgba(109,78,232,0.1)':C.surface,
-                    }">
-                    <div :style="{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}">
-                      <div :style="{width:'28px',height:'28px',borderRadius:'8px',background:form.cta_type==='text'?'rgba(109,78,232,0.25)':'rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center'}">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="form.cta_type==='text'?'#A78BFA':C.textDim" stroke-width="2"><path d="M4 6h16M4 12h8M4 18h12"/></svg>
-                      </div>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='text'?'#A78BFA':C.text2}">Text</span>
-                    </div>
-                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Classic button with customizable text and color.</p>
-                  </div>
-                  <div @click="form.cta_type='image'"
-                    :style="{
-                      padding:'14px 16px',borderRadius:'14px',cursor:'pointer',transition:'all 0.15s',
-                      border:'2px solid',
-                      borderColor:form.cta_type==='image'?'#6D4EE8':C.border,
-                      background:form.cta_type==='image'?'rgba(109,78,232,0.1)':C.surface,
-                    }">
-                    <div :style="{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}">
-                      <div :style="{width:'28px',height:'28px',borderRadius:'8px',background:form.cta_type==='image'?'rgba(109,78,232,0.25)':'rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center'}">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="form.cta_type==='image'?'#A78BFA':C.textDim" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                      </div>
-                      <span :style="{fontSize:'13px',fontWeight:700,color:form.cta_type==='image'?'#A78BFA':C.text2}">Image</span>
-                    </div>
-                    <p :style="{fontSize:'11px',color:C.textDim,margin:0,lineHeight:1.5}">Clickable image card with a link — great for promoting visually.</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Image upload (image type) -->
-              <div v-if="form.cta_type==='image'">
-                <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'10px'}">Button image</label>
-                <div :style="{
-                  position:'relative',borderRadius:'16px',overflow:'hidden',
-                  border:`2px dashed ${C.border}`,
-                  background:C.surface,
-                  minHeight:'140px',display:'flex',alignItems:'center',justifyContent:'center',
-                  cursor:'pointer',
-                }">
-                  <img v-if="form.cta_image_url" :src="form.cta_image_url" :style="{width:'100%',height:'140px',objectFit:'cover',display:'block'}" />
-                  <div v-else :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'24px'}">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" :stroke="C.textFaint" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    <span :style="{fontSize:'12px',fontWeight:600,color:C.textFaint}">No image</span>
-                  </div>
-                  <!-- Link icon badge in top-right -->
-                  <div :style="{position:'absolute',top:'8px',right:'8px',width:'28px',height:'28px',borderRadius:'50%',background:'rgba(0,0,0,0.45)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center'}">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-                  </div>
-                  <input type="file" accept="image/*" :style="{position:'absolute',inset:0,opacity:0,cursor:'pointer'}"
-                    @change="uploadCtaImage" />
-                </div>
-                <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'6px'}">JPG, PNG, WEBP — Recommended ratio 16:9 or 3:1</p>
-              </div>
-
               <!-- CTA URL -->
               <div>
                 <label :style="{display:'flex',alignItems:'center',gap:'8px',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">
