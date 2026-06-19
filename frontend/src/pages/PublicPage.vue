@@ -349,7 +349,7 @@ import api from '@/lib/axios'
 const route = useRoute()
 // Slug comes from the URL (/p/:slug) or, on a custom domain served at root by
 // Laravel, from the injected window.__VSL_SLUG__.
-const slug = slug || window.__VSL_SLUG__
+const slug = route.params.slug || window.__VSL_SLUG__
 const page = ref(null)
 const loading = ref(true)
 const ageModal = ref(false)
