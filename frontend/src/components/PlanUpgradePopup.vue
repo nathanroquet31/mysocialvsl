@@ -46,17 +46,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useThemeStore } from '@/stores/theme'
+import api from '@/lib/axios'
 
-const auth = useAuthStore()
 const theme = useThemeStore()
 
 const show = ref(false)
 const shownPlan = ref(null)
+let pollTimer = null
 
-const STORAGE_KEY = 'seen_plan'
+const CELEBRATED_KEY = 'celebrated_upgrades'
 const LABELS = { pro: 'Pro', agency: 'Agency', free: 'Free' }
 
 const cardBg        = computed(() => theme.dark ? '#1a1733' : '#fff')
@@ -71,29 +71,45 @@ const message = computed(() =>
     : "Welcome aboard — your Pro features are unlocked. Time to make those links convert."
 )
 
-// Compare the live plan against the last one this browser acknowledged.
-// First time we ever see a plan we just record it silently (no popup on
-// initial login); only an actual upgrade to pro/agency pops the celebration.
-function check(plan) {
-  if (!plan) return
-  const seen = localStorage.getItem(STORAGE_KEY)
-  if (seen === null) {
-    localStorage.setItem(STORAGE_KEY, plan)
-    return
+function celebrated() {
+  try { return JSON.parse(localStorage.getItem(CELEBRATED_KEY) || '[]') } catch (e) { return [] }
+}
+function markCelebrated(id) {
+  const list = celebrated()
+  if (!list.includes(id)) {
+    list.push(id)
+    // keep the list bounded
+    localStorage.setItem(CELEBRATED_KEY, JSON.stringify(list.slice(-30)))
   }
-  if (plan !== seen && (plan === 'pro' || plan === 'agency')) {
-    shownPlan.value = plan
-    show.value = true
-  }
-  localStorage.setItem(STORAGE_KEY, plan)
+}
+
+// Server-driven: an unread plan-upgrade notification means a grant happened.
+// Works whether the user was already connected (polling picks it up) or just
+// logged in (first poll on mount finds it). Each id is celebrated once.
+async function poll() {
+  if (show.value) return
+  try {
+    const { data } = await api.get('/notifications/plan-upgrade')
+    if (data.id && !celebrated().includes(data.id)) {
+      shownPlan.value = data.plan
+      show.value = true
+      markCelebrated(data.id)
+    }
+  } catch (e) { /* silent — no popup */ }
 }
 
 function dismiss() {
   show.value = false
 }
 
-onMounted(() => check(auth.user?.plan))
-watch(() => auth.user?.plan, (p) => check(p))
+onMounted(() => {
+  poll()
+  pollTimer = setInterval(poll, 45000)
+})
+
+onBeforeUnmount(() => {
+  if (pollTimer) clearInterval(pollTimer)
+})
 </script>
 
 <style scoped>

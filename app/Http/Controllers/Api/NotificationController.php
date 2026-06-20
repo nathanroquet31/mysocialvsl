@@ -56,6 +56,29 @@ class NotificationController extends Controller
         return response()->json(['ok' => true]);
     }
 
+    /**
+     * GET /notifications/plan-upgrade — the latest *unread* plan-upgrade
+     * notification (to Pro/Agency), used to drive the celebratory popup.
+     * Returns {id, plan} or {id: null}. Polled by the dashboard; the client
+     * tracks which ids it has already celebrated so it never pops twice.
+     */
+    public function planUpgrade(Request $request)
+    {
+        $n = $request->user()->unreadNotifications()
+            ->latest()
+            ->get()
+            ->first(function (DatabaseNotification $n) {
+                $d = $n->data;
+                return ($d['category'] ?? null) === 'billing'
+                    && in_array($d['meta']['context'] ?? null, ['upgraded', 'trial_converted'], true)
+                    && in_array($d['meta']['plan'] ?? null, ['pro', 'agency'], true);
+            });
+
+        return response()->json($n
+            ? ['id' => $n->id, 'plan' => $n->data['meta']['plan']]
+            : ['id' => null]);
+    }
+
     private function present(DatabaseNotification $n): array
     {
         $data = $n->data;

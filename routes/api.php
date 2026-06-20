@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // In-app notifications (bell dropdown)
     Route::get('/notifications',                 [NotificationController::class, 'index']);
     Route::get('/notifications/unread-count',     [NotificationController::class, 'unreadCount']);
+    Route::get('/notifications/plan-upgrade',      [NotificationController::class, 'planUpgrade']);
     Route::post('/notifications/read-all',        [NotificationController::class, 'readAll']);
     Route::patch('/notifications/{id}/read',      [NotificationController::class, 'read']);
 
