@@ -218,6 +218,8 @@
       </div>
     </div>
 
+    <PlanUpgradePopup />
+
   </div>
 </template>
 
@@ -230,6 +232,7 @@ import NavItem from '@/components/NavItem.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import LogoMark from '@/components/LogoMark.vue'
 import NotificationBell from '@/components/NotificationBell.vue'
+import PlanUpgradePopup from '@/components/PlanUpgradePopup.vue'
 
 const props = defineProps({
   title: { type: String, default: 'Dashboard' },

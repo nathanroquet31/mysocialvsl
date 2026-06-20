@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
+use App\Notifications\PlanChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -131,6 +132,8 @@ class AdminController extends Controller
             'unlimited' => 'boolean',
         ]);
 
+        $previousPlan = $user->plan;
+
         if (! empty($data['days'])) {
             $user->startTrial($data['plan'], (int) $data['days']);
         } else {
@@ -139,6 +142,11 @@ class AdminController extends Controller
 
         if (($data['unlimited'] ?? false) && $data['plan'] === 'agency') {
             $user->forceFill(['agency_pages' => 0, 'agency_links' => 0])->save(); // 0 = ∞
+        }
+
+        // Let the granted user know their plan changed (skip no-op re-grants).
+        if ($data['plan'] !== $previousPlan) {
+            $user->notify(new PlanChanged($data['plan'], $data['plan'] === 'free' ? 'downgraded' : 'upgraded'));
         }
 
         $user->loadCount('pages');

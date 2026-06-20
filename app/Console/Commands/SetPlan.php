@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Notifications\PlanChanged;
 use Illuminate\Console\Command;
 
 /**
@@ -38,6 +39,8 @@ class SetPlan extends Command
             return self::FAILURE;
         }
 
+        $previousPlan = $user->plan;
+
         if ($days !== null) {
             // Time-limited, card-free access (auto-expires via ProcessTrials).
             $user->startTrial($plan, (int) $days);
@@ -51,6 +54,12 @@ class SetPlan extends Command
         if ($this->option('unlimited') && $plan === 'agency') {
             $user->forceFill(['agency_pages' => 0, 'agency_links' => 0])->save(); // 0 = ∞
             $this->info('   + unlimited pages & links.');
+        }
+
+        // In-app notification for the user (skip no-op re-grants).
+        if ($plan !== $previousPlan) {
+            $user->notify(new PlanChanged($plan, $plan === 'free' ? 'downgraded' : 'upgraded'));
+            $this->info('   + notified the user.');
         }
 
         return self::SUCCESS;
