@@ -174,45 +174,43 @@
           </div>
         </div>
 
-        <!-- Right — 3-theme templates showcase -->
+        <!-- Right — clean VSL phone mockup -->
         <div data-aos="fade-left" data-aos-delay="100"
           style="position:relative;display:flex;align-items:center;justify-content:center;padding:40px 0;min-height:440px">
 
           <!-- Ambient glow -->
-          <div style="position:absolute;width:320px;height:320px;background:radial-gradient(circle,rgba(109,78,232,0.16),transparent 70%);filter:blur(40px);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+          <div style="position:absolute;width:340px;height:340px;background:radial-gradient(circle,rgba(109,78,232,0.18),transparent 70%);filter:blur(45px);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
 
-          <div style="display:flex;align-items:center;justify-content:center;gap:14px;position:relative;z-index:2">
-            <div v-for="(t, i) in vslThemes" :key="t.name"
-              :style="{ width:'118px', flexShrink:0, transform: i===1 ? 'translateY(-20px) scale(1.07)' : 'scale(0.95)', zIndex: i===1 ? 3 : 1 }">
+          <!-- Phone -->
+          <div style="position:relative;z-index:2;width:212px;background:#0a0a0a;border-radius:40px;padding:5px;box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 30px 70px rgba(0,0,0,0.7)">
+            <div style="border-radius:35px;overflow:hidden;position:relative;aspect-ratio:9/16;background:linear-gradient(160deg,#1a1033,#0d0820)">
 
-              <!-- Phone frame -->
-              <div style="background:#0a0a0a;border-radius:26px;padding:3px;box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 24px 50px rgba(0,0,0,0.7)">
-                <div :style="{ borderRadius:'23px', overflow:'hidden', position:'relative', aspectRatio:'9/16', background: t.bg }">
+              <!-- Notch -->
+              <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:72px;height:18px;background:#000;border-radius:12px;z-index:5"></div>
 
-                  <!-- Notch -->
-                  <div style="position:absolute;top:7px;left:50%;transform:translateX(-50%);width:40px;height:12px;background:#000;border-radius:8px;z-index:5"></div>
-
-                  <!-- VSL badge -->
-                  <div style="position:absolute;top:9px;left:8px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border-radius:999px;padding:2px 6px;z-index:5">
-                    <span style="font-size:6px;font-weight:800;color:#fff;letter-spacing:0.1em">VSL</span>
-                  </div>
-
-                  <!-- Play icon -->
-                  <div style="position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;z-index:4">
-                    <i class="bi bi-play-fill" style="color:#fff;font-size:15px"></i>
-                  </div>
-
-                  <!-- Bottom overlay -->
-                  <div style="position:absolute;bottom:0;left:0;right:0;padding:34px 8px 9px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);z-index:4">
-                    <div style="height:5px;width:54%;background:rgba(255,255,255,0.5);border-radius:3px;margin-bottom:3px"></div>
-                    <div style="height:4px;width:36%;background:rgba(255,255,255,0.22);border-radius:3px;margin-bottom:8px"></div>
-                    <div :style="{ height:'18px', borderRadius:'7px', background:t.cta, boxShadow:'0 3px 12px '+t.glow }"></div>
-                  </div>
-                </div>
+              <!-- VSL badge -->
+              <div style="position:absolute;top:13px;left:12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border-radius:999px;padding:3px 9px;z-index:5">
+                <span style="font-size:8px;font-weight:800;color:#fff;letter-spacing:0.08em">● VSL</span>
+              </div>
+              <!-- Mute -->
+              <div style="position:absolute;top:11px;right:12px;z-index:5;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center">
+                <i class="bi bi-volume-mute-fill" style="color:#fff;font-size:11px"></i>
               </div>
 
-              <!-- Theme name -->
-              <p :style="{ textAlign:'center', fontSize:'10px', fontWeight:600, color:'rgba(255,255,255,0.4)', margin:'10px 0 0' }">{{ t.name }}</p>
+              <!-- Play icon -->
+              <div style="position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;z-index:4">
+                <i class="bi bi-play-fill" style="color:#fff;font-size:23px"></i>
+              </div>
+
+              <!-- Bottom overlay: name + CTA -->
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:48px 14px 16px;background:linear-gradient(to top,rgba(0,0,0,0.92),transparent);z-index:4">
+                <p style="font-size:15px;font-weight:700;color:#fff;margin:0 0 2px">Karine <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;vertical-align:middle;margin-left:2px"></span></p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.6);margin:0 0 12px">@karinefrenchwoman</p>
+                <div style="height:38px;border-radius:11px;background:#00AFF0;box-shadow:0 4px 16px rgba(0,175,240,0.45);display:flex;align-items:center;justify-content:center;gap:6px">
+                  <i class="bi bi-lock-fill" style="color:#fff;font-size:11px"></i>
+                  <span style="font-size:12px;font-weight:700;color:#fff">OnlyFans — Private access</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -744,13 +742,6 @@ const videoFeatures = [
   { label: 'Multiple videos per page',              icon: 'bi-collection-play',   sub: null },
   { label: '10+ fully customizable themes',         icon: 'bi-palette',           sub: null },
   { label: 'Deep linking — opens native app',       icon: 'bi-link-45deg',        sub: 'Bypasses Instagram WebView' },
-]
-
-// Theme presets shown as the templates showcase (illustrates "10+ themes")
-const vslThemes = [
-  { name: 'Aurora', bg: 'linear-gradient(160deg,#1a1033,#0d0820)', cta: 'linear-gradient(135deg,#6D4EE8,#8B6FF0)', glow: 'rgba(109,78,232,0.5)' },
-  { name: 'Glow',   bg: 'linear-gradient(160deg,#0a1c2e,#06121f)', cta: '#00AFF0',                                  glow: 'rgba(0,175,240,0.5)' },
-  { name: 'Blush',  bg: 'linear-gradient(160deg,#2a1020,#180a14)', cta: 'linear-gradient(135deg,#E1306C,#f06595)', glow: 'rgba(225,48,108,0.45)' },
 ]
 
 const deepLinkSteps = [
