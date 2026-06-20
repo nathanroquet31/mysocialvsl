@@ -168,6 +168,40 @@
       </div>
     </div>
 
+    <!-- ── VSL Watch Funnel (real watch-time engagement) ──────────────────── -->
+    <div class="adash-card" :style="{marginBottom:'20px'}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+        <div>
+          <h3 class="adash-card-title" style="margin:0">VSL Watch Funnel</h3>
+          <p class="adash-card-sub">How far your audience watches before clicking</p>
+        </div>
+        <div :style="{display:'flex',gap:'20px',flexWrap:'wrap'}">
+          <div style="text-align:right">
+            <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ data.vsl?.play_rate ?? 0 }}%</p>
+            <p :style="{margin:0,fontSize:'11px',color:textMuted}">play rate</p>
+          </div>
+          <div style="text-align:right">
+            <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ data.vsl?.avg_watch_before_click != null ? data.vsl.avg_watch_before_click + 's' : '—' }}</p>
+            <p :style="{margin:0,fontSize:'11px',color:textMuted}">avg watch → click</p>
+          </div>
+          <div style="text-align:right">
+            <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ data.vsl?.avg_time_on_page != null ? data.vsl.avg_time_on_page + 's' : '—' }}</p>
+            <p :style="{margin:0,fontSize:'11px',color:textMuted}">avg time on page</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div v-for="step in vslFunnel" :key="step.label" style="display:flex;align-items:center;gap:14px">
+          <div :style="{width:'140px',flexShrink:0,fontSize:'12px',color:textMuted}">{{ step.label }}</div>
+          <div :style="{flex:1,background:theme.dark?'rgba(255,255,255,0.04)':'#F3F4F6',borderRadius:'999px',height:'28px',position:'relative',overflow:'hidden'}">
+            <div :style="{position:'absolute',left:0,top:0,bottom:0,width:Math.max(step.pct,2)+'%',borderRadius:'999px',transition:'width 0.8s cubic-bezier(0.4,0,0.2,1)',background: step.green ? 'linear-gradient(90deg,#059669,#34d399)' : 'linear-gradient(90deg,#5B2FD4,#8B6FF0)'}"></div>
+          </div>
+          <div :style="{width:'46px',flexShrink:0,textAlign:'right',fontSize:'12px',fontWeight:700,color: step.green ? '#34d399' : (theme.dark?'rgba(255,255,255,0.6)':'#6B7280')}">{{ step.pct }}%</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Top Links + Goal ─────────────────────────────────────────────── -->
     <div :style="{marginBottom:'20px'}">
       <div class="adash-card">
@@ -343,6 +377,20 @@ const data       = ref({
   hourly: Array(24).fill(0),
   live: { visitors_now: 0, views_30m: 0, clicks_30m: 0, top_country: null, events: [] },
   per_link: [], pages: [],
+  vsl: { plays: 0, play_rate: 0, milestones: { 25: 0, 50: 0, 75: 0, 100: 0 }, avg_watch_before_click: null, avg_time_on_page: null },
+})
+
+// VSL watch funnel rows (real data) — narrows from views down to clicks.
+const vslFunnel = computed(() => {
+  const v = data.value.vsl || {}
+  const m = v.milestones || {}
+  return [
+    { label: 'Page views',      pct: 100,                 green: false },
+    { label: 'Played the video', pct: v.play_rate || 0,    green: false },
+    { label: 'Watched halfway',  pct: m[50] ?? 0,          green: false },
+    { label: 'Watched to the end', pct: m[100] ?? 0,       green: false },
+    { label: 'Clicked → OnlyFans', pct: data.value.ctr || 0, green: true },
+  ]
 })
 
 // ── Filters ───────────────────────────────────────────────────────────────

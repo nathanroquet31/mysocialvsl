@@ -177,8 +177,36 @@ class AnalyticsController extends Controller
             'hourly'             => $this->buildHourly($pageIds, $from, $to),
             'live'               => $this->buildLive($pageIds),
             'per_link'           => $this->buildPerLink($pageIds, $from, $to, $country),
+            'vsl'                => $this->buildVslEngagement($base, $pageViews),
             'pages'              => $user->pages()->get(['id', 'model_name', 'slug'])->toArray(),
         ]);
+    }
+
+    /**
+     * VSL watch engagement aggregated across the filtered pages: play rate,
+     * watch-depth milestones (% of plays reaching each), and average watch /
+     * time-on-page. Drives the "VSL Watch Funnel" card.
+     */
+    private function buildVslEngagement($base, int $pageViews): array
+    {
+        $plays = (clone $base)->where('type', 'video_play')->count();
+
+        $milestones = [];
+        foreach ([25, 50, 75, 100] as $pct) {
+            $count = (clone $base)->where('type', 'video_progress')->where('value', $pct)->count();
+            $milestones[$pct] = $plays > 0 ? round($count / $plays * 100, 1) : 0;
+        }
+
+        $avgWatch = (clone $base)->where('type', 'link_click')->whereNotNull('value')->avg('value');
+        $avgTime  = (clone $base)->where('type', 'time_on_page')->whereNotNull('value')->avg('value');
+
+        return [
+            'plays'                  => $plays,
+            'play_rate'              => $pageViews > 0 ? round($plays / $pageViews * 100, 1) : 0,
+            'milestones'             => $milestones,
+            'avg_watch_before_click' => $avgWatch ? round($avgWatch, 1) : null,
+            'avg_time_on_page'       => $avgTime ? round($avgTime) : null,
+        ];
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────────
@@ -419,6 +447,7 @@ class AnalyticsController extends Controller
             'hourly'             => array_fill(0, 24, 0),
             'live'               => ['visitors_now' => 0, 'views_30m' => 0, 'clicks_30m' => 0, 'top_country' => null, 'events' => []],
             'per_link'           => [],
+            'vsl'                => ['plays' => 0, 'play_rate' => 0, 'milestones' => [25 => 0, 50 => 0, 75 => 0, 100 => 0], 'avg_watch_before_click' => null, 'avg_time_on_page' => null],
             'pages'              => [],
         ];
     }
