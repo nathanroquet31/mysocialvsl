@@ -213,22 +213,22 @@ onUnmounted(() => {
 /* Uses pseudo-elements for each frame face with depth */
 .frame-top, .frame-bottom, .frame-left, .frame-right {
   position: absolute;
-  background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 40%, #3a3a3a 100%);
+  background: linear-gradient(180deg, #2c2c2e 0%, #161618 40%, #202022 100%);
   z-index: 10;
 }
 .frame-top    { top:-3px; left:50px; right:50px; height:3px; border-radius:1px 1px 0 0; }
 .frame-bottom { bottom:-3px; left:50px; right:50px; height:3px; border-radius:0 0 1px 1px; }
-.frame-left   { left:-3px; top:50px; bottom:50px; width:3px; background:linear-gradient(90deg,#3a3a3a,#2a2a2a); }
-.frame-right  { right:-3px; top:50px; bottom:50px; width:3px; background:linear-gradient(270deg,#3a3a3a,#2a2a2a); }
+.frame-left   { left:-3px; top:50px; bottom:50px; width:3px; background:linear-gradient(90deg,#202022,#161618); }
+.frame-right  { right:-3px; top:50px; bottom:50px; width:3px; background:linear-gradient(270deg,#202022,#161618); }
 
 .frame-corner {
   position: absolute; width:54px; height:54px; z-index:10;
   border: 3px solid transparent;
 }
-.frame-corner.tl { top:-3px; left:-3px; border-top:3px solid #404040; border-left:3px solid #353535; border-radius:54px 0 0 0; }
-.frame-corner.tr { top:-3px; right:-3px; border-top:3px solid #404040; border-right:3px solid #454545; border-radius:0 54px 0 0; }
-.frame-corner.bl { bottom:-3px; left:-3px; border-bottom:3px solid #353535; border-left:3px solid #353535; border-radius:0 0 0 54px; }
-.frame-corner.br { bottom:-3px; right:-3px; border-bottom:3px solid #353535; border-right:3px solid #454545; border-radius:0 0 54px 0; }
+.frame-corner.tl { top:-3px; left:-3px; border-top:3px solid #28282a; border-left:3px solid #1c1c1e; border-radius:54px 0 0 0; }
+.frame-corner.tr { top:-3px; right:-3px; border-top:3px solid #28282a; border-right:3px solid #2e2e30; border-radius:0 54px 0 0; }
+.frame-corner.bl { bottom:-3px; left:-3px; border-bottom:3px solid #1c1c1e; border-left:3px solid #1c1c1e; border-radius:0 0 0 54px; }
+.frame-corner.br { bottom:-3px; right:-3px; border-bottom:3px solid #1c1c1e; border-right:3px solid #2e2e30; border-radius:0 0 54px 0; }
 
 /* ── Front face ────────────────────────── */
 .phone-front {
@@ -440,25 +440,25 @@ onUnmounted(() => {
 .btn-power {
   position: absolute; right: -4px; top: 190px;
   width: 4px; height: 82px; border-radius: 0 3px 3px 0;
-  background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 40%, #4a4a4a 100%);
+  background: linear-gradient(180deg, #2c2c2e 0%, #202022 40%, #2c2c2e 100%);
   box-shadow: 2px 0 4px rgba(0,0,0,0.5);
 }
 .btn-mute {
   position: absolute; left: -4px; top: 110px;
   width: 4px; height: 30px; border-radius: 3px 0 0 3px;
-  background: linear-gradient(180deg, #4a4a4a, #3a3a3a, #4a4a4a);
+  background: linear-gradient(180deg, #2c2c2e, #202022, #2c2c2e);
   box-shadow: -2px 0 4px rgba(0,0,0,0.5);
 }
 .btn-vol1 {
   position: absolute; left: -4px; top: 158px;
   width: 4px; height: 50px; border-radius: 3px 0 0 3px;
-  background: linear-gradient(180deg, #4a4a4a, #3a3a3a, #4a4a4a);
+  background: linear-gradient(180deg, #2c2c2e, #202022, #2c2c2e);
   box-shadow: -2px 0 4px rgba(0,0,0,0.5);
 }
 .btn-vol2 {
   position: absolute; left: -4px; top: 222px;
   width: 4px; height: 50px; border-radius: 3px 0 0 3px;
-  background: linear-gradient(180deg, #4a4a4a, #3a3a3a, #4a4a4a);
+  background: linear-gradient(180deg, #2c2c2e, #202022, #2c2c2e);
   box-shadow: -2px 0 4px rgba(0,0,0,0.5);
 }
 

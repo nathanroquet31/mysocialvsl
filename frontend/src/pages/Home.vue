@@ -14,6 +14,7 @@
         <!-- Nav desktop -->
         <nav class="nav-desktop" style="display:flex;align-items:center;gap:32px">
           <a href="#features" class="nav-link">Features</a>
+          <a href="#how-it-works" class="nav-link">How it works</a>
           <a href="#pricing" class="nav-link">Pricing</a>
           <a href="#faq" class="nav-link">FAQ</a>
         </nav>
@@ -52,6 +53,9 @@
               <!-- Links -->
               <a href="#features" @click="mobileMenuOpen = false" class="drawer-link">
                 <i class="bi bi-lightning-charge" style="font-size:15px;opacity:0.5"></i> Features
+              </a>
+              <a href="#how-it-works" @click="mobileMenuOpen = false" class="drawer-link">
+                <i class="bi bi-compass" style="font-size:15px;opacity:0.5"></i> How it works
               </a>
               <a href="#pricing" @click="mobileMenuOpen = false" class="drawer-link">
                 <i class="bi bi-tag" style="font-size:15px;opacity:0.5"></i> Pricing
@@ -138,7 +142,7 @@
     </section>
 
     <!-- HOW IT WORKS — Orbital Timeline -->
-    <div style="position:relative">
+    <div id="how-it-works" style="position:relative;scroll-margin-top:80px">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(109,78,232,0.06),transparent 70%);pointer-events:none"></div>
       <OrbitalTimeline />
     </div>
@@ -170,98 +174,47 @@
           </div>
         </div>
 
-        <!-- Right — Realistic mockup of the actual product -->
+        <!-- Right — 3-theme templates showcase -->
         <div data-aos="fade-left" data-aos-delay="100"
-          style="position:relative;display:flex;align-items:center;justify-content:center;padding:40px 0">
+          style="position:relative;display:flex;align-items:center;justify-content:center;padding:40px 0;min-height:440px">
 
-          <!-- Ambient glow behind the phone -->
-          <div style="position:absolute;width:260px;height:260px;background:radial-gradient(circle,rgba(109,78,232,0.15),transparent 70%);filter:blur(40px);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+          <!-- Ambient glow -->
+          <div style="position:absolute;width:320px;height:320px;background:radial-gradient(circle,rgba(109,78,232,0.16),transparent 70%);filter:blur(40px);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
 
-          <!-- Phone -->
-          <div style="position:relative;width:210px;flex-shrink:0">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;position:relative;z-index:2">
+            <div v-for="(t, i) in vslThemes" :key="t.name"
+              :style="{ width:'118px', flexShrink:0, transform: i===1 ? 'translateY(-20px) scale(1.07)' : 'scale(0.95)', zIndex: i===1 ? 3 : 1 }">
 
-            <!-- Cadre phone -->
-            <div style="background:#0a0a0a;border-radius:40px;padding:3px;box-shadow:0 0 0 1px rgba(255,255,255,0.12),0 40px 80px rgba(0,0,0,0.85),0 16px 40px rgba(0,0,0,0.6);overflow:hidden">
+              <!-- Phone frame -->
+              <div style="background:#0a0a0a;border-radius:26px;padding:3px;box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 24px 50px rgba(0,0,0,0.7)">
+                <div :style="{ borderRadius:'23px', overflow:'hidden', position:'relative', aspectRatio:'9/16', background: t.bg }">
 
-              <!-- Screen -->
-              <div style="border-radius:37px;overflow:hidden;background:#000;position:relative;aspect-ratio:9/16">
+                  <!-- Notch -->
+                  <div style="position:absolute;top:7px;left:50%;transform:translateX(-50%);width:40px;height:12px;background:#000;border-radius:8px;z-index:5"></div>
 
-                <!-- Dynamic Island -->
-                <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:90px;height:26px;background:#000;border-radius:16px;z-index:20;box-shadow:0 0 0 1px rgba(255,255,255,0.07)"></div>
-
-                <!-- Status bar -->
-                <div style="position:absolute;top:12px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 20px;z-index:15;pointer-events:none">
-                  <span style="font-size:9px;font-weight:700;color:#fff;letter-spacing:-0.3px">9:41</span>
-                  <div style="display:flex;align-items:center;gap:3px">
-                    <div style="display:flex;align-items:flex-end;gap:1px">
-                      <div style="width:2px;height:3px;background:rgba(255,255,255,0.45);border-radius:0.5px"></div>
-                      <div style="width:2px;height:5px;background:rgba(255,255,255,0.65);border-radius:0.5px"></div>
-                      <div style="width:2px;height:7px;background:#fff;border-radius:0.5px"></div>
-                    </div>
-                    <div style="position:relative;width:17px;height:8px;border:1.5px solid rgba(255,255,255,0.65);border-radius:2px;margin-left:3px">
-                      <div style="position:absolute;left:1px;top:1px;bottom:1px;width:65%;background:#fff;border-radius:1px"></div>
-                      <div style="position:absolute;right:-3px;top:50%;transform:translateY(-50%);width:2px;height:5px;background:rgba(255,255,255,0.4);border-radius:0 1px 1px 0"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Real looping video -->
-                <iframe
-                  src="https://streamable.com/e/0ed1q5?autoplay=1&muted=1&loop=1&nocontrols=1"
-                  allow="autoplay; fullscreen"
-                  allowfullscreen
-                  style="position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:none"
-                ></iframe>
-
-                <!-- Badge VSL -->
-                <div style="position:absolute;top:48px;left:12px;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border-radius:999px;padding:3px 9px;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.12);z-index:10">
-                  <span style="width:5px;height:5px;border-radius:50%;background:#ff3b3b;animation:pulse-dot 1.5s ease-in-out infinite;display:inline-block;flex-shrink:0"></span>
-                  <span style="font-size:7.5px;font-weight:800;color:#fff;letter-spacing:0.1em">VSL</span>
-                </div>
-
-                <!-- Muted -->
-                <div style="position:absolute;top:48px;right:12px;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);border-radius:6px;padding:3px 7px;border:1px solid rgba(255,255,255,0.08);z-index:10">
-                  <i class="bi bi-volume-mute-fill" style="color:rgba(255,255,255,0.6);font-size:9px"></i>
-                </div>
-
-                <!-- Bottom overlay — exact copy of the real UI -->
-                <div style="position:absolute;bottom:0;left:0;right:0;padding:56px 14px 0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.6) 55%,transparent 100%)">
-
-                  <!-- Creator profile -->
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                    <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4)">🌸</div>
-                    <div>
-                      <p style="color:#fff;font-size:10px;font-weight:700;margin:0;line-height:1.1">Karine</p>
-                      <p style="color:rgba(255,255,255,0.45);font-size:7.5px;margin:0">@karinefrenchwoman</p>
-                    </div>
+                  <!-- VSL badge -->
+                  <div style="position:absolute;top:9px;left:8px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border-radius:999px;padding:2px 6px;z-index:5">
+                    <span style="font-size:6px;font-weight:800;color:#fff;letter-spacing:0.1em">VSL</span>
                   </div>
 
-                  <!-- CTA button — identical to the real product -->
-                  <div style="background:#00aff0;border-radius:12px;padding:10px 12px;text-align:center;box-shadow:0 4px 20px rgba(0,175,240,0.5);margin-bottom:10px;animation:cta-pulse 3s ease-in-out infinite">
-                    <span style="color:#fff;font-size:9.5px;font-weight:800;letter-spacing:0.02em">🔐 My OnlyFans — Private access</span>
+                  <!-- Play icon -->
+                  <div style="position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;z-index:4">
+                    <i class="bi bi-play-fill" style="color:#fff;font-size:15px"></i>
                   </div>
 
-                  <!-- Home indicator -->
-                  <div style="width:60px;height:3px;background:rgba(255,255,255,0.2);border-radius:999px;margin:0 auto 10px"></div>
+                  <!-- Bottom overlay -->
+                  <div style="position:absolute;bottom:0;left:0;right:0;padding:34px 8px 9px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);z-index:4">
+                    <div style="height:5px;width:54%;background:rgba(255,255,255,0.5);border-radius:3px;margin-bottom:3px"></div>
+                    <div style="height:4px;width:36%;background:rgba(255,255,255,0.22);border-radius:3px;margin-bottom:8px"></div>
+                    <div :style="{ height:'18px', borderRadius:'7px', background:t.cta, boxShadow:'0 3px 12px '+t.glow }"></div>
+                  </div>
                 </div>
-
               </div>
+
+              <!-- Theme name -->
+              <p :style="{ textAlign:'center', fontSize:'10px', fontWeight:600, color:'rgba(255,255,255,0.4)', margin:'10px 0 0' }">{{ t.name }}</p>
             </div>
-
-            <!-- Side buttons -->
-            <div style="position:absolute;right:-4px;top:130px;width:3px;height:72px;background:linear-gradient(180deg,#333,#222,#333);border-radius:0 3px 3px 0;box-shadow:2px 0 4px rgba(0,0,0,0.5)"></div>
-            <div style="position:absolute;left:-4px;top:100px;width:3px;height:26px;background:linear-gradient(180deg,#333,#222,#333);border-radius:3px 0 0 3px;box-shadow:-2px 0 4px rgba(0,0,0,0.4)"></div>
-            <div style="position:absolute;left:-4px;top:142px;width:3px;height:46px;background:linear-gradient(180deg,#333,#222,#333);border-radius:3px 0 0 3px;box-shadow:-2px 0 4px rgba(0,0,0,0.4)"></div>
-            <div style="position:absolute;left:-4px;top:200px;width:3px;height:46px;background:linear-gradient(180deg,#333,#222,#333);border-radius:3px 0 0 3px;box-shadow:-2px 0 4px rgba(0,0,0,0.4)"></div>
           </div>
-
-          <!-- Carte flottante — conversion -->
-          <div style="position:absolute;bottom:10px;right:0;background:#0d0d0d;border:1px solid rgba(52,211,153,0.25);border-radius:14px;padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.7)">
-            <p style="color:rgba(255,255,255,0.28);font-size:9px;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.1em">Taux de conversion</p>
-            <p style="color:#34d399;font-size:22px;font-weight:700;letter-spacing:-0.03em;margin:0 0 2px">41.7%</p>
-            <p style="color:rgba(52,211,153,0.55);font-size:10px;margin:0">↑ +80% vs Linktree</p>
-          </div>
-
         </div>
       </div>
     </section>
@@ -791,6 +744,13 @@ const videoFeatures = [
   { label: 'Multiple videos per page',              icon: 'bi-collection-play',   sub: null },
   { label: '10+ fully customizable themes',         icon: 'bi-palette',           sub: null },
   { label: 'Deep linking — opens native app',       icon: 'bi-link-45deg',        sub: 'Bypasses Instagram WebView' },
+]
+
+// Theme presets shown as the templates showcase (illustrates "10+ themes")
+const vslThemes = [
+  { name: 'Aurora', bg: 'linear-gradient(160deg,#1a1033,#0d0820)', cta: 'linear-gradient(135deg,#6D4EE8,#8B6FF0)', glow: 'rgba(109,78,232,0.5)' },
+  { name: 'Glow',   bg: 'linear-gradient(160deg,#0a1c2e,#06121f)', cta: '#00AFF0',                                  glow: 'rgba(0,175,240,0.5)' },
+  { name: 'Blush',  bg: 'linear-gradient(160deg,#2a1020,#180a14)', cta: 'linear-gradient(135deg,#E1306C,#f06595)', glow: 'rgba(225,48,108,0.45)' },
 ]
 
 const deepLinkSteps = [
