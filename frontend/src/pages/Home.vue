@@ -372,19 +372,22 @@
             <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.65;margin-bottom:20px">
               When Instagram scans your link, it sees a harmless "My Links" page — no adult keywords, no real URL. Your actual page is only shown to real visitors.
             </p>
-            <!-- Mini decoy preview -->
+            <!-- Mini decoy preview — concrete, side by side -->
             <div style="background:#111;border-radius:12px;border:1px solid rgba(255,255,255,0.06);padding:14px;font-size:11px">
-              <p style="color:rgba(255,255,255,0.2);margin-bottom:6px">Instagram sees:</p>
-              <div style="background:#1a1a1a;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px">
-                <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:4px;width:60%"></div>
-                <div style="height:6px;background:rgba(255,255,255,0.05);border-radius:4px;width:40%"></div>
-                <div style="height:24px;background:rgba(255,255,255,0.04);border-radius:6px;margin-top:4px"></div>
+              <p style="color:rgba(255,255,255,0.35);margin-bottom:7px"><i class="bi bi-robot" style="margin-right:5px"></i>Instagram's bot sees:</p>
+              <div style="background:#1a1a1a;border-radius:8px;padding:16px 12px;text-align:center">
+                <p style="color:rgba(255,255,255,0.55);font-weight:700;font-size:12px;margin:0 0 3px">My Links</p>
+                <p style="color:rgba(255,255,255,0.25);font-size:10px;margin:0">Check out my latest content</p>
               </div>
-              <p style="color:rgba(255,255,255,0.2);margin-top:8px;margin-bottom:6px">Real fan sees:</p>
-              <div style="background:linear-gradient(135deg,#1e1040,#0d0d0d);border-radius:8px;padding:10px;border:1px solid rgba(109,78,232,0.2);display:flex;flex-direction:column;gap:6px">
-                <div style="height:6px;background:rgba(109,78,232,0.4);border-radius:4px;width:70%"></div>
-                <div style="height:6px;background:rgba(109,78,232,0.2);border-radius:4px;width:45%"></div>
-                <div style="height:24px;background:rgba(109,78,232,0.15);border-radius:6px;margin-top:4px"></div>
+              <p style="color:rgba(255,255,255,0.35);margin-top:11px;margin-bottom:7px"><i class="bi bi-heart-fill" style="margin-right:5px;color:#E1306C"></i>A real fan sees:</p>
+              <div style="background:linear-gradient(135deg,#1e1040,#0d0d0d);border-radius:8px;border:1px solid rgba(109,78,232,0.25);overflow:hidden">
+                <div style="height:56px;background:linear-gradient(160deg,#2a1a4d,#140a26);display:flex;align-items:center;justify-content:center;position:relative">
+                  <span style="position:absolute;top:6px;left:7px;background:rgba(109,78,232,0.9);border-radius:4px;padding:1px 5px;font-size:7px;font-weight:800;color:#fff;letter-spacing:0.05em">VSL</span>
+                  <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center"><i class="bi bi-play-fill" style="color:#fff;font-size:13px"></i></div>
+                </div>
+                <div style="padding:8px">
+                  <div style="height:20px;background:#00AFF0;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff"><i class="bi bi-lock-fill" style="margin-right:4px;font-size:8px"></i>OnlyFans — Private access</div>
+                </div>
               </div>
             </div>
           </div>
@@ -503,10 +506,10 @@
           <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <p style="font-size:12px;color:rgba(255,255,255,0.25);margin:0">
               <i class="bi bi-info-circle" style="margin-right:5px"></i>
-              38% of total views click the CTA — avg. 18s watch time before click
+              The video keeps them watching — 38% end up tapping through to OnlyFans (avg. 18s before the click)
             </p>
             <div style="display:flex;align-items:center;gap:16px">
-              <div v-for="leg in [{color:'#8B6FF0',label:'VSL'},{color:'#34d399',label:'Clicked'}]" :key="leg.label"
+              <div v-for="leg in [{color:'#8B6FF0',label:'Watching'},{color:'#34d399',label:'Clicked OnlyFans'}]" :key="leg.label"
                 style="display:flex;align-items:center;gap:5px">
                 <span :style="{width:'8px',height:'8px',borderRadius:'2px',background:leg.color,display:'inline-block'}"></span>
                 <span style="font-size:11px;color:rgba(255,255,255,0.35)">{{ leg.label }}</span>
@@ -805,12 +808,10 @@ const analyticsStats = [
 ]
 
 const vslFunnel = [
-  { label: 'Page Views',   value: '12 400', pct: 100 },
-  { label: 'VSL Started',  value: '9 176',  pct: 74  },
-  { label: '25% watched',  value: '7 812',  pct: 63  },
-  { label: '50% watched',  value: '5 084',  pct: 41  },
-  { label: '75% watched',  value: '3 472',  pct: 28  },
-  { label: 'Clicked CTA',  value: '4 712',  pct: 38  },
+  { label: 'Visitors',           value: '12 400', pct: 100 },
+  { label: 'Started the video',  value: '9 176',  pct: 74  },
+  { label: 'Watched halfway',    value: '5 084',  pct: 41  },
+  { label: 'Clicked → OnlyFans', value: '4 712',  pct: 38  },
 ]
 
 
