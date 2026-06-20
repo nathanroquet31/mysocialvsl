@@ -21,17 +21,25 @@ trait ResolvesPublicPages
             ->with(['links', 'geoRules', 'user'])
             ->firstOrFail();
 
-        // Deeplink bypass (in-app browser escape) is a paid feature. Force it off
-        // for free-plan owners so neither the server bounce page nor the SPA apply
-        // it — the VSL page itself still works on the free plan.
-        if (($page->user->plan ?? 'free') === 'free') {
+        // Paid-only page features. Force them off for free-plan owners server-side
+        // so neither the server bounce page nor the SPA can apply them — the VSL
+        // page itself still works on the free plan, just without these.
+        // (deeplink bypass, strict deeplink, bot-protection cloaking = Creator+.)
+        if ($page->user->isFree()) {
             $page->deep_link_enabled = false;
             $page->strict_deep_link = false;
+            $page->bot_protection = false;
+        }
+
+        // Geo targeting is an Agency-only feature: ignore geo rules for any other
+        // plan so publicPageGuards never redirects on them.
+        if (! $page->user->isAgency()) {
+            $page->setRelation('geoRules', collect());
         }
 
         // White-label: only the Agency plan hides the "Powered by" footer
         // (matches GetMySocial — Creator/Pro still shows branding).
-        $page->setAttribute('show_branding', ($page->user->plan ?? 'free') !== 'agency');
+        $page->setAttribute('show_branding', ! $page->user->isAgency());
 
         // Drop the owner relation so the public JSON never leaks user data
         // (email, Stripe ids…) — we only needed the plan above.

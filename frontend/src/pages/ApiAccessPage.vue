@@ -1,6 +1,18 @@
 <template>
   <DashboardLayout title="API Access">
 
+    <!-- Agency-only gate -->
+    <div v-if="!isAgency" :style="{background:theme.dark?'rgba(255,255,255,0.04)':'#fff',border:`1.5px dashed ${bd}`,borderRadius:'12px',padding:'48px 24px',textAlign:'center',maxWidth:'460px',margin:'40px auto'}">
+      <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#6D4EE8,#A78BFA);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i class="bi bi-key" style="color:#fff;font-size:22px"></i>
+      </div>
+      <p :style="{fontSize:'17px',fontWeight:700,color:tx,margin:'0 0 6px'}">API Access is an Agency feature</p>
+      <p :style="{fontSize:'13px',color:txMuted,margin:'0 0 20px',lineHeight:1.6}">Programmatic access to your links and analytics (REST API v3 + MCP). Upgrade to the Agency plan to mint keys.</p>
+      <button @click="router.push('/billing')" :style="btnPrimary">Upgrade to Agency <i class="bi bi-arrow-right"></i></button>
+    </div>
+
+    <template v-else>
+
     <!-- Intro -->
     <div :style="card" style="margin-bottom:20px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
@@ -80,16 +92,23 @@
       <p :style="{fontSize:'12px',color:txMuted,margin:0}">The legacy single API key has been replaced by revocable v3 keys above. See <RouterLink to="/dashboard/legacy" style="color:#6D4EE8">Legacy</RouterLink> for migration details.</p>
     </div>
 
+    </template>
+
   </DashboardLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/lib/axios'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 
 const theme = useThemeStore()
+const auth = useAuthStore()
+const router = useRouter()
+const isAgency = computed(() => auth.user?.plan === 'agency')
 
 const keys = ref([])
 const loading = ref(true)

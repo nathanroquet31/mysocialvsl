@@ -336,9 +336,14 @@
                     <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                       <div>
                         <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Enable Strict Deeplink</p>
-                        <p :style="{fontSize:'11px',color:C.textDim}">Use this if the normal deeplink doesn't work with your target audience</p>
+                        <p :style="{fontSize:'11px',color:C.textDim}">{{ isFreePlan ? 'Available on paid plans' : "Use this if the normal deeplink doesn't work with your target audience" }}</p>
                       </div>
-                      <div @click="form.strict_deep_link = !form.strict_deep_link"
+                      <div v-if="isFreePlan" @click="router.push('/billing')"
+                        :style="{display:'flex',alignItems:'center',gap:'5px',padding:'5px 12px',borderRadius:'999px',cursor:'pointer',background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.3)',flexShrink:0}">
+                        <i class="bi bi-lock-fill" style="font-size:10px;color:#F59E0B"></i>
+                        <span :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B'}">Paid</span>
+                      </div>
+                      <div v-else @click="form.strict_deep_link = !form.strict_deep_link"
                         :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.strict_deep_link?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
                         <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.strict_deep_link?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
                       </div>
@@ -381,9 +386,14 @@
                     <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
                       <div>
                         <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Enable Bot Protection</p>
-                        <p :style="{fontSize:'11px',color:C.textDim}">Disabled by default — only recommended if you have a specific issue</p>
+                        <p :style="{fontSize:'11px',color:C.textDim}">{{ isFreePlan ? 'Available on paid plans' : 'Disabled by default — only recommended if you have a specific issue' }}</p>
                       </div>
-                      <div @click="form.bot_protection = !form.bot_protection"
+                      <div v-if="isFreePlan" @click="router.push('/billing')"
+                        :style="{display:'flex',alignItems:'center',gap:'5px',padding:'5px 12px',borderRadius:'999px',cursor:'pointer',background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.3)',flexShrink:0}">
+                        <i class="bi bi-lock-fill" style="font-size:10px;color:#F59E0B"></i>
+                        <span :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B'}">Paid</span>
+                      </div>
+                      <div v-else @click="form.bot_protection = !form.bot_protection"
                         :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.bot_protection?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
                         <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.bot_protection?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
                       </div>

@@ -1,6 +1,18 @@
 <template>
   <DashboardLayout title="Social Analytics — Instagram">
 
+    <!-- Agency-only gate -->
+    <div v-if="!isAgency" :style="{background:theme.dark?'rgba(255,255,255,0.04)':'#fff',border:`1.5px dashed ${bd}`,borderRadius:'12px',padding:'48px 24px',textAlign:'center',maxWidth:'460px',margin:'40px auto'}">
+      <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#E1306C,#6D4EE8);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i class="bi bi-graph-up-arrow" style="color:#fff;font-size:22px"></i>
+      </div>
+      <p :style="{fontSize:'17px',fontWeight:700,color:tx,margin:'0 0 6px'}">Social Analytics is an Agency feature</p>
+      <p :style="{fontSize:'13px',color:txMuted,margin:'0 0 20px',lineHeight:1.6}">Track followers, views and reel performance across all your accounts. Upgrade to the Agency plan to unlock it.</p>
+      <button @click="router.push('/billing')" :style="btnPrimary">Upgrade to Agency <i class="bi bi-arrow-right"></i></button>
+    </div>
+
+    <template v-else>
+
     <!-- Connect banner -->
     <div :style="{background:'linear-gradient(135deg,rgba(225,48,108,0.1),rgba(109,78,232,0.08))',border:`1px solid ${theme.dark?'rgba(225,48,108,0.25)':'#FBCFE8'}`,borderRadius:'12px',padding:'20px 24px',marginBottom:'20px',display:'flex',alignItems:'center',gap:'16px',flexWrap:'wrap'}">
       <div style="width:42px;height:42px;border-radius:12px;background:#E1306C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -81,16 +93,23 @@
       </div>
     </div>
 
+    </template>
+
   </DashboardLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/lib/axios'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 
 const theme = useThemeStore()
+const auth = useAuthStore()
+const router = useRouter()
+const isAgency = computed(() => auth.user?.plan === 'agency')
 const accounts = ref([])
 const loading = ref(true)
 const newUsername = ref('')

@@ -33,6 +33,24 @@ class User extends Authenticatable
         return (bool) $this->is_admin;
     }
 
+    /** Free plan: no paid features. Admins are never treated as free. */
+    public function isFree(): bool
+    {
+        return ! $this->isAdmin() && (($this->plan ?? 'free') === 'free');
+    }
+
+    /** Paid plan (Creator/Pro or Agency). Unlocks deeplink, strict, bot protection. */
+    public function isPaid(): bool
+    {
+        return $this->isAdmin() || in_array($this->plan, ['pro', 'agency'], true);
+    }
+
+    /** Agency plan: top tier — white-label, geo targeting, social analytics, API. */
+    public function isAgency(): bool
+    {
+        return $this->isAdmin() || ($this->plan === 'agency');
+    }
+
     /**
      * On an active card-free trial: the deadline is in the future and the user
      * has not yet converted to a paid Stripe subscription.

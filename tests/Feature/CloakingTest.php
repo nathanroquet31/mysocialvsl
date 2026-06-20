@@ -29,9 +29,11 @@ class CloakingTest extends TestCase
         Location::shouldReceive('get')->andReturn(false);
     }
 
-    private function makePage(array $overrides = []): Page
+    private function makePage(array $overrides = [], string $plan = 'pro'): Page
     {
-        $user = User::factory()->create();
+        // Bot protection (Shield) is a paid feature, so the owner must be on a
+        // paid plan for cloaking to apply (see ResolvesPublicPages::resolvePublicPage).
+        $user = User::factory()->create(['plan' => $plan]);
 
         return $user->pages()->create(array_merge([
             'slug' => 'karine-vsl',
@@ -123,6 +125,22 @@ class CloakingTest extends TestCase
         // No protection → even a bot gets the real payload.
         $response->assertOk();
         $response->assertJsonPath('slug', $page->slug);
+    }
+
+    public function test_bot_protection_is_gated_off_for_free_plan(): void
+    {
+        // A free-plan owner enabled bot protection, but it's a paid feature:
+        // the server forces it off, so even a bot gets the real payload.
+        $page = $this->makePage(['bot_protection' => true], plan: 'free');
+
+        $response = $this->getJson('/api/p/'.$page->slug, ['User-Agent' => 'Googlebot/2.1']);
+
+        $response->assertOk();
+        $response->assertJsonPath('slug', $page->slug);
+        $this->assertDatabaseMissing('analytics_events', [
+            'page_id' => $page->id,
+            'type' => 'bot_blocked',
+        ]);
     }
 
     public function test_web_route_serves_decoy_to_bots_and_shell_to_humans(): void
