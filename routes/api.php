@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiKeyController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SessionController;
 use App\Http\Controllers\Api\SocialAccountController;
 use App\Http\Controllers\Api\UserController;
@@ -63,6 +64,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sessions',         [SessionController::class, 'index']);
     Route::delete('/sessions',      [SessionController::class, 'destroyOthers']);
     Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
+
+    // In-app notifications (bell dropdown)
+    Route::get('/notifications',                 [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count',     [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/read-all',        [NotificationController::class, 'readAll']);
+    Route::patch('/notifications/{id}/read',      [NotificationController::class, 'read']);
 
     // Affiliate program
     Route::get('/affiliate', [AffiliateController::class, 'show']);

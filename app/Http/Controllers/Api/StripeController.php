@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\PaymentFailed;
+use App\Notifications\PlanChanged;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Customer;
@@ -385,7 +387,12 @@ class StripeController extends Controller
             $data['agency_links'] = isset($session->metadata->agency_links) ? (int) $session->metadata->agency_links : 25;
         }
 
-        User::find($userId)?->update($data);
+        $user = User::find($userId);
+        if (!$user) return;
+
+        $wasTrialing = $user->trial_ends_at !== null;
+        $user->update($data);
+        $user->notify(new PlanChanged($plan, $wasTrialing ? 'trial_converted' : 'upgraded'));
     }
 
     private function handleSubscriptionUpdated(object $subscription): void
@@ -398,6 +405,7 @@ class StripeController extends Controller
 
         $plan   = $subscription->metadata->plan ?? $user->plan ?? 'pro';
         $status = $subscription->status;
+        $previousPlan = $user->plan;
 
         if (in_array($status, ['active', 'trialing'])) {
             $update = [
@@ -431,6 +439,12 @@ class StripeController extends Controller
             }
 
             $user->update($update);
+
+            // Only ping the user when the plan actually changed (skip noisy
+            // capacity-only / billing-cycle updates).
+            if ($plan !== $previousPlan) {
+                $user->notify(new PlanChanged($plan, 'upgraded'));
+            }
         } elseif ($status === 'canceled') {
             // Ignore cancellation of a stale/orphan sub that isn't the user's current one.
             if ($user->stripe_subscription_id !== $subscription->id) return;
@@ -444,6 +458,10 @@ class StripeController extends Controller
                 'agency_pages'    => null,
                 'agency_links'    => null,
             ]);
+
+            if ($previousPlan !== 'free') {
+                $user->notify(new PlanChanged('free', 'downgraded'));
+            }
         }
     }
 
@@ -457,6 +475,7 @@ class StripeController extends Controller
         // Prevents a stale/orphan subscription cancellation from wiping an active plan.
         if (!$user || $user->stripe_subscription_id !== $subscription->id) return;
 
+        $previousPlan = $user->plan;
         $user->update([
             'plan'                   => 'free',
             'stripe_subscription_id' => null,
@@ -464,6 +483,10 @@ class StripeController extends Controller
             'agency_pages'           => null,
             'agency_links'           => null,
         ]);
+
+        if ($previousPlan !== 'free') {
+            $user->notify(new PlanChanged('free', 'downgraded'));
+        }
     }
 
     /**
@@ -512,6 +535,11 @@ class StripeController extends Controller
 
     private function handlePaymentFailed(object $invoice): void
     {
-        // Could send email notification — handled by Stripe email for now
+        // Stripe sends its own dunning email; we add an in-app billing alert.
+        $customerId = $invoice->customer ?? null;
+        if (!$customerId) return;
+
+        User::where('stripe_customer_id', $customerId)->first()
+            ?->notify(new PaymentFailed());
     }
 }

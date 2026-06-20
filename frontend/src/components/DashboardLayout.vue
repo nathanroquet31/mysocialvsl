@@ -206,7 +206,10 @@
         <slot name="header-left">
           <h1 :style="{fontSize:'15px',fontWeight:600,color:theme.dark?'#fff':'#111827',letterSpacing:'-0.01em',margin:0}">{{ title }}</h1>
         </slot>
-        <slot name="header-actions" />
+        <div style="display:flex;align-items:center;gap:14px">
+          <slot name="header-actions" />
+          <NotificationBell />
+        </div>
       </header>
 
       <!-- Page content -->
@@ -226,6 +229,7 @@ import { useThemeStore } from '@/stores/theme'
 import NavItem from '@/components/NavItem.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import LogoMark from '@/components/LogoMark.vue'
+import NotificationBell from '@/components/NotificationBell.vue'
 
 const props = defineProps({
   title: { type: String, default: 'Dashboard' },

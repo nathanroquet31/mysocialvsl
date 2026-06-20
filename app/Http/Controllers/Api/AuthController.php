@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\NewLogin;
+use App\Notifications\PlanChanged;
+use App\Notifications\Welcome;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Stevebauman\Location\Facades\Location;
 
 class AuthController extends Controller
 {
@@ -39,6 +43,12 @@ class AuthController extends Controller
             $user->startTrial('agency', 60);
         }
 
+        // Account notifications: welcome everyone; announce the beta Agency trial.
+        $user->notify(new Welcome());
+        if ($referrer?->is_beta_partner) {
+            $user->notify(new PlanChanged('agency', 'upgraded'));
+        }
+
         $token = $this->issueSessionToken($user, $request);
 
         return response()->json(['token' => $token, 'user' => $user], 201);
@@ -59,7 +69,29 @@ class AuthController extends Controller
             ]);
         }
 
+        // Security notification: only when this IP hasn't been seen on the
+        // account before (checked before the new session token is issued).
+        $ip = $request->ip();
+        $knownIp = $ip && $user->tokens()
+            ->where('kind', 'session')
+            ->where('ip_address', $ip)
+            ->exists();
+
         $token = $this->issueSessionToken($user, $request);
+
+        if ($ip && ! $knownIp) {
+            $city = $country = null;
+            try {
+                $position = Location::get($ip);
+                if ($position) {
+                    $city    = $position->cityName ?: null;
+                    $country = $position->countryName ?: null;
+                }
+            } catch (\Throwable $e) {
+                // Geo is best-effort; never block login on it.
+            }
+            $user->notify(new NewLogin($city, $country, $ip));
+        }
 
         return response()->json(['token' => $token, 'user' => $user]);
     }
