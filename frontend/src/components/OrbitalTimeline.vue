@@ -1,15 +1,15 @@
 <template>
-  <section style="padding:96px 24px;border-top:1px solid rgba(255,255,255,0.06);overflow:hidden">
+  <section style="padding:96px 24px;border-top:1px solid var(--border);overflow:hidden">
 
     <div class="ot-layout">
 
       <!-- Left column: text + steps -->
       <div data-aos="fade-right" class="ot-text-col">
         <p style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">How it works</p>
-        <h2 style="font-weight:700;color:#fff;letter-spacing:-0.03em;line-height:1.1;font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:20px">
+        <h2 style="font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.1;font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:20px">
           From your bio link<br/>to a signed subscription
         </h2>
-        <p style="color:rgba(255,255,255,0.35);font-size:0.95rem;margin-bottom:40px;line-height:1.6">
+        <p style="color:var(--text-dim);font-size:0.95rem;margin-bottom:40px;line-height:1.6">
           Click a step to learn more
         </p>
         <!-- List of clickable steps -->
@@ -25,8 +25,8 @@
               <i :class="'bi ' + step.icon" style="font-size:14px"></i>
             </div>
             <div style="text-align:left">
-              <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:600;letter-spacing:0.06em;margin-bottom:1px">{{ step.num }}</div>
-              <div style="font-size:13px;font-weight:600;color:#fff">{{ step.title }}</div>
+              <div style="font-size:10px;color:var(--text-dim);font-weight:600;letter-spacing:0.06em;margin-bottom:1px">{{ step.num }}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">{{ step.title }}</div>
             </div>
             <div class="ot-step-badge" :class="'ot-badge--' + step.status">{{ statusLabel(step.status) }}</div>
           </button>
@@ -245,15 +245,15 @@ const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', 
   gap: 12px;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  background: var(--card-bg);
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
 }
 .ot-step-row:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.12);
+  background: var(--pill-bg);
+  border-color: var(--border);
 }
 .ot-step-row--on {
   background: rgba(109,78,232,0.12);
@@ -264,11 +264,11 @@ const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', 
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: rgba(255,255,255,0.06);
+  background: var(--pill-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.7);
+  color: var(--text2);
   flex-shrink: 0;
 }
 .ot-step-row--on .ot-step-icon {
@@ -364,7 +364,7 @@ const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', 
   top: 50%; left: 50%;
   width: 400px; height: 400px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid var(--border);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -417,7 +417,7 @@ const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', 
   display: flex; align-items: center; justify-content: center;
   border: 2px solid rgba(255,255,255,0.22);
   background: rgba(8,8,8,0.92);
-  color: rgba(255,255,255,0.7);
+  color: var(--text2);
   transition: all 0.3s;
   position: relative; z-index: 1;
 }
@@ -481,14 +481,14 @@ const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', 
 }
 .ot-badge--completed    { background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.22); }
 .ot-badge--in-progress  { background: #fff; color: #000; }
-.ot-badge--pending      { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.12); }
+.ot-badge--pending      { background: var(--pill-bg); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.12); }
 .ot-card__num   { font-size: 10px; font-family: monospace; color: rgba(255,255,255,0.3); }
 .ot-card__title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 8px; }
 .ot-card__body  { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.65; }
 
 .ot-bar-wrap { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.07); }
 .ot-bar-top  { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.38); margin-bottom: 6px; }
-.ot-bar-track { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.ot-bar-track { height: 3px; background: var(--pill-bg); border-radius: 2px; overflow: hidden; }
 .ot-bar-fill  { height: 100%; background: linear-gradient(to right, #6D4EE8, #8B6FF0); border-radius: 2px; }
 
 .ot-related { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.07); }
@@ -504,7 +504,7 @@ const statusLabel = (s)  => ({ completed: 'DONE', 'in-progress': 'IN PROGRESS', 
   display: flex; align-items: center;
   transition: all 0.15s;
 }
-.ot-related__btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.ot-related__btn:hover { background: var(--pill-bg); color: #fff; }
 
 /* Card transition */
 .ot-card-enter-active,

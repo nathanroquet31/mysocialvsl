@@ -1,14 +1,14 @@
 <template>
-  <div class="w-full text-white font-sans antialiased page-root">
+  <div class="w-full font-sans antialiased page-root">
 
     <!-- NAV -->
-    <header style="position:fixed;top:0;left:0;right:0;z-index:50;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+    <header :style="{position:'fixed',top:0,left:0,right:0,zIndex:50,borderBottom:'1px solid var(--border-light)',background:theme.dark?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.85)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)'}">
       <div style="max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between">
 
         <!-- Logo -->
         <RouterLink to="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
           <LogoMark :size="30" />
-          <span style="font-weight:700;color:#fff;font-size:15px;letter-spacing:-0.02em">MySocialVSL</span>
+          <span :style="{fontWeight:700,color:'var(--text)',fontSize:'15px',letterSpacing:'-0.02em'}">MySocialVSL</span>
         </RouterLink>
 
         <!-- Nav desktop -->
@@ -21,6 +21,7 @@
 
         <!-- CTA desktop -->
         <div class="nav-desktop" style="display:flex;align-items:center;gap:12px">
+          <ThemeToggle />
           <RouterLink to="/login" class="nav-link">Login</RouterLink>
           <RouterLink to="/register" class="nav-cta">
             Get Started Free <i class="bi bi-arrow-right"></i>
@@ -29,7 +30,7 @@
 
         <!-- Hamburger mobile -->
         <button class="nav-mobile nav-burger" @click="mobileMenuOpen = true" aria-label="Menu">
-          <i class="bi bi-list" style="font-size:22px;color:#fff"></i>
+          <i class="bi bi-list" style="font-size:22px;color:var(--text)"></i>
         </button>
       </div>
 
@@ -37,15 +38,15 @@
       <Teleport to="body">
         <Transition name="nav-drawer">
           <div v-if="mobileMenuOpen" style="position:fixed;inset:0;z-index:100;display:flex;justify-content:flex-end" @click.self="mobileMenuOpen = false">
-            <div style="width:280px;height:100%;background:#0a0a0a;border-left:1px solid rgba(255,255,255,0.08);padding:24px;display:flex;flex-direction:column;gap:8px;animation:drawer-in 0.25s cubic-bezier(0.16,1,0.3,1)">
+            <div style="width:280px;height:100%;background:var(--bg2);border-left:1px solid var(--border);padding:24px;display:flex;flex-direction:column;gap:8px;animation:drawer-in 0.25s cubic-bezier(0.16,1,0.3,1)">
 
               <!-- Header drawer -->
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
                 <div style="display:flex;align-items:center;gap:8px">
                   <LogoMark :size="26" />
-                  <span style="font-weight:700;color:#fff;font-size:14px">MySocialVSL</span>
+                  <span style="font-weight:700;color:var(--text);font-size:14px">MySocialVSL</span>
                 </div>
-                <button @click="mobileMenuOpen = false" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);padding:4px">
+                <button @click="mobileMenuOpen = false" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px">
                   <i class="bi bi-x-lg" style="font-size:18px"></i>
                 </button>
               </div>
@@ -65,7 +66,7 @@
               </a>
 
               <!-- Divider -->
-              <div style="height:1px;background:rgba(255,255,255,0.07);margin:12px 0"></div>
+              <div style="height:1px;background:var(--border);margin:12px 0"></div>
 
               <!-- Auth -->
               <RouterLink to="/login" @click="mobileMenuOpen = false" class="drawer-link">
@@ -90,19 +91,19 @@
 
         <!-- Left — texte -->
         <div>
-          <div data-aos="fade-right" style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(109,78,232,0.3);border-radius:999px;padding:6px 16px;font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:32px;background:rgba(109,78,232,0.08)">
+          <div data-aos="fade-right" style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(109,78,232,0.3);border-radius:999px;padding:6px 16px;font-size:12px;color:var(--text-muted);margin-bottom:32px;background:rgba(109,78,232,0.08)">
             <span style="width:6px;height:6px;border-radius:50%;background:#A78BFA;display:inline-block;animation:pulse-dot 2s ease-in-out infinite"></span>
             The #1 VSL link-in-bio for content creators
           </div>
 
           <h1 data-aos="fade-right" data-aos-delay="80"
-            style="font-weight:800;color:#fff;letter-spacing:-0.04em;line-height:1.05;margin-bottom:24px;font-size:clamp(2.4rem,5vw,4rem)">
+            style="font-weight:800;color:var(--text);letter-spacing:-0.04em;line-height:1.05;margin-bottom:24px;font-size:clamp(2.4rem,5vw,4rem)">
             The link-in-bio that
             <span style="background:linear-gradient(135deg,#A78BFA,#6D4EE8,#8B6FF0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"> actually converts</span>
           </h1>
 
-          <p data-aos="fade-right" data-aos-delay="140" style="color:rgba(255,255,255,0.45);font-size:1.1rem;line-height:1.7;margin-bottom:40px;max-width:440px">
-            Replace Linktree. Your audience sees your video, clicks directly into the app. Result: <strong style="color:rgba(255,255,255,0.8)">up to 3× more conversions.</strong>
+          <p data-aos="fade-right" data-aos-delay="140" style="color:var(--text-muted);font-size:1.1rem;line-height:1.7;margin-bottom:40px;max-width:440px">
+            Replace Linktree. Your audience sees your video, clicks directly into the app. Result: <strong style="color:var(--text2)">up to 3× more conversions.</strong>
           </p>
 
           <div data-aos="fade-right" data-aos-delay="180" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:40px">
@@ -110,7 +111,7 @@
               style="background:linear-gradient(135deg,#6D4EE8,#8B6FF0);color:#fff;padding:14px 28px;border-radius:999px;font-weight:700;font-size:14px;text-decoration:none;display:inline-block;box-shadow:0 0 32px rgba(109,78,232,0.5)">
               Create my page for free <i class="bi bi-arrow-right"></i>
             </RouterLink>
-            <a href="#features" style="color:rgba(255,255,255,0.35);font-size:14px;text-decoration:none;display:flex;align-items:center;gap:5px">
+            <a href="#features" style="color:var(--text-dim);font-size:14px;text-decoration:none;display:flex;align-items:center;gap:5px">
               See how it works <i class="bi bi-arrow-down"></i>
             </a>
           </div>
@@ -119,8 +120,8 @@
           <div data-aos="fade-right" data-aos-delay="220" style="display:flex;flex-direction:column;gap:10px">
             <div v-for="stat in heroStats" :key="stat.label" style="display:flex;align-items:center;gap:10px">
               <div style="width:6px;height:6px;border-radius:50%;background:#34d399;flex-shrink:0"></div>
-              <span style="font-size:13px;color:rgba(255,255,255,0.5)">
-                <strong style="color:rgba(255,255,255,0.9)">{{ stat.value }}</strong> {{ stat.label }}
+              <span style="font-size:13px;color:var(--text-muted)">
+                <strong style="color:var(--text)">{{ stat.value }}</strong> {{ stat.label }}
               </span>
             </div>
           </div>
@@ -148,17 +149,17 @@
     </div>
 
     <!-- FEATURE 1 — Video -->
-    <section id="features" style="padding:96px 24px;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden">
+    <section id="features" style="padding:96px 24px;border-top:1px solid var(--border);position:relative;overflow:hidden">
       <div style="position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(ellipse 80% 60% at 90% 40%,rgba(109,78,232,0.06),transparent 70%);pointer-events:none"></div>
       <div style="max-width:1152px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
 
         <!-- Left — texte -->
         <div data-aos="fade-right">
           <p style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">Video Sales Letter</p>
-          <h2 style="font-weight:700;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
+          <h2 style="font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
             Your face before<br/>the first click
           </h2>
-          <p style="color:rgba(255,255,255,0.45);font-size:1.05rem;line-height:1.7;margin-bottom:36px">
+          <p style="color:var(--text-muted);font-size:1.05rem;line-height:1.7;margin-bottom:36px">
             The video plays automatically, muted and looped. Your audience sees you and builds trust before they even tap a button — the #1 conversion tool for creators.
           </p>
           <div style="display:flex;flex-direction:column;gap:14px">
@@ -167,8 +168,8 @@
                 <i :class="'bi ' + item.icon" style="color:#A78BFA;font-size:10px"></i>
               </div>
               <div>
-                <p style="color:rgba(255,255,255,0.8);font-weight:500;font-size:14px;margin:0 0 2px">{{ item.label }}</p>
-                <p v-if="item.sub" style="color:rgba(255,255,255,0.3);font-size:12px;margin:0">{{ item.sub }}</p>
+                <p style="color:var(--text2);font-weight:500;font-size:14px;margin:0 0 2px">{{ item.label }}</p>
+                <p v-if="item.sub" style="color:var(--text-dim);font-size:12px;margin:0">{{ item.sub }}</p>
               </div>
             </div>
           </div>
@@ -219,7 +220,7 @@
 
     <!-- FEATURE 2 — Deep Linking -->
     <section
-      style="padding:96px 24px;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;min-height:680px;display:flex;align-items:center"
+      style="padding:96px 24px;border-top:1px solid var(--border);position:relative;overflow:hidden;min-height:680px;display:flex;align-items:center"
       @mousemove="onDeepLinkMouseMove"
     >
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(109,78,232,0.07),transparent);pointer-events:none"></div>
@@ -253,15 +254,15 @@
       <!-- Center content -->
       <div style="max-width:640px;margin:0 auto;width:100%;text-align:center;position:relative;z-index:2">
         <p data-aos="fade-up" style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">Deep Linking</p>
-        <h2 data-aos="fade-up" data-aos-delay="60" style="font-weight:700;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
+        <h2 data-aos="fade-up" data-aos-delay="60" style="font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
           Bypass Instagram.<br/>Open the native app.
         </h2>
-        <p data-aos="fade-up" data-aos-delay="120" style="color:rgba(255,255,255,0.45);font-size:1.05rem;line-height:1.7;margin-bottom:36px">
+        <p data-aos="fade-up" data-aos-delay="120" style="color:var(--text-muted);font-size:1.05rem;line-height:1.7;margin-bottom:36px">
           Fans tap from Instagram or TikTok — MySocialVSL bypasses the in-app WebView and opens the destination app directly. Zero friction, maximum conversions.
         </p>
         <div data-aos="fade-up" data-aos-delay="180" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
           <span v-for="platform in deepLinkFloatingIcons.map(i => i.name)" :key="platform"
-            style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:13px;color:rgba(255,255,255,0.5)">
+            style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;background:var(--pill-bg);border:1px solid var(--border);font-size:13px;color:var(--text-muted)">
             <span style="width:6px;height:6px;border-radius:50%;background:#34d399;flex-shrink:0;display:inline-block"></span>
             {{ platform }}
           </span>
@@ -270,7 +271,7 @@
     </section>
 
     <!-- FEATURE 3 — Shield Protection™ -->
-    <section style="padding:96px 24px;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden">
+    <section style="padding:96px 24px;border-top:1px solid var(--border);position:relative;overflow:hidden">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(16,185,129,0.04),transparent 70%);pointer-events:none"></div>
       <div style="max-width:1152px;margin:0 auto">
         <div data-aos="fade-up" style="text-align:center;margin-bottom:56px">
@@ -278,10 +279,10 @@
             <span style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block;animation:pulse-dot 2s ease-in-out infinite"></span>
             <span style="font-size:12px;color:#34d399;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Shield Protection™</span>
           </div>
-          <h2 style="font-weight:700;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:16px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
+          <h2 style="font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.1;margin-bottom:16px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
             Invisible to bots.<br/>Only real fans get through.
           </h2>
-          <p style="color:rgba(255,255,255,0.4);font-size:1.05rem;max-width:560px;margin:0 auto;line-height:1.7">
+          <p style="color:var(--text-muted);font-size:1.05rem;max-width:560px;margin:0 auto;line-height:1.7">
             Our dual-layer protection detects 30+ crawlers and Instagram's scanner — and shows them a harmless decoy page instead of your real link.
           </p>
         </div>
@@ -289,22 +290,22 @@
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
           <!-- Card 1: Bot Detection -->
           <div data-glow data-aos="fade-up" data-aos-delay="0"
-            style="--base:155;--spread:120;--radius:14;--border:1;--size:260;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:32px;position:relative">
+            style="--base:155;--spread:120;--radius:14;--border:1;--size:260;border:1px solid var(--border);border-radius:20px;padding:32px;position:relative">
             <div data-glow></div>
             <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(16,185,129,0.08),transparent 70%);pointer-events:none"></div>
             <div style="width:44px;height:44px;border-radius:12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
               <i class="bi bi-robot" style="font-size:20px"></i>
             </div>
-            <h3 style="font-weight:700;color:#fff;font-size:16px;margin-bottom:10px">Bot & Crawler Detection</h3>
-            <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.65;margin-bottom:20px">
+            <h3 style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:10px">Bot & Crawler Detection</h3>
+            <p style="color:var(--text-dim);font-size:13px;line-height:1.65;margin-bottom:20px">
               Detects and blocks 30+ known crawlers — Googlebot, AhrefsBot, SemrushBot, Meta, and more — before they can index your destination URLs.
             </p>
             <div style="display:flex;flex-wrap:wrap;gap:6px">
               <span v-for="bot in ['Googlebot','Meta','AhrefsBot','TikTokBot','Twitterbot','Slackbot']" :key="bot"
-                style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:3px 9px;font-size:11px;color:rgba(255,255,255,0.35)">
+                style="background:var(--pill-bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:11px;color:var(--text-dim)">
                 {{ bot }}
               </span>
-              <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:3px 9px;font-size:11px;color:rgba(255,255,255,0.35)">+24 more</span>
+              <span style="background:var(--pill-bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:11px;color:var(--text-dim)">+24 more</span>
             </div>
           </div>
 
@@ -319,18 +320,18 @@
             <div style="position:absolute;top:16px;right:16px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:999px;padding:3px 10px">
               <span style="font-size:10px;color:#34d399;font-weight:700">KEY FEATURE</span>
             </div>
-            <h3 style="font-weight:700;color:#fff;font-size:16px;margin-bottom:10px">Instagram Decoy Page</h3>
-            <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.65;margin-bottom:20px">
+            <h3 style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:10px">Instagram Decoy Page</h3>
+            <p style="color:var(--text-dim);font-size:13px;line-height:1.65;margin-bottom:20px">
               When Instagram scans your link, it sees a harmless "My Links" page — no adult keywords, no real URL. Your actual page is only shown to real visitors.
             </p>
             <!-- Mini decoy preview — concrete, side by side -->
-            <div style="background:#111;border-radius:12px;border:1px solid rgba(255,255,255,0.06);padding:14px;font-size:11px">
-              <p style="color:rgba(255,255,255,0.35);margin-bottom:7px"><i class="bi bi-robot" style="margin-right:5px"></i>Instagram's bot sees:</p>
+            <div style="background:#111;border-radius:12px;border:1px solid var(--border);padding:14px;font-size:11px">
+              <p style="color:var(--text-dim);margin-bottom:7px"><i class="bi bi-robot" style="margin-right:5px"></i>Instagram's bot sees:</p>
               <div style="background:#1a1a1a;border-radius:8px;padding:16px 12px;text-align:center">
                 <p style="color:rgba(255,255,255,0.55);font-weight:700;font-size:12px;margin:0 0 3px">My Links</p>
                 <p style="color:rgba(255,255,255,0.25);font-size:10px;margin:0">Check out my latest content</p>
               </div>
-              <p style="color:rgba(255,255,255,0.35);margin-top:11px;margin-bottom:7px"><i class="bi bi-heart-fill" style="margin-right:5px;color:#E1306C"></i>A real fan sees:</p>
+              <p style="color:var(--text-dim);margin-top:11px;margin-bottom:7px"><i class="bi bi-heart-fill" style="margin-right:5px;color:#E1306C"></i>A real fan sees:</p>
               <div style="background:linear-gradient(135deg,#1e1040,#0d0d0d);border-radius:8px;border:1px solid rgba(109,78,232,0.25);overflow:hidden">
                 <div style="height:56px;background:linear-gradient(160deg,#2a1a4d,#140a26);display:flex;align-items:center;justify-content:center;position:relative">
                   <span style="position:absolute;top:6px;left:7px;background:rgba(109,78,232,0.9);border-radius:4px;padding:1px 5px;font-size:7px;font-weight:800;color:#fff;letter-spacing:0.05em">VSL</span>
@@ -345,14 +346,14 @@
 
           <!-- Card 3: Deep Link Bypass -->
           <div data-glow data-aos="fade-up" data-aos-delay="160"
-            style="--base:265;--spread:120;--radius:14;--border:1;--size:260;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:32px;position:relative">
+            style="--base:265;--spread:120;--radius:14;--border:1;--size:260;border:1px solid var(--border);border-radius:20px;padding:32px;position:relative">
             <div data-glow></div>
             <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(109,78,232,0.08),transparent 70%);pointer-events:none"></div>
             <div style="width:44px;height:44px;border-radius:12px;background:rgba(109,78,232,0.1);border:1px solid rgba(109,78,232,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
               <i class="bi bi-link-45deg" style="font-size:20px"></i>
             </div>
-            <h3 style="font-weight:700;color:#fff;font-size:16px;margin-bottom:10px">WebView Bypass</h3>
-            <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.65;margin-bottom:20px">
+            <h3 style="font-weight:700;color:var(--text);font-size:16px;margin-bottom:10px">WebView Bypass</h3>
+            <p style="color:var(--text-dim);font-size:13px;line-height:1.65;margin-bottom:20px">
               When a fan taps your link inside Instagram or TikTok, we bypass the in-app browser and open the destination app natively — zero friction, no login wall.
             </p>
             <div style="display:flex;flex-direction:column;gap:8px">
@@ -361,8 +362,8 @@
                 { icon:'music-note-beamed', label:'TikTok WebView', status:'Bypassed', ok:true },
                 { icon:'box-arrow-up-right', label:'App opens natively', status:'Always', ok:true },
               ]" :key="item.label"
-                style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.05)">
-                <span style="font-size:12px;color:rgba(255,255,255,0.55)"><i :class="`bi bi-${item.icon}`" style="margin-right:4px"></i>{{ item.label }}</span>
+                style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card-bg);border-radius:8px;border:1px solid var(--border-light)">
+                <span style="font-size:12px;color:var(--text-muted)"><i :class="`bi bi-${item.icon}`" style="margin-right:4px"></i>{{ item.label }}</span>
                 <span style="font-size:11px;font-weight:700;color:#34d399">{{ item.status }} <i class="bi bi-check" style="font-size:10px"></i></span>
               </div>
             </div>
@@ -372,30 +373,30 @@
     </section>
 
     <!-- FEATURE 4 — Analytics -->
-    <section style="padding:96px 24px 0;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden">
+    <section style="padding:96px 24px 0;border-top:1px solid var(--border);position:relative;overflow:hidden">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(109,78,232,0.06),transparent 70%);pointer-events:none"></div>
       <!-- Fondu vers le Pricing -->
-      <div style="position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to bottom,transparent,#080810);pointer-events:none;z-index:2"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to bottom,transparent,transparent);pointer-events:none;z-index:2"></div>
       <div style="max-width:1152px;margin:0 auto;padding-bottom:120px;position:relative;z-index:1">
 
         <!-- Header -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:48px">
           <div data-aos="fade-right">
             <p style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">VSL Analytics</p>
-            <h2 style="font-weight:700;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
+            <h2 style="font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
               Know exactly when<br/>they clicked.
             </h2>
-            <p style="color:rgba(255,255,255,0.45);font-size:1.05rem;line-height:1.7">
+            <p style="color:var(--text-muted);font-size:1.05rem;line-height:1.7">
               Page views, VSL play rate, seconds watched before clicking, milestone funnel (25/50/75/100%), link clicks, countries, devices. Real time.
             </p>
           </div>
           <!-- Stat cards -->
           <div data-aos="fade-left" data-aos-delay="80" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div v-for="stat in analyticsStats" :key="stat.label"
-              style="background:#0d0d0d;border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden">
+              style="background:var(--card-bg);border-radius:16px;padding:22px;border:1px solid var(--border);position:relative;overflow:hidden">
               <div style="position:absolute;top:0;right:0;width:70px;height:70px;background:radial-gradient(circle,rgba(109,78,232,0.07),transparent 70%);pointer-events:none"></div>
-              <p style="color:rgba(255,255,255,0.28);font-size:10px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">{{ stat.label }}</p>
-              <p style="font-size:26px;font-weight:700;color:#fff;letter-spacing:-0.03em;margin-bottom:6px">{{ stat.value }}</p>
+              <p style="color:var(--text-dim);font-size:10px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">{{ stat.label }}</p>
+              <p style="font-size:26px;font-weight:700;color:var(--text);letter-spacing:-0.03em;margin-bottom:6px">{{ stat.value }}</p>
               <div style="display:flex;align-items:center;gap:5px">
                 <span :style="{display:'inline-block',width:'5px',height:'5px',borderRadius:'50%',background:stat.up?'#34d399':'#60a5fa',flexShrink:0}"></span>
                 <p :style="{fontSize:'11px',fontWeight:500,color:stat.up?'#34d399':'#60a5fa',margin:0}">{{ stat.trend }}</p>
@@ -406,12 +407,12 @@
 
         <!-- VSL Watch Funnel -->
         <div data-aos="fade-up" data-aos-delay="120"
-          style="background:#0d0d0d;border-radius:20px;border:1px solid rgba(255,255,255,0.06);padding:36px">
+          style="background:var(--card-bg);border-radius:20px;border:1px solid var(--border);padding:36px">
 
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
             <div>
-              <p style="color:#fff;font-size:15px;font-weight:600;margin-bottom:5px">VSL Watch Funnel</p>
-              <p style="color:rgba(255,255,255,0.3);font-size:12px;line-height:1.5">How far your audience watches before clicking — last 30 days</p>
+              <p style="color:var(--text);font-size:15px;font-weight:600;margin-bottom:5px">VSL Watch Funnel</p>
+              <p style="color:var(--text-dim);font-size:12px;line-height:1.5">How far your audience watches before clicking — last 30 days</p>
             </div>
             <div style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:999px;padding:5px 14px;flex-shrink:0">
               <span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;animation:pulse-dot 2s ease-in-out infinite"></span>
@@ -423,10 +424,10 @@
             <div v-for="(step, i) in vslFunnel" :key="step.label" style="display:flex;align-items:center;gap:16px">
               <!-- Step label -->
               <div style="width:130px;flex-shrink:0">
-                <p style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:500;margin:0">{{ step.label }}</p>
+                <p style="font-size:12px;color:var(--text-muted);font-weight:500;margin:0">{{ step.label }}</p>
               </div>
               <!-- Progress bar -->
-              <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:999px;height:32px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.04)">
+              <div style="flex:1;background:var(--pill-bg);border-radius:999px;height:32px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.04)">
                 <div :style="{
                   position:'absolute',left:0,top:0,bottom:0,
                   width: step.pct + '%',
@@ -454,8 +455,8 @@
           </div>
 
           <!-- Footer note -->
-          <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-            <p style="font-size:12px;color:rgba(255,255,255,0.25);margin:0">
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <p style="font-size:12px;color:var(--text-faint);margin:0">
               <i class="bi bi-info-circle" style="margin-right:5px"></i>
               The video keeps them watching — 38% end up tapping through to OnlyFans (avg. 18s before the click)
             </p>
@@ -463,7 +464,7 @@
               <div v-for="leg in [{color:'#8B6FF0',label:'Watching'},{color:'#34d399',label:'Clicked OnlyFans'}]" :key="leg.label"
                 style="display:flex;align-items:center;gap:5px">
                 <span :style="{width:'8px',height:'8px',borderRadius:'2px',background:leg.color,display:'inline-block'}"></span>
-                <span style="font-size:11px;color:rgba(255,255,255,0.35)">{{ leg.label }}</span>
+                <span style="font-size:11px;color:var(--text-dim)">{{ leg.label }}</span>
               </div>
             </div>
           </div>
@@ -476,9 +477,9 @@
     <PricingSection />
 
     <!-- FAQ -->
-    <section id="faq" style="padding:96px 24px;border-top:none;position:relative;overflow:hidden;background:linear-gradient(to bottom,#0a0814 0%,#050508 30%,#000 60%)">
+    <section id="faq" style="padding:96px 24px;border-top:none;position:relative;overflow:hidden;background:var(--bg)">
       <!-- Fondu depuis le haut — absorbe la fin du Pricing -->
-      <div style="position:absolute;top:0;left:0;right:0;height:160px;background:linear-gradient(to bottom,#0a0814,transparent);pointer-events:none;z-index:0"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:160px;background:linear-gradient(to bottom,transparent,transparent);pointer-events:none;z-index:0"></div>
       <!-- Orb ambiant -->
       <div style="position:absolute;top:20%;left:50%;transform:translateX(-50%);width:70vw;height:400px;background:radial-gradient(ellipse at center,rgba(109,78,232,0.04),transparent 70%);pointer-events:none;z-index:0"></div>
       <div style="max-width:760px;margin:0 auto;position:relative;z-index:1">
@@ -489,10 +490,10 @@
             <i class="bi bi-question-circle" style="color:#A78BFA;font-size:13px"></i>
             <span style="font-size:12px;color:#A78BFA;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">FAQ</span>
           </div>
-          <h2 style="font-weight:700;color:#fff;letter-spacing:-0.03em;font-size:clamp(1.8rem,3.5vw,2.6rem);margin-bottom:12px">
+          <h2 style="font-weight:700;color:var(--text);letter-spacing:-0.03em;font-size:clamp(1.8rem,3.5vw,2.6rem);margin-bottom:12px">
             Frequently Asked Questions
           </h2>
-          <p style="color:rgba(255,255,255,0.35);font-size:1rem;line-height:1.6">Everything you need to know about MySocialVSL.</p>
+          <p style="color:var(--text-dim);font-size:1rem;line-height:1.6">Everything you need to know about MySocialVSL.</p>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:6px">
@@ -517,7 +518,7 @@
                 <i :class="'bi ' + faq.icon" :style="{color: openFaq===i?'#A78BFA':'rgba(255,255,255,0.35)',fontSize:'15px',transition:'color 0.2s ease'}"></i>
               </div>
               <!-- Question text -->
-              <span style="flex:1;font-weight:500;color:rgba(255,255,255,0.85);font-size:14px;line-height:1.4">{{ faq.q }}</span>
+              <span style="flex:1;font-weight:500;color:var(--text2);font-size:14px;line-height:1.4">{{ faq.q }}</span>
               <!-- Rotating chevron -->
               <div :style="{
                 width:'28px',height:'28px',borderRadius:'999px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',
@@ -525,13 +526,13 @@
                 transform: openFaq===i ? 'rotate(180deg)':'rotate(0deg)',
                 transition:'transform 0.28s cubic-bezier(0.4,0,0.2,1)'
               }">
-                <i class="bi bi-chevron-down" style="color:rgba(255,255,255,0.4);font-size:11px"></i>
+                <i class="bi bi-chevron-down" style="color:var(--text-muted);font-size:11px"></i>
               </div>
             </button>
             <Transition name="faq-slide">
               <div v-if="openFaq === i" style="padding:0 20px 20px 72px">
-                <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:14px">
-                  <p style="color:rgba(255,255,255,0.45);font-size:14px;line-height:1.75;margin:0">{{ faq.a }}</p>
+                <div style="border-top:1px solid var(--border);padding-top:14px">
+                  <p style="color:var(--text-muted);font-size:14px;line-height:1.75;margin:0">{{ faq.a }}</p>
                 </div>
               </div>
             </Transition>
@@ -540,7 +541,7 @@
 
         <!-- Bottom CTA -->
         <div data-aos="fade-up" style="text-align:center;margin-top:48px">
-          <p style="color:rgba(255,255,255,0.3);font-size:14px;margin-bottom:14px">Still have questions?</p>
+          <p style="color:var(--text-dim);font-size:14px;margin-bottom:14px">Still have questions?</p>
           <a href="https://t.me/mysocialvsl" target="_blank"
             style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:999px;background:rgba(109,78,232,0.1);border:1px solid rgba(109,78,232,0.25);color:#A78BFA;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.2s">
             <i class="bi bi-telegram"></i> Chat with us on Telegram
@@ -551,7 +552,7 @@
     </section>
 
     <!-- CTA FINAL -->
-    <section style="padding:80px 24px 100px;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;background:linear-gradient(to bottom,#000,#050508)">
+    <section style="padding:80px 24px 100px;border-top:1px solid var(--border);position:relative;overflow:hidden;background:var(--bg)">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 80%,rgba(109,78,232,0.08),transparent 70%);pointer-events:none"></div>
       <div style="max-width:1100px;margin:0 auto">
         <div data-aos="fade-up" class="cta-box">
@@ -567,10 +568,10 @@
           </div>
 
           <!-- Titre + sous-titre -->
-          <h2 style="font-weight:800;color:#fff;letter-spacing:-0.04em;line-height:1.1;font-size:clamp(2rem,4vw,3.2rem);margin-bottom:16px;max-width:560px">
+          <h2 style="font-weight:800;color:var(--text);letter-spacing:-0.04em;line-height:1.1;font-size:clamp(2rem,4vw,3.2rem);margin-bottom:16px;max-width:560px">
             Try MySocialVSL today
           </h2>
-          <p style="color:rgba(255,255,255,0.4);font-size:1rem;line-height:1.7;max-width:480px;margin-bottom:36px">
+          <p style="color:var(--text-muted);font-size:1rem;line-height:1.7;max-width:480px;margin-bottom:36px">
             Live in 30 seconds. Free to start. The only link-in-bio built for creators who want real conversions — not just clicks.
           </p>
 
@@ -589,7 +590,7 @@
     </section>
 
     <!-- FOOTER -->
-    <footer style="position:relative;border-top:1px solid rgba(255,255,255,0.06);background:linear-gradient(to bottom,#080810,#0a0814);font-family:Inter,sans-serif">
+    <footer style="position:relative;border-top:1px solid var(--border);background:var(--bg);font-family:Inter,sans-serif">
       <div style="max-width:1152px;margin:0 auto;padding:64px 24px 0">
 
         <!-- Decorative orb -->
@@ -602,17 +603,17 @@
             <!-- Logo -->
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
               <LogoMark :size="28" />
-              <span style="font-weight:700;color:#fff;font-size:15px;letter-spacing:-0.02em">MySocialVSL</span>
+              <span style="font-weight:700;color:var(--text);font-size:15px;letter-spacing:-0.02em">MySocialVSL</span>
             </div>
-            <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.65;margin:0 0 20px;max-width:240px">
+            <p style="color:var(--text-dim);font-size:13px;line-height:1.65;margin:0 0 20px;max-width:240px">
               The VSL link-in-bio that turns your fans into paying subscribers.
             </p>
             <!-- Newsletter -->
             <div style="position:relative;max-width:280px">
               <input type="email" placeholder="Your email address"
-                style="width:100%;padding:10px 44px 10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;backdrop-filter:blur(8px)"
+                style="width:100%;padding:10px 44px 10px 14px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:13px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;backdrop-filter:blur(8px)"
                 @focus="e => e.target.style.borderColor='rgba(109,78,232,0.5)'"
-                @blur="e => e.target.style.borderColor='rgba(255,255,255,0.1)'" />
+                @blur="e => e.target.style.borderColor='var(--border)'" />
               <button style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#5940D1,#6D4EE8);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.15s"
                 onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
                 <i class="bi bi-send-fill" style="color:#fff;font-size:11px"></i>
@@ -623,35 +624,35 @@
 
           <!-- Col 2 — Product -->
           <div>
-            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Product</h3>
+            <h3 style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Product</h3>
             <nav style="display:flex;flex-direction:column;gap:10px">
-              <a href="#features" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Features</a>
-              <a href="#pricing" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Pricing</a>
-              <a href="#faq" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">FAQ</a>
-              <RouterLink to="/register" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Create an account</RouterLink>
-              <RouterLink to="/login" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Log in</RouterLink>
+              <a href="#features" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Features</a>
+              <a href="#pricing" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Pricing</a>
+              <a href="#faq" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">FAQ</a>
+              <RouterLink to="/register" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Create an account</RouterLink>
+              <RouterLink to="/login" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Log in</RouterLink>
             </nav>
           </div>
 
           <!-- Col 3 — Resources -->
           <div>
-            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Resources</h3>
+            <h3 style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Resources</h3>
             <nav style="display:flex;flex-direction:column;gap:10px">
-              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Blog</a>
-              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">API Documentation</a>
-              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Affiliates</a>
-              <a href="#" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Status</a>
+              <a href="#" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Blog</a>
+              <a href="#" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">API Documentation</a>
+              <a href="#" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Affiliates</a>
+              <a href="#" style="color:var(--text-muted);font-size:13px;text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='#A78BFA'" onmouseout="this.style.color='var(--text-muted)'">Status</a>
             </nav>
           </div>
 
           <!-- Col 4 — Social -->
           <div>
-            <h3 style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Follow us</h3>
+            <h3 style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 18px">Follow us</h3>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <a v-for="s in socials" :key="s.label" :href="s.href" :title="s.label"
-                style="width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.15s;color:rgba(255,255,255,0.5);font-size:15px"
+                style="width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--pill-bg);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.15s;color:var(--text-muted);font-size:15px"
                 onmouseover="this.style.borderColor='rgba(109,78,232,0.5)';this.style.background='rgba(109,78,232,0.1)';this.style.color='#A78BFA'"
-                onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='rgba(255,255,255,0.04)';this.style.color='rgba(255,255,255,0.5)'">
+                onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--pill-bg)';this.style.color='var(--text-muted)'">
                 <i :class="s.icon"></i>
               </a>
             </div>
@@ -660,12 +661,12 @@
         </div>
 
         <!-- Bottom bar -->
-        <div style="border-top:1px solid rgba(255,255,255,0.06);padding:24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <p style="font-size:12px;color:rgba(255,255,255,0.2);margin:0">© 2026 MySocialVSL. All rights reserved.</p>
+        <div style="border-top:1px solid var(--border);padding:24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <p style="font-size:12px;color:var(--text-faint);margin:0">© 2026 MySocialVSL. All rights reserved.</p>
           <nav style="display:flex;gap:24px">
-            <RouterLink to="/privacy" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='rgba(255,255,255,0.5)'" @mouseout="e => e.target.style.color='rgba(255,255,255,0.2)'">Privacy Policy</RouterLink>
-            <RouterLink to="/terms" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='rgba(255,255,255,0.5)'" @mouseout="e => e.target.style.color='rgba(255,255,255,0.2)'">Terms</RouterLink>
-            <RouterLink to="/cookies" style="color:rgba(255,255,255,0.2);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='rgba(255,255,255,0.5)'" @mouseout="e => e.target.style.color='rgba(255,255,255,0.2)'">Cookies</RouterLink>
+            <RouterLink to="/privacy" style="color:var(--text-faint);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='var(--text-muted)'" @mouseout="e => e.target.style.color='var(--text-faint)'">Privacy Policy</RouterLink>
+            <RouterLink to="/terms" style="color:var(--text-faint);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='var(--text-muted)'" @mouseout="e => e.target.style.color='var(--text-faint)'">Terms</RouterLink>
+            <RouterLink to="/cookies" style="color:var(--text-faint);font-size:12px;text-decoration:none;transition:color 0.15s" @mouseover="e => e.target.style.color='var(--text-muted)'" @mouseout="e => e.target.style.color='var(--text-faint)'">Cookies</RouterLink>
           </nav>
         </div>
 
@@ -684,6 +685,10 @@ import PhoneDemo from '@/components/PhoneDemo.vue'
 import PricingSection from '@/components/PricingSection.vue'
 import LogoMark from '@/components/LogoMark.vue'
 import OrbitalTimeline from '@/components/OrbitalTimeline.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
+import { useThemeStore } from '@/stores/theme'
+
+const theme = useThemeStore()
 
 const syncGlowPointer = (e) => {
   const xp = (e.clientX / window.innerWidth).toFixed(2)
@@ -1024,11 +1029,28 @@ const socials = [
 
 /* ── Page global ambient ── */
 .page-root {
+  color: var(--text);
   background:
     radial-gradient(ellipse 90% 40% at 70% 0%,   rgba(109,78,232,0.07) 0%, transparent 100%),
     radial-gradient(ellipse 70% 35% at 10% 100%, rgba(89,64,209,0.05)  0%, transparent 100%),
     #000;
 }
+
+/* ════════ Light theme ════════ */
+[data-theme="light"] .page-root {
+  background:
+    radial-gradient(ellipse 90% 40% at 70% 0%,   rgba(109,78,232,0.08) 0%, transparent 100%),
+    radial-gradient(ellipse 70% 35% at 10% 100%, rgba(109,78,232,0.05) 0%, transparent 100%),
+    #F7F7FB;
+}
+[data-theme="light"] .nav-link { color: #4B5563; }
+[data-theme="light"] .nav-link:hover { color: #111827; }
+[data-theme="light"] .nav-burger { border-color: #E5E7EB; }
+[data-theme="light"] .drawer-link { color: #4B5563; }
+[data-theme="light"] .drawer-link:hover { background: #F3F4F6; color: #111827; }
+[data-theme="light"] .cta-box { background: #fff; border-color: #E5E7EB; box-shadow: 0 20px 50px rgba(17,24,39,0.08); }
+[data-theme="light"] .cta-btn-outline { background: #fff; color: #374151; border-color: #E5E7EB; }
+[data-theme="light"] .cta-btn-outline:hover { background: #F3F4F6; color: #111827; border-color: #D1D5DB; }
 </style>
 
 <style>
@@ -1097,5 +1119,20 @@ const socials = [
 [data-glow] > [data-glow]::before {
   inset: -8px;
   border-width: 8px;
+}
+
+/* Light theme: glow cards become clean white cards with a soft border. */
+[data-theme="light"] [data-glow]:not([data-glow] [data-glow]) {
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 16px rgba(17,24,39,0.05);
+}
+[data-theme="light"] [data-glow]:not([data-glow] [data-glow]) {
+  background-image: radial-gradient(
+    var(--spotlight-size) var(--spotlight-size) at
+    calc(var(--x, -9999) * 1px) calc(var(--y, -9999) * 1px),
+    hsl(258 90% 66% / 0.06),
+    transparent
+  );
 }
 </style>

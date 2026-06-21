@@ -1,8 +1,8 @@
 <template>
-  <section id="pricing" :style="{position:'relative',overflow:'hidden',padding:'96px 24px 80px',background:'linear-gradient(to bottom, #080810 0%, #0d0b1e 25%, #0f0c22 100%)'}">
+  <section id="pricing" :style="{position:'relative',overflow:'hidden',padding:'96px 24px 80px',background: theme.dark ? 'linear-gradient(to bottom, #080810 0%, #0d0b1e 25%, #0f0c22 100%)' : 'var(--bg)'}">
 
     <!-- Top fade — blends with the section above -->
-    <div style="position:absolute;top:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,#080810 0%,transparent 100%);z-index:2;pointer-events:none"></div>
+    <div :style="{position:'absolute',top:0,left:0,right:0,height:'180px',background: theme.dark ? 'linear-gradient(to bottom,#080810 0%,transparent 100%)' : 'linear-gradient(to bottom,var(--bg) 0%,transparent 100%)',zIndex:2,pointerEvents:'none'}"></div>
 
     <!-- Background grid + glow orbs -->
     <div style="position:absolute;inset:0;pointer-events:none;z-index:0">
@@ -15,7 +15,7 @@
       <!-- Soft ambient bottom -->
       <div style="position:absolute;left:20%;right:20%;bottom:0;height:300px;background:radial-gradient(circle at 50% 100%, rgba(109,78,232,0.12) 0%, transparent 70%)"></div>
       <!-- Bottom fade — bridge to FAQ -->
-      <div style="position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to bottom,transparent,#0a0814);pointer-events:none;z-index:3"></div>
+      <div :style="{position:'absolute',bottom:0,left:0,right:0,height:'220px',background: theme.dark ? 'linear-gradient(to bottom,transparent,#0a0814)' : 'linear-gradient(to bottom,transparent,var(--bg))',pointerEvents:'none',zIndex:3}"></div>
       <!-- Sparkles canvas -->
       <canvas ref="sparklesCanvas" style="position:absolute;inset:0;width:100%;height:100%;mask-image:radial-gradient(50% 50% at 50% 0%, white, transparent 85%);opacity:0.5"></canvas>
     </div>
@@ -26,23 +26,23 @@
         <span style="width:6px;height:6px;border-radius:50%;background:#6D4EE8;display:inline-block"></span>
         <span style="font-size:11px;font-weight:600;color:rgba(109,78,232,0.9);letter-spacing:0.1em;text-transform:uppercase">Pricing</span>
       </div>
-      <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#fff;letter-spacing:-0.04em;margin:0 0 12px">
+      <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--text);letter-spacing:-0.04em;margin:0 0 12px">
         Plans that work best for you
       </h2>
-      <p style="color:rgba(255,255,255,0.4);font-size:1.05rem;margin:0 0 28px">
+      <p style="color:var(--text-muted);font-size:1.05rem;margin:0 0 28px">
         Start free. Scale when you're ready. Cancel anytime.
       </p>
 
       <!-- Toggle -->
       <div style="display:flex;justify-content:center">
-        <div style="position:relative;display:flex;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:4px">
+        <div :style="{position:'relative',display:'flex',background:'var(--pill-bg)',border:'1px solid var(--border)',borderRadius:'999px',padding:'4px'}">
           <button @click="isYearly=false"
-            :style="{position:'relative',zIndex:2,padding:'8px 24px',borderRadius:'999px',border:'none',fontFamily:'Inter,sans-serif',fontSize:'13px',fontWeight:600,cursor:'pointer',transition:'color 0.2s',color:!isYearly?'#fff':'rgba(255,255,255,0.45)',background:'none'}">
+            :style="{position:'relative',zIndex:2,padding:'8px 24px',borderRadius:'999px',border:'none',fontFamily:'Inter,sans-serif',fontSize:'13px',fontWeight:600,cursor:'pointer',transition:'color 0.2s',color:!isYearly?'#fff':'var(--text-muted)',background:'none'}">
             <span v-if="!isYearly" style="position:absolute;inset:0;border-radius:999px;background:linear-gradient(135deg,#5940D1,#6D4EE8);box-shadow:0 0 18px rgba(109,78,232,0.5);z-index:-1"></span>
             Monthly
           </button>
           <button @click="isYearly=true"
-            :style="{position:'relative',zIndex:2,padding:'8px 24px',borderRadius:'999px',border:'none',fontFamily:'Inter,sans-serif',fontSize:'13px',fontWeight:600,cursor:'pointer',transition:'color 0.2s',color:isYearly?'#fff':'rgba(255,255,255,0.45)',background:'none'}">
+            :style="{position:'relative',zIndex:2,padding:'8px 24px',borderRadius:'999px',border:'none',fontFamily:'Inter,sans-serif',fontSize:'13px',fontWeight:600,cursor:'pointer',transition:'color 0.2s',color:isYearly?'#fff':'var(--text-muted)',background:'none'}">
             <span v-if="isYearly" style="position:absolute;inset:0;border-radius:999px;background:linear-gradient(135deg,#5940D1,#6D4EE8);box-shadow:0 0 18px rgba(109,78,232,0.5);z-index:-1"></span>
             <span style="display:flex;align-items:center;gap:6px">
               Yearly
@@ -61,8 +61,8 @@
           borderRadius:'20px',
           background: plan.popular
             ? 'linear-gradient(135deg, rgba(109,78,232,0.18) 0%, rgba(89,64,209,0.1) 50%, rgba(109,78,232,0.08) 100%)'
-            : 'rgba(255,255,255,0.025)',
-          border: plan.popular ? '1.5px solid rgba(109,78,232,0.5)' : '1px solid rgba(255,255,255,0.07)',
+            : 'var(--card-bg)',
+          border: plan.popular ? '1.5px solid rgba(109,78,232,0.5)' : '1px solid var(--border)',
           padding:'32px',
           position:'relative',
           transform: plan.popular ? 'translateY(-10px)' : 'none',
@@ -87,15 +87,15 @@
         </div>
 
         <!-- Plan name -->
-        <h3 :style="{fontSize:'26px',fontWeight:700,color:'#fff',margin:'0 0 8px',letterSpacing:'-0.02em'}">{{ plan.name }}</h3>
-        <p style="font-size:13px;color:rgba(255,255,255,0.4);margin:0 0 20px;line-height:1.5">{{ plan.description }}</p>
+        <h3 :style="{fontSize:'26px',fontWeight:700,color:'var(--text)',margin:'0 0 8px',letterSpacing:'-0.02em'}">{{ plan.name }}</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 20px;line-height:1.5">{{ plan.description }}</p>
 
         <!-- Price -->
         <div style="display:flex;align-items:baseline;gap:2px;margin-bottom:4px">
-          <span style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-0.04em">
+          <span style="font-size:36px;font-weight:800;color:var(--text);letter-spacing:-0.04em">
             $<NumberFlow :value="isYearly ? plan.yearlyPrice : plan.price" :format="{style:'decimal'}" style="display:inline" />
           </span>
-          <span style="font-size:13px;color:rgba(255,255,255,0.3);margin-left:4px">/{{ isYearly ? 'year' : 'month' }}</span>
+          <span style="font-size:13px;color:var(--text-dim);margin-left:4px">/{{ isYearly ? 'year' : 'month' }}</span>
         </div>
         <p v-if="isYearly && plan.price > 0" style="font-size:11px;color:rgba(167,139,250,0.8);margin:0 0 24px;font-weight:600">
           Save ${{ plan.price * 12 - plan.yearlyPrice }}/year
@@ -110,21 +110,21 @@
             marginBottom:'24px', transition:'all 0.15s',
             background: plan.popular
               ? 'linear-gradient(135deg, #5940D1, #6D4EE8)'
-              : 'rgba(255,255,255,0.06)',
-            color:'#fff',
-            border: plan.popular ? '1px solid rgba(109,78,232,0.6)' : '1px solid rgba(255,255,255,0.1)',
+              : 'var(--pill-bg)',
+            color: plan.popular ? '#fff' : 'var(--text)',
+            border: plan.popular ? '1px solid rgba(109,78,232,0.6)' : '1px solid var(--border)',
             boxShadow: plan.popular ? '0 4px 20px rgba(109,78,232,0.4)' : 'none'
           }">
           {{ plan.buttonText }}
         </RouterLink>
 
         <!-- Features -->
-        <div :style="{borderTop:'1px solid rgba(255,255,255,0.07)',paddingTop:'20px'}">
-          <p style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">{{ plan.includes[0] }}</p>
+        <div :style="{borderTop:'1px solid var(--border)',paddingTop:'20px'}">
+          <p style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin:0 0 12px">{{ plan.includes[0] }}</p>
           <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px">
             <li v-for="(f, fi) in plan.includes.slice(1)" :key="fi" style="display:flex;align-items:center;gap:10px">
               <span style="width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#6D4EE8,#A78BFA);flex-shrink:0;box-shadow:0 0 6px rgba(109,78,232,0.4)"></span>
-              <span style="font-size:13px;color:rgba(255,255,255,0.5)">{{ f }}</span>
+              <span style="font-size:13px;color:var(--text-muted)">{{ f }}</span>
             </li>
           </ul>
         </div>
@@ -137,7 +137,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import NumberFlow from '@number-flow/vue'
+import { useThemeStore } from '@/stores/theme'
 
+const theme = useThemeStore()
 const isYearly = ref(false)
 const sparklesCanvas = ref(null)
 const sectionVisible = ref(false)
