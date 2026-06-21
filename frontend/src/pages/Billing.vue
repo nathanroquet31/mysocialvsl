@@ -325,27 +325,27 @@
     <Teleport to="body">
       <div v-if="agencyConfirm" @click.self="cancelAgency"
         style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px">
-        <div style="background:#13101f;border:1px solid rgba(255,255,255,0.1);border-radius:18px;max-width:400px;width:100%;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,0.6);font-family:Inter,sans-serif">
-          <h3 style="font-size:17px;font-weight:800;color:#fff;margin:0 0 6px">{{ agencyConfirm.isUpdate ? 'Update your Agency plan' : 'Confirm Agency plan' }}</h3>
-          <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:0 0 18px;line-height:1.5">Review your new plan before confirming.</p>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;max-width:400px;width:100%;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,0.4);font-family:Inter,sans-serif">
+          <h3 style="font-size:17px;font-weight:800;color:var(--text);margin:0 0 6px">{{ agencyConfirm.isUpdate ? 'Update your Agency plan' : 'Confirm Agency plan' }}</h3>
+          <p style="font-size:13px;color:var(--text-muted);margin:0 0 18px;line-height:1.5">Review your new plan before confirming.</p>
 
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:16px">
+          <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Landing pages</span>
-              <span style="font-size:14px;font-weight:700;color:#fff">{{ agencyConfirm.pages === Infinity ? '∞' : agencyConfirm.pages }}</span>
+              <span style="font-size:13px;color:var(--text2)">Landing pages</span>
+              <span style="font-size:14px;font-weight:700;color:var(--text)">{{ agencyConfirm.pages === Infinity ? '∞' : agencyConfirm.pages }}</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Direct links</span>
-              <span style="font-size:14px;font-weight:700;color:#fff">{{ agencyConfirm.links === Infinity ? '∞' : agencyConfirm.links }}</span>
+              <span style="font-size:13px;color:var(--text2)">Direct links</span>
+              <span style="font-size:14px;font-weight:700;color:var(--text)">{{ agencyConfirm.links === Infinity ? '∞' : agencyConfirm.links }}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
-              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Price</span>
-              <span style="font-size:18px;font-weight:800;color:#fff">${{ agencyConfirm.price }}<span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.5)">/mo</span></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border)">
+              <span style="font-size:13px;color:var(--text2)">Price</span>
+              <span style="font-size:18px;font-weight:800;color:var(--text)">${{ agencyConfirm.price }}<span style="font-size:12px;font-weight:500;color:var(--text-muted)">/mo</span></span>
             </div>
 
             <!-- Exact prorated amount charged right now (in-place updates only) -->
-            <div v-if="agencyConfirm.isUpdate" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
-              <span style="font-size:13px;color:rgba(255,255,255,0.6)">Charged now <span style="font-size:11px;color:rgba(255,255,255,0.4)">(pro rata)</span></span>
+            <div v-if="agencyConfirm.isUpdate" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+              <span style="font-size:13px;color:var(--text2)">Charged now <span style="font-size:11px;color:var(--text-muted)">(pro rata)</span></span>
               <span style="font-size:16px;font-weight:800;color:#A78BFA">
                 <template v-if="agencyPreview && agencyPreview.loading">…</template>
                 <template v-else-if="agencyPreview && agencyPreview.amount != null">${{ agencyPreview.amount.toFixed(2) }}</template>
@@ -356,18 +356,18 @@
 
           <div style="display:flex;gap:8px;align-items:flex-start;background:rgba(109,78,232,0.1);border:1px solid rgba(109,78,232,0.25);border-radius:10px;padding:11px 13px;margin-bottom:18px">
             <i class="bi bi-info-circle" style="color:#A78BFA;font-size:14px;margin-top:1px"></i>
-            <p style="font-size:12px;color:rgba(255,255,255,0.7);margin:0;line-height:1.5">
+            <p style="font-size:12px;color:var(--text2);margin:0;line-height:1.5">
               {{ agencyConfirm.isUpdate
                 ? 'The prorated difference for the rest of this billing period is charged to your saved card now. If the payment fails, your plan stays unchanged.'
                 : 'You\'ll be redirected to Stripe to enter your card and pay.' }}
             </p>
           </div>
 
-          <p v-if="agencyError" style="font-size:12px;color:#F87171;margin:0 0 14px;text-align:center;line-height:1.5">{{ agencyError }}</p>
+          <p v-if="agencyError" style="font-size:12px;color:#EF4444;margin:0 0 14px;text-align:center;line-height:1.5">{{ agencyError }}</p>
 
           <div style="display:flex;gap:10px">
             <button @click="cancelAgency" :disabled="checkoutLoading==='agency-custom'"
-              style="flex:1;padding:11px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:rgba(255,255,255,0.8);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">
+              style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">
               Cancel
             </button>
             <button @click="proceedAgency" :disabled="checkoutLoading==='agency-custom'"
