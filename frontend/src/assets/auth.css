@@ -138,3 +138,36 @@
 }
 .auth-foot a { color: #A78BFA; font-weight: 600; text-decoration: none; }
 .auth-foot a:hover { color: #C4B5FD; }
+
+/* ============ Light theme ============ */
+/* The store sets data-theme="light" on <html>; scoped rules still match it as an ancestor. */
+[data-theme="light"] .auth-root { background: #F7F7FB; }
+[data-theme="light"] .auth-card {
+  background: #ffffff;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 20px 50px rgba(17, 24, 39, 0.10);
+}
+[data-theme="light"] .brand-name { color: #111827; }
+[data-theme="light"] .auth-head h2 { color: #111827; }
+[data-theme="light"] .auth-head p { color: #6B7280; }
+
+[data-theme="light"] .field-input { color: #111827 !important; border-bottom-color: #D1D5DB !important; }
+[data-theme="light"] .field-input:focus { border-bottom-color: #7C3AED !important; }
+[data-theme="light"] .field-label { color: #6B7280; }
+[data-theme="light"] .field-input:focus + .field-label,
+[data-theme="light"] .field-input:not(:placeholder-shown) + .field-label { color: #7C3AED; }
+
+[data-theme="light"] .auth-error { background: #FEF2F2; border-color: #FECACA; color: #B91C1C; }
+[data-theme="light"] .auth-success { background: #ECFDF5; border-color: #A7F3D0; color: #047857; }
+
+[data-theme="light"] .auth-row a { color: #9CA3AF; }
+[data-theme="light"] .auth-row a:hover { color: #111827; }
+[data-theme="light"] .auth-foot { color: #6B7280; }
+[data-theme="light"] .auth-foot a { color: #7C3AED; }
+[data-theme="light"] .auth-foot a:hover { color: #6D4EE8; }
+
+/* Inline link (e.g. "Forgot password?") — readable on both themes. */
+.auth-link { font-size: 12px; color: #A78BFA; text-decoration: none; }
+.auth-link:hover { color: #C4B5FD; }
+[data-theme="light"] .auth-link { color: #7C3AED; }
+[data-theme="light"] .auth-link:hover { color: #6D4EE8; }

@@ -172,10 +172,9 @@
             <i class="bi bi-credit-card" style="font-size:14px"></i>
             Billing
           </RouterLink>
-          <div v-if="false" :style="{height:'1px',background:border}"></div>
-          <!-- Dark mode toggle row — hidden for V1 (dark-only). Remove v-if when light mode is finished. -->
+          <div :style="{height:'1px',background:border}"></div>
+          <!-- Light / dark mode toggle -->
           <div
-            v-if="false"
             :style="{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 14px',cursor:'pointer'}"
             @click="theme.toggle()"
             @mouseenter="e => e.currentTarget.style.background=hoverBg"

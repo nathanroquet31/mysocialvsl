@@ -2,14 +2,12 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
 export const useThemeStore = defineStore('theme', () => {
-  // V1 is dark-only until light mode is finished (see project_v1_roadmap).
-  // To restore the toggle later: const dark = ref(localStorage.getItem('theme') !== 'light')
-  const dark = ref(true)
+  // Light is the default (cleaner, sells better); the user's choice is persisted.
+  const saved = localStorage.getItem('theme')
+  const dark = ref(saved === 'dark')
 
   function toggle() {
     dark.value = !dark.value
-    localStorage.setItem('theme', dark.value ? 'dark' : 'light')
-    apply()
   }
 
   function apply() {
@@ -52,6 +50,14 @@ export const useThemeStore = defineStore('theme', () => {
       root.setAttribute('data-theme', 'light')
     }
   }
+
+  // Persist + re-apply on every change, and apply once on store init so the
+  // CSS variables are set on first paint.
+  watch(dark, (v) => {
+    localStorage.setItem('theme', v ? 'dark' : 'light')
+    apply()
+  })
+  apply()
 
   return { dark, toggle, apply }
 })

@@ -144,4 +144,8 @@ onBeforeUnmount(() => {
 .smokey-bg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
 .smokey-canvas { width: 100%; height: 100%; display: block; }
 .smokey-blur { position: absolute; inset: 0; }
+
+/* Light theme: the shader's base is opaque black, so fade it to a faint violet
+   shimmer and let the light page background show through. */
+[data-theme="light"] .smokey-canvas { opacity: 0.13; }
 </style>

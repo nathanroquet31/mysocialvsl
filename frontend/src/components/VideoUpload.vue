@@ -9,14 +9,14 @@
       :style="{
         border: '2px dashed', borderRadius: '16px', padding: '52px 24px',
         textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s',
-        borderColor: dragging ? '#6D4EE8' : 'rgba(255,255,255,0.15)',
-        background: dragging ? 'rgba(109,78,232,0.08)' : 'rgba(255,255,255,0.03)',
+        borderColor: dragging ? '#6D4EE8' : 'var(--input-border)',
+        background: dragging ? 'rgba(109,78,232,0.08)' : 'var(--card-bg)',
       }">
       <div style="width:64px;height:64px;background:rgba(109,78,232,0.15);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       </div>
-      <p style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px">Drop your video here</p>
-      <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:20px">MP4 (H.264) or WebM — max 100MB · 45s recommended</p>
+      <p style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Drop your video here</p>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">MP4 (H.264) or WebM — max 100MB · 45s recommended</p>
       <div style="display:inline-flex;align-items:center;gap:8px;background:#6D4EE8;color:#fff;padding:11px 24px;border-radius:10px;font-size:13px;font-weight:700">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Choose a file

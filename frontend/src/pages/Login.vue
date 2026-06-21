@@ -31,7 +31,7 @@
         </div>
 
         <div style="text-align:right;margin-top:-16px">
-          <RouterLink to="/forgot-password" style="font-size:12px;color:#A78BFA;text-decoration:none">Forgot password?</RouterLink>
+          <RouterLink to="/forgot-password" class="auth-link">Forgot password?</RouterLink>
         </div>
 
         <button type="submit" :disabled="loading" class="auth-submit">
