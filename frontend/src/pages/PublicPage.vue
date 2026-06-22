@@ -251,8 +251,8 @@
         </div>
 
         <div style="padding:18px 20px 22px">
-          <!-- Name (fallback if no image) -->
-          <p v-if="!page.popup_image_url && page.model_name" style="font-size:18px;font-weight:800;color:#fff;margin:0 0 10px">{{ page.model_name }}</p>
+          <!-- Title: the manager's custom popup title, falling back to the model name -->
+          <p v-if="!page.popup_image_url && (page.popup_title || page.model_name)" style="font-size:18px;font-weight:800;color:#fff;margin:0 0 10px">{{ page.popup_title || page.model_name }}</p>
 
           <!-- "Incoming DM" framing: online + animated typing indicator -->
           <div v-if="page.online_status" style="display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap">
@@ -266,8 +266,8 @@
             </span>
           </div>
 
-          <!-- Text -->
-          <p v-if="page.popup_text" style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.55;margin:0 0 16px">{{ page.popup_text }}</p>
+          <!-- Subtitle/text: custom popup subtitle, falling back to legacy popup_text -->
+          <p v-if="page.popup_subtitle || page.popup_text" style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.55;margin:0 0 16px">{{ page.popup_subtitle || page.popup_text }}</p>
 
           <!-- CTA bounce + arrow -->
           <button v-if="primaryLink" @click="handleLinkClick(primaryLink); popupVisible = false"

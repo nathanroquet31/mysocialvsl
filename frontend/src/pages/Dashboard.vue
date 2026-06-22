@@ -556,6 +556,11 @@ async function duplicatePage(page) {
       card_position: page.card_position,
       vsl_enabled:   page.vsl_enabled,
       vsl_position:  page.vsl_position,
+      popup_title:    page.popup_title,
+      popup_subtitle: page.popup_subtitle,
+      popup_text:     page.popup_text,
+      popup_image_url: page.popup_image_url,
+      popup_delay_seconds: page.popup_delay_seconds,
       // The actual fix: the CTA + extra links live in the links relation, not on
       // the page row. The old duplicate dropped them, so the copy had nothing to
       // redirect to. Carry them over.

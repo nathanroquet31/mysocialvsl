@@ -768,11 +768,11 @@
                 <div>
                   <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Appearance delay</label>
                   <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
-                    <input v-model.number="form.popup_delay" type="range" min="0" max="60" step="1"
+                    <input v-model.number="form.popup_delay" type="range" min="1" max="45" step="1"
                       :style="{flex:1,accentColor:'#F59E0B'}" />
                     <span :style="{fontSize:'14px',fontWeight:700,color:C.text,width:'50px',textAlign:'right'}">{{ form.popup_delay }}s</span>
                   </div>
-                  <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'4px'}">0 = appears immediately when the page opens</p>
+                  <p :style="{fontSize:'11px',color:C.textFaint,marginTop:'4px'}">The first few seconds convert best — 3s is the sweet spot.</p>
                 </div>
                 <div>
                   <label :style="{display:'block',fontSize:'12px',fontWeight:600,color:C.text2,marginBottom:'6px',textTransform:'uppercase',letterSpacing:'0.07em'}">Popup title</label>
@@ -1237,7 +1237,7 @@ const form = ref({
   extra_links:      [] as Array<{ type?: string; label: string; url: string; color: string }>,
   popup_title:      'Join me in private 🔥',
   popup_subtitle:   'Contenu exclusif disponible maintenant',
-  popup_delay:      5,
+  popup_delay:      3,
 })
 
 const bandeauPlatforms = [
@@ -1312,7 +1312,7 @@ async function loadPageForEdit() {
     form.value.extra_links      = extraLinks
     form.value.popup_title      = data.popup_title    || 'Join me in private 🔥'
     form.value.popup_subtitle   = data.popup_subtitle || 'Contenu exclusif disponible maintenant'
-    form.value.popup_delay      = data.popup_delay_seconds ?? 5
+    form.value.popup_delay      = data.popup_delay_seconds ?? 3
 
     // skip type-selection sub-step, go straight to infos
     setupSubStep.value = 1
@@ -1385,9 +1385,9 @@ async function save() {
       deep_link_enabled:  form.value.deep_link_enabled,
       strict_deep_link:   form.value.strict_deep_link,
       bot_protection:     form.value.bot_protection,
-      popup_title:        form.value.popup_title || undefined,
-      popup_subtitle:     form.value.popup_subtitle || undefined,
-      popup_delay:        form.value.popup_delay || undefined,
+      popup_title:         form.value.popup_title || undefined,
+      popup_subtitle:      form.value.popup_subtitle || undefined,
+      popup_delay_seconds: form.value.popup_delay,
       is_active:     true,
       links: [
         ...(form.value.cta_url ? [{

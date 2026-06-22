@@ -62,6 +62,11 @@ class PageController extends Controller
             'meta_description' => 'nullable|string|max:300',
             'og_image_url'  => 'nullable|url:http,https',
             'utm_passthrough' => 'boolean',
+            'popup_title'    => 'nullable|string|max:120',
+            'popup_subtitle' => 'nullable|string|max:255',
+            'popup_text'     => 'nullable|string|max:500',
+            'popup_image_url'=> 'nullable|url:http,https',
+            'popup_delay_seconds' => 'nullable|integer|min:1|max:45',
             'links'         => 'nullable|array',
             'links.*.type'  => 'required|string|max:50',
             'links.*.label' => 'nullable|string|max:100',
@@ -151,6 +156,11 @@ class PageController extends Controller
             'meta_description' => $request->meta_description,
             'og_image_url'  => $request->og_image_url,
             'utm_passthrough' => $request->utm_passthrough ?? true,
+            'popup_title'         => $request->popup_title,
+            'popup_subtitle'      => $request->popup_subtitle,
+            'popup_text'          => $request->popup_text,
+            'popup_image_url'     => $request->popup_image_url,
+            'popup_delay_seconds' => $request->popup_delay_seconds ?? 5,
         ]);
 
         foreach ($request->links ?? [] as $i => $link) {
@@ -234,6 +244,11 @@ class PageController extends Controller
             'meta_description' => 'nullable|string|max:300',
             'og_image_url'  => 'nullable|url:http,https',
             'utm_passthrough' => 'boolean',
+            'popup_title'    => 'nullable|string|max:120',
+            'popup_subtitle' => 'nullable|string|max:255',
+            'popup_text'     => 'nullable|string|max:500',
+            'popup_image_url'=> 'nullable|url:http,https',
+            'popup_delay_seconds' => 'nullable|integer|min:1|max:45',
             'links'         => 'nullable|array',
             'links.*.type'  => 'required|string|max:50',
             'links.*.label' => 'nullable|string|max:100',
@@ -257,6 +272,7 @@ class PageController extends Controller
             'vsl_enabled', 'vsl_position',
             'fomo_enabled', 'fomo_title', 'fomo_message', 'fomo_cta_label', 'fomo_delay_seconds',
             'meta_title', 'meta_description', 'og_image_url', 'utm_passthrough',
+            'popup_title', 'popup_subtitle', 'popup_text', 'popup_image_url', 'popup_delay_seconds',
         ]));
 
         if ($request->has('links')) {

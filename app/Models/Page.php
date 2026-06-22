@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'video_fit', 'overlay_opacity', 'card_position',
     'vsl_enabled', 'vsl_position', 'cta_reveal_at',
     'fomo_enabled', 'fomo_title', 'fomo_message', 'fomo_cta_label', 'fomo_delay_seconds',
-    'popup_delay_seconds', 'popup_image_url', 'popup_text',
+    'popup_delay_seconds', 'popup_image_url', 'popup_text', 'popup_title', 'popup_subtitle',
     'meta_title', 'meta_description', 'og_image_url', 'utm_passthrough',
 ])]
 class Page extends Model
