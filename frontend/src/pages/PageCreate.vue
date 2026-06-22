@@ -630,6 +630,73 @@
             <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">The video that sells. Upload it vertical (9:16) for a perfect look.</p>
 
             <VideoUpload v-model="form.video_url" @uploading="uploadingVideo = $event" />
+
+            <!-- ── "How to film a VSL that converts" walkthrough (manager-facing helper) ── -->
+            <div :style="{marginTop:'24px',background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'14px',overflow:'hidden'}">
+              <!-- Header (click to fold) -->
+              <div @click="guideOpen = !guideOpen"
+                :style="{display:'flex',alignItems:'center',gap:'10px',padding:'14px 18px',cursor:'pointer',userSelect:'none'}">
+                <div :style="{width:'28px',height:'28px',borderRadius:'8px',background:'rgba(109,78,232,0.14)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}">
+                  <i class="bi bi-camera-reels" style="color:#A78BFA;font-size:14px"></i>
+                </div>
+                <div :style="{flex:1,minWidth:0}">
+                  <p :style="{fontSize:'13px',fontWeight:700,color:C.text,margin:0}">Not sure what to film?</p>
+                  <p :style="{fontSize:'11px',color:C.textDim,margin:'2px 0 0'}">A 30-second guide to a VSL that converts.</p>
+                </div>
+                <i class="bi bi-chevron-down" :style="{color:C.textMuted,fontSize:'13px',transition:'transform 0.2s',transform:guideOpen?'rotate(180deg)':'none'}"></i>
+              </div>
+
+              <!-- Body -->
+              <div v-if="guideOpen" :style="{padding:'0 18px 18px'}">
+                <!-- Tabs -->
+                <div :style="{display:'flex',gap:'6px',marginBottom:'16px'}">
+                  <div v-for="(t,i) in ['① The right format','② Starter script','③ Ask your model']" :key="i"
+                    @click="guideStep = i"
+                    :style="{flex:1,textAlign:'center',padding:'8px 6px',borderRadius:'9px',fontSize:'11px',fontWeight:600,cursor:'pointer',transition:'all 0.15s',
+                      background: guideStep===i ? '#6D4EE8' : C.pillBg,
+                      color: guideStep===i ? '#fff' : C.pillText}">{{ t }}</div>
+                </div>
+
+                <!-- ① The right format -->
+                <div v-if="guideStep===0" :style="{display:'flex',flexDirection:'column',gap:'9px'}">
+                  <div v-for="tip in ['Shoot vertical (9:16) — full-screen, portrait.','Hook in the first 3 seconds: her face + a teasing line.','Keep it short — 15 to 40 seconds is the sweet spot.','Tease, never show everything — curiosity is what makes them click.','End by saying it out loud: “tap the button below”.']" :key="tip"
+                    :style="{display:'flex',gap:'8px',fontSize:'12.5px',color:C.text2,lineHeight:1.5}">
+                    <i class="bi bi-check-circle-fill" style="color:#A78BFA;font-size:12px;margin-top:3px;flex-shrink:0"></i>
+                    <span>{{ tip }}</span>
+                  </div>
+                </div>
+
+                <!-- ② Starter script -->
+                <div v-else-if="guideStep===1">
+                  <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'10px',lineHeight:1.5}">A starter script to hand to your model — adapt it to her voice.</p>
+                  <div :style="{background:C.bg,border:`1px solid ${C.border}`,borderRadius:'10px',padding:'14px',fontSize:'12.5px',color:C.text2,lineHeight:1.6,whiteSpace:'pre-line'}">{{ guideScript }}</div>
+                  <button @click="copyGuideScript"
+                    :style="{marginTop:'10px',display:'inline-flex',alignItems:'center',gap:'6px',padding:'8px 16px',borderRadius:'9px',border:'none',background:'#6D4EE8',color:'#fff',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}">
+                    <i :class="copiedScript ? 'bi bi-check2' : 'bi bi-clipboard'" style="font-size:13px"></i>
+                    {{ copiedScript ? 'Copied!' : 'Copy script' }}
+                  </button>
+                </div>
+
+                <!-- ③ Ask your model -->
+                <div v-else :style="{display:'flex',flexDirection:'column',gap:'9px'}">
+                  <div v-for="ask in ['A 10–20s selfie-style clip, filmed vertical.','Good lighting + eye contact straight into the camera.','She says the hook AND the call-to-action out loud.','A few seconds of b-roll you can cut to (optional).','Re-record until the first 3 seconds truly grab attention.']" :key="ask"
+                    :style="{display:'flex',gap:'8px',fontSize:'12.5px',color:C.text2,lineHeight:1.5}">
+                    <i class="bi bi-arrow-right-short" style="color:#A78BFA;font-size:16px;flex-shrink:0"></i>
+                    <span>{{ ask }}</span>
+                  </div>
+                </div>
+
+                <!-- Nav -->
+                <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'16px'}">
+                  <button v-if="guideStep>0" @click="guideStep--"
+                    :style="{padding:'7px 14px',borderRadius:'8px',border:`1px solid ${C.border}`,background:'transparent',color:C.text2,fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}">← Back</button>
+                  <span v-else></span>
+                  <button v-if="guideStep<2" @click="guideStep++"
+                    :style="{padding:'7px 14px',borderRadius:'8px',border:'none',background:C.pillBg,color:C.text,fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}">Next →</button>
+                  <RouterLink v-else to="/dashboard/guide" :style="{fontSize:'12px',color:'#A78BFA',fontWeight:600,textDecoration:'none'}">See the full guide →</RouterLink>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- ===== STEP 4 — CTA ===== -->
@@ -984,7 +1051,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import api from '@/lib/axios'
 import VideoUpload from '@/components/VideoUpload.vue'
@@ -1068,6 +1135,28 @@ const setupSubStep = ref(0) // 0=type, 1=infos
 const showAdvanced = ref(false)
 const advancedTab  = ref(0) // 0=deeplink, 1=strict, 2=bot
 const stepDir = ref<'forward' | 'back'>('forward')
+
+// Step-3 "How to film a VSL that converts" walkthrough (manager-facing helper).
+const guideStep = ref(0)               // 0=format, 1=script, 2=checklist
+const guideOpen = ref(true)            // collapses once a video is uploaded
+const copiedScript = ref(false)
+const guideScript = computed(() => {
+  const name = (form.value.model_name || '').trim() || 'babe'
+  return `Hey, it's ${name} 😘\n`
+    + `I post way more than I can show here — the good stuff is on my page.\n`
+    + `If you want to see the rest (and talk to me directly), it's all waiting for you below.\n`
+    + `Tap the button under this video — I'll see you on the other side 🔥`
+})
+function copyGuideScript() {
+  navigator.clipboard.writeText(guideScript.value)
+  copiedScript.value = true
+  setTimeout(() => { copiedScript.value = false }, 2000)
+}
+// Once a video is in, the manager doesn't need the how-to anymore — fold it away
+// (they can still reopen it from the header).
+watch(() => form.value.video_url, (url, prev) => {
+  if (url && !prev) guideOpen.value = false
+})
 
 const steps = computed(() =>
   form.value.page_type === 'direct'
