@@ -74,7 +74,7 @@
             background:btnColor, color:'#fff', fontFamily:'inherit',
           }">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          {{ primaryLink.label || 'Rejoindre' }}
+          {{ primaryLink.label || 'Join' }}
         </button>
 
         <!-- vsl-popup: once the popup has been closed, the bottom CTA behaves like
@@ -91,7 +91,7 @@
             border:'none', cursor:'pointer',
             background:btnColor, color:'#fff', fontFamily:'inherit',
           }">
-          {{ primaryLink.label || 'Rejoindre' }}
+          {{ primaryLink.label || 'Join' }}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
 
@@ -236,7 +236,7 @@
       <div style="position:relative;background:#13101f;border-radius:24px;padding:0;max-width:330px;width:100%;border:1px solid rgba(255,255,255,0.09);box-shadow:0 32px 80px rgba(0,0,0,0.7);overflow:hidden;animation:popup-bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both">
 
         <!-- Discreet close (X) in the corner -->
-        <button @click="popupVisible = false" aria-label="Fermer"
+        <button @click="popupVisible = false" aria-label="Close"
           style="position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:0">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
         </button>
@@ -284,7 +284,7 @@
               boxShadow:`0 6px 24px ${btnColor}66`,
               color:'#fff', fontFamily:'inherit', position:'relative', overflow:'hidden',
             }">
-            {{ primaryLink.label || 'Rejoindre' }}
+            {{ primaryLink.label || 'Join' }}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
 

@@ -796,9 +796,9 @@
               <!-- Extra links (bandeau uniquement) -->
               <div v-if="form.template === 'vsl-bandeau'">
                 <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'4px'}">
-                  Liens du bandeau
+                  Banner links
                 </label>
-                <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px'}">Ces liens apparaissent dans le tiroir qui s'ouvre depuis le bas.</p>
+                <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px'}">These links show up in the drawer that slides up from the bottom.</p>
 
                 <!-- Quick-add platforms — iOS-style square icons -->
                 <div :style="{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'16px'}">
@@ -953,7 +953,7 @@
                       <!-- Title -->
                       <p :style="{fontSize:'8px',fontWeight:800,color:'#fff',margin:'0 0 3px',letterSpacing:'-0.2px',lineHeight:1.3}">{{ form.popup_title || 'Join me in private 🔥' }}</p>
                       <!-- Subtitle -->
-                      <p :style="{fontSize:'6.5px',color:'rgba(255,255,255,0.45)',margin:'0 0 10px',lineHeight:1.5}">{{ form.popup_subtitle || 'Contenu exclusif disponible maintenant' }}</p>
+                      <p :style="{fontSize:'6.5px',color:'rgba(255,255,255,0.45)',margin:'0 0 10px',lineHeight:1.5}">{{ form.popup_subtitle || 'Exclusive content available now' }}</p>
                       <!-- CTA -->
                       <div :style="{padding:'7px 8px',borderRadius:'7px',background:form.btn_color,fontSize:'7px',fontWeight:800,color:'#fff',boxShadow:`0 4px 14px ${form.btn_color}55`,letterSpacing:'0.02em'}">
                         {{ form.btn_label || '🔓 My OnlyFans — Private access' }}
@@ -967,7 +967,7 @@
                   <div :style="{position:'absolute',bottom:0,left:0,right:0,padding:'48px 10px 12px',background:'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%)',zIndex:5,opacity:form.template==='vsl-popup'?0.3:1}">
                     <!-- Creator info -->
                     <div :style="{marginBottom:'8px'}">
-                      <p :style="{fontSize:'11px',fontWeight:700,color:'#fff',letterSpacing:'-0.2px',textShadow:'0 1px 6px rgba(0,0,0,0.6)'}">{{ form.model_name || 'Ton nom' }}</p>
+                      <p :style="{fontSize:'11px',fontWeight:700,color:'#fff',letterSpacing:'-0.2px',textShadow:'0 1px 6px rgba(0,0,0,0.6)'}">{{ form.model_name || 'Your name' }}</p>
                       <p :style="{fontSize:'8px',color:'rgba(255,255,255,0.62)',textShadow:'0 1px 4px rgba(0,0,0,0.6)'}">@{{ form.model_handle || 'handle' }}</p>
                     </div>
 
@@ -975,7 +975,7 @@
                     <div v-if="form.template === 'vsl-bandeau'"
                       :style="{display:'flex',flexDirection:'column',alignItems:'center',gap:'3px',paddingBottom:'4px',cursor:'pointer'}">
                       <div :style="{width:'20px',height:'2px',background:'rgba(255,255,255,0.3)',borderRadius:'999px'}"></div>
-                      <span :style="{fontSize:'6px',color:'rgba(255,255,255,0.4)',fontWeight:600}">{{ form.extra_links.length > 0 ? `+${form.extra_links.length} liens` : 'Bandeau' }}</span>
+                      <span :style="{fontSize:'6px',color:'rgba(255,255,255,0.4)',fontWeight:600}">{{ form.extra_links.length > 0 ? `+${form.extra_links.length} links` : 'Banner' }}</span>
                     </div>
 
                     <!-- CTA button with bounce animation (hidden in popup mode) -->
@@ -1036,7 +1036,7 @@
           :title="uploadingVideo ? 'Wait for the video upload to finish' : !isStepValid ? 'Fill in the required fields' : ''">
           <i v-if="uploadingVideo" class="bi bi-hourglass-split" style="animation:spin 1s linear infinite"></i>
           <template v-else-if="!isLastAction">
-            Continuer
+            Continue
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5l7 7-7 7"/></svg>
           </template>
           <template v-else>
@@ -1236,7 +1236,7 @@ const form = ref({
   cta_reveal_at:    null as number | null,
   extra_links:      [] as Array<{ type?: string; label: string; url: string; color: string }>,
   popup_title:      'Join me in private 🔥',
-  popup_subtitle:   'Contenu exclusif disponible maintenant',
+  popup_subtitle:   'Exclusive content available now',
   popup_delay:      3,
 })
 
@@ -1311,13 +1311,13 @@ async function loadPageForEdit() {
     form.value.cta_reveal_at    = data.cta_reveal_at ?? null
     form.value.extra_links      = extraLinks
     form.value.popup_title      = data.popup_title    || 'Join me in private 🔥'
-    form.value.popup_subtitle   = data.popup_subtitle || 'Contenu exclusif disponible maintenant'
+    form.value.popup_subtitle   = data.popup_subtitle || 'Exclusive content available now'
     form.value.popup_delay      = data.popup_delay_seconds ?? 3
 
     // skip type-selection sub-step, go straight to infos
     setupSubStep.value = 1
   } catch {
-    error.value = 'Impossible de charger la page.'
+    error.value = 'Could not load the page.'
   }
 }
 
@@ -1341,7 +1341,7 @@ function nextStep() {
     if (setupSubStep.value === 0) { setupSubStep.value = 1; return }
     if (!form.value.model_name.trim()) { error.value = 'Enter your name or handle.'; return }
     if (form.value.page_type === 'direct' && !form.value.direct_url.trim()) {
-      error.value = 'Entre l\'URL de destination.'; return
+      error.value = 'Enter the destination URL.'; return
     }
     if (form.value.page_type === 'direct') { save(); return }
   }
