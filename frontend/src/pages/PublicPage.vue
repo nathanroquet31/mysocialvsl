@@ -77,8 +77,10 @@
           {{ primaryLink.label || 'Rejoindre' }}
         </button>
 
-        <!-- vsl-popup: reopen button, once the popup is closed (the link stays always accessible) -->
-        <button v-else-if="isPopup && popupShownOnce && !popupVisible && primaryLink" @click="openPopup"
+        <!-- vsl-popup: once the popup has been closed, the bottom CTA behaves like
+             the classic one — it goes straight to the link (age gate → destination)
+             instead of re-opening the popup, so visitors aren't looped back. -->
+        <button v-else-if="isPopup && popupShownOnce && !popupVisible && primaryLink" @click="handleLinkClick(primaryLink)"
           class="btn-bounce cta-appear"
           :style="{
             '--btn-shadow-sm': `0 4px 22px ${btnColor}60`,
