@@ -529,15 +529,48 @@ async function deletePage(id) {
 async function duplicatePage(page) {
   try {
     const { data } = await api.post('/pages', {
-      model_name: page.model_name + ' (copy)',
-      model_handle: page.model_handle,
-      bio: page.bio,
-      video_url: page.video_url,
-      bg_color: page.bg_color,
-      btn_color: page.btn_color,
-      template: page.template,
-      deep_link_enabled: page.deep_link_enabled,
-      age_gate: page.age_gate,
+      model_name:    page.model_name + ' (copy)',
+      model_handle:  page.model_handle,
+      bio:           page.bio,
+      page_type:     page.page_type,
+      direct_url:    page.direct_url,
+      video_url:     page.video_url,
+      avatar_url:    page.avatar_url,
+      bg_image_url:  page.bg_image_url,
+      bg_color:      page.bg_color,
+      btn_color:     page.btn_color,
+      template:      page.template,
+      verified_badge: page.verified_badge,
+      show_avatar:   page.show_avatar,
+      age_gate:      page.age_gate,
+      online_status: page.online_status,
+      location:      page.location,
+      response_time: page.response_time,
+      promo_text:    page.promo_text,
+      bot_protection:       page.bot_protection,
+      deep_link_enabled:    page.deep_link_enabled,
+      strict_deep_link:     page.strict_deep_link,
+      link_preview_enabled: page.link_preview_enabled,
+      video_fit:     page.video_fit,
+      overlay_opacity: page.overlay_opacity,
+      card_position: page.card_position,
+      vsl_enabled:   page.vsl_enabled,
+      vsl_position:  page.vsl_position,
+      // The actual fix: the CTA + extra links live in the links relation, not on
+      // the page row. The old duplicate dropped them, so the copy had nothing to
+      // redirect to. Carry them over.
+      links: (page.links || []).map(l => ({
+        type:      l.type,
+        label:     l.label,
+        title:     l.title,
+        subtitle:  l.subtitle,
+        url:       l.url,
+        icon:      l.icon,
+        image_url: l.image_url,
+        meta:      l.meta,
+        btn_color: l.btn_color,
+        is_visible: l.is_visible,
+      })),
     })
     pages.value.push(data)
     stats.value[data.id] = { page_views: 0, link_clicks: 0, age_confirmed: 0, ctr: 0 }
