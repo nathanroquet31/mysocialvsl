@@ -143,7 +143,22 @@ async function upload(file) {
     // On garde la preview locale à l'écran (même vidéo, déjà en mémoire) :
     // pas de re-téléchargement depuis R2. modelValue porte l'URL réelle pour la sauvegarde.
   } catch (e) {
-    error.value = 'Upload failed. Please try again.'
+    // Surface the real cause instead of a blanket "failed" so prod issues are
+    // diagnosable: 413 = server body limit, 422 = validation, 5xx = storage/R2.
+    const status = e?.response?.status
+    const serverMsg = e?.response?.data?.message
+    if (status === 413) {
+      error.value = 'The server rejected the video as too large. Try a shorter clip or compress it to 720p.'
+    } else if (status === 422) {
+      error.value = serverMsg || 'Video rejected — use an MP4 (H.264) or WebM under 100MB.'
+    } else if (status >= 500) {
+      error.value = 'The server could not store the video (storage error). Please retry in a moment.'
+    } else if (e?.code === 'ERR_NETWORK') {
+      error.value = 'Connection dropped during upload. Check your connection and retry.'
+    } else {
+      error.value = 'Upload failed. Please try again.'
+    }
+    console.error('[VideoUpload] failed', { status, serverMsg, code: e?.code, message: e?.message })
     clearLocalPreview()
   } finally {
     uploading.value = false
