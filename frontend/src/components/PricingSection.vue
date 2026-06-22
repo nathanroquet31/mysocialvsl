@@ -54,7 +54,7 @@
     </div>
 
     <!-- Cards grid -->
-    <div style="position:relative;z-index:10;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:980px;margin:0 auto">
+    <div class="pricing-grid" style="position:relative;z-index:10;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:980px;margin:0 auto">
       <div v-for="(plan, index) in plans" :key="plan.name"
         :class="['pricing-card', {visible: sectionVisible}]"
         :style="{
@@ -286,4 +286,12 @@ onUnmounted(() => {
 .pricing-card:nth-child(1) { transition-delay: 0.05s; }
 .pricing-card:nth-child(2) { transition-delay: 0.17s; }
 .pricing-card:nth-child(3) { transition-delay: 0.29s; }
+
+/* Phones: the 3 plans can't sit side by side, stack them and keep the popular
+   card from floating 10px up so the column reads evenly. */
+@media (max-width: 768px) {
+  .pricing-grid { grid-template-columns: 1fr !important; max-width: 380px !important; }
+  .pricing-card,
+  .pricing-card.visible[style*="translateY(-10px)"] { transform: none !important; }
+}
 </style>

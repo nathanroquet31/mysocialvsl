@@ -129,7 +129,7 @@
 
         <!-- Right — Phone 3D -->
         <div data-aos="fade-left" data-aos-delay="100" style="display:flex;justify-content:center;align-items:center">
-          <div style="transform:scale(0.65);transform-origin:center center">
+          <div class="hero-phone" style="transform:scale(0.65);transform-origin:center center">
             <PhoneDemo
               name="Karine"
               handle="@karinefrenchwoman"
@@ -932,6 +932,10 @@ const socials = [
   .cards-3     { grid-template-columns: 1fr !important; }
   .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
   .footer-brand { grid-column: 1 / -1 !important; }
+
+  /* The phone is scaled to 0.65 but its 320x660 box is still reserved, leaving
+     ~230px of dead space above/below on phones. Pull it back in. */
+  .hero-phone { margin: -110px 0 !important; }
 }
 
 @keyframes drawer-in {
