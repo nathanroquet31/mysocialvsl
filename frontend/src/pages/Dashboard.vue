@@ -417,8 +417,9 @@ const selectedPage = ref(null)
 const copiedLink = ref('')
 
 // "Watch a live example" → opens a real public VSL page that showcases the product.
-// Create a public page with the slug "demo" to back this button.
-const DEMO_VSL_URL = 'https://mysocialvsl.com/p/demo'
+// Points at the live Karine page; keep that page published (don't delete/rename
+// its slug) or this button 404s.
+const DEMO_VSL_URL = 'https://mysocialvsl.com/p/karine-ZSnjk'
 function watchExample() {
   window.open(DEMO_VSL_URL, '_blank')
 }
