@@ -153,7 +153,7 @@
       </div>
       <div style="flex:1;min-width:0">
         <p :style="{fontSize:'13px',fontWeight:700,color:theme.dark?'#c4b5fd':'#5B21B6',margin:'0 0 2px'}">{{ selectedPageInfo.model_name }}</p>
-        <p :style="{fontSize:'12px',color:theme.dark?'rgba(196,181,253,0.7)':'#7C3AED',margin:0,fontFamily:'monospace'}">mysocialvsl.com/{{ selectedPageInfo.slug }}</p>
+        <p :style="{fontSize:'12px',color:theme.dark?'rgba(196,181,253,0.7)':'#7C3AED',margin:0,fontFamily:'monospace'}">mysocialvsl.com/p/{{ selectedPageInfo.slug }}</p>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
         <span :style="{fontSize:'11px',color:theme.dark?'rgba(196,181,253,0.6)':'#7C3AED',fontStyle:'italic'}">Share this link to get data →</span>
@@ -221,7 +221,7 @@
             <div class="adash-tl-avatar">{{ (link.name||'?')[0].toUpperCase() }}</div>
             <div style="flex:1;min-width:0">
               <p :style="{fontSize:'13px',fontWeight:700,color:textPrimary,margin:'0 0 1px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">{{ link.name }}</p>
-              <p :style="{fontSize:'11px',color:textMuted,margin:0,fontFamily:'monospace',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">mysocialvsl.com/{{ link.slug }}</p>
+              <p :style="{fontSize:'11px',color:textMuted,margin:0,fontFamily:'monospace',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">mysocialvsl.com/p/{{ link.slug }}</p>
             </div>
             <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
               <div style="text-align:right">
@@ -441,7 +441,7 @@ const selectedPageInfo = computed(() => {
 
 const copiedPageUrl = ref(false)
 function copyPageUrl(slug) {
-  navigator.clipboard.writeText(`https://mysocialvsl.com/${slug}`)
+  navigator.clipboard.writeText(`https://mysocialvsl.com/p/${slug}`)
   copiedPageUrl.value = true
   setTimeout(() => { copiedPageUrl.value = false }, 2000)
 }

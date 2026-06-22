@@ -435,7 +435,7 @@
                   <div>
                     <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Your page URL</label>
                     <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
-                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/</span>
+                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/p/</span>
                       <input v-model="form.slug" placeholder="sofia"
                         :style="{flex:1,background:'transparent',border:'none',outline:'none',padding:'10px 14px 10px 0',fontSize:'14px',color:'#A78BFA',fontFamily:'inherit',fontWeight:600}" />
                     </div>
@@ -465,7 +465,7 @@
                   <div>
                     <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'8px'}">Your page URL</label>
                     <div :style="{display:'flex',alignItems:'center',background:C.inputBg,border:`1px solid ${C.borderInput}`,borderRadius:'10px',overflow:'hidden'}">
-                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/</span>
+                      <span :style="{padding:'10px 12px 10px 14px',fontSize:'12px',color:C.textFaint,fontWeight:500,flexShrink:0,whiteSpace:'nowrap'}">mysocialvsl.com/p/</span>
                       <input v-model="form.slug" placeholder="sofia"
                         :style="{flex:1,background:'transparent',border:'none',outline:'none',padding:'10px 14px 10px 0',fontSize:'14px',color:'#A78BFA',fontFamily:'inherit',fontWeight:600}" />
                     </div>
@@ -953,7 +953,7 @@
           <!-- Page URL preview -->
           <div :style="{marginTop:'16px',display:'flex',alignItems:'center',gap:'6px',background:C.surface2,borderRadius:'999px',padding:'6px 14px'}">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" :stroke="C.textDim" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-            <span :style="{fontSize:'11px',color:C.textMuted}">mysocialvsl.com/<span :style="{color:'#A78BFA',fontWeight:600}">{{ form.slug || '…' }}</span></span>
+            <span :style="{fontSize:'11px',color:C.textMuted}">mysocialvsl.com/p/<span :style="{color:'#A78BFA',fontWeight:600}">{{ form.slug || '…' }}</span></span>
           </div>
 
         </div>

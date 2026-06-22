@@ -206,7 +206,7 @@ const shieldPoints = [
 const deeplinkSteps = [
   { n: 1, title: 'Create your VSL page', desc: 'Set up your landing page with video, bio and links in MySocialVSL.' },
   { n: 2, title: 'Enable Deeplink', desc: 'In step 1 of page creation, toggle on "Deeplink" in Advanced Settings.' },
-  { n: 3, title: 'Add link to bio', desc: 'Copy your mysocialvsl.com/your-slug link and paste it in your Instagram bio.' },
+  { n: 3, title: 'Add link to bio', desc: 'Copy your mysocialvsl.com/p/your-slug link and paste it in your Instagram bio.' },
   { n: 4, title: 'Test on mobile', desc: 'Tap the link from the Instagram app — it should open in Safari/Chrome, not in-app.' },
   { n: 5, title: 'Enable Shield', desc: 'Also turn on "Shield Protection" to block Instagram\'s preview bots from scanning the page.' },
   { n: 6, title: 'Use custom domain', desc: 'For agency use, set up a custom domain per creator for full isolation.' },

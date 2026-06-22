@@ -99,11 +99,15 @@ class PageController extends Controller
         }
 
         // Honour the creator's chosen slug (clean links like /sofia); fall back to
-        // the model name. Only append a random suffix when it's empty or already
-        // taken, so a published link is never blocked by a collision.
-        $slug = Str::slug($request->filled('slug') ? $request->slug : $request->model_name);
-        if (! $slug || Page::where('slug', $slug)->exists()) {
-            $slug = ($slug ?: 'page') . '-' . Str::random(5);
+        // the model name. On collision, append a short incremental number (-2, -3…)
+        // so links stay human-readable instead of a random token — a manager can
+        // reuse a name across IG accounts and still get tidy slugs.
+        $base = Str::slug($request->filled('slug') ? $request->slug : $request->model_name) ?: 'page';
+        $slug = $base;
+        $n = 2;
+        while (Page::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $n;
+            $n++;
         }
 
         $page = $request->user()->pages()->create([
