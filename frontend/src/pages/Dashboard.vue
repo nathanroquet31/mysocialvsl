@@ -53,7 +53,7 @@
         <!-- Feature cards -->
         <div style="width:100%;margin-top:52px">
           <p style="font-size:11px;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.14em;margin:0 0 18px">Everything you need to convert</p>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div class="dash-feat-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
             <div class="feat-card">
               <div class="feat-icon" style="background:rgba(167,139,250,0.14);color:#A78BFA"><i class="bi bi-box-arrow-up-right"></i></div>
               <p class="feat-title">Deeplink Bypass</p>
@@ -76,7 +76,7 @@
       <!-- ─── Has pages → full dashboard ─── -->
       <template v-else>
       <!-- Stats summary row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+      <div class="dash-kpi-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
         <div class="kpi-card">
           <div class="kpi-card-top">
             <span class="kpi-card-label">VSL Pages</span>
@@ -172,6 +172,7 @@
             <div v-else>
               <div v-for="page in pagesInGroup(group.id)" :key="page.id"
                 @click="openModal(page)"
+                class="dash-page-row"
                 style="display:flex;align-items:center;gap:12px;padding:13px 20px;border-top:1px solid var(--border-light);cursor:pointer;transition:background 0.12s"
                 onmouseover="this.style.background='rgba(109,78,232,0.05)'"
                 onmouseout="this.style.background='transparent'">
@@ -193,7 +194,7 @@
                 <span v-if="page.deep_link_enabled" style="font-size:10px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);border-radius:999px;padding:1px 8px;flex-shrink:0">Deep link</span>
 
                 <!-- Stats inline -->
-                <div style="display:flex;gap:16px;flex-shrink:0">
+                <div class="dash-row-stats" style="display:flex;gap:16px;flex-shrink:0">
                   <div style="text-align:center">
                     <p style="font-size:12px;font-weight:700;color:var(--text);margin:0">{{ getPageStat(page.id, 'page_views') }}</p>
                     <p style="font-size:9px;color:var(--text-dim);margin:0;text-transform:uppercase;letter-spacing:0.05em">Views</p>
@@ -610,4 +611,15 @@ async function duplicatePage(page) {
   transition: all 0.15s;
 }
 .modal-delete-btn:hover { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  /* Empty-state feature cards + KPI cards stack instead of squishing */
+  .dash-feat-grid { grid-template-columns: 1fr !important; }
+  .dash-kpi-grid  { grid-template-columns: 1fr 1fr !important; }
+  /* Page-row inline stats overflow the URL on phones — they're available on tap (modal) */
+  .dash-row-stats { display: none !important; }
+  /* Let the row wrap so badges + Active toggle drop to a second line instead of overlapping the URL */
+  .dash-page-row  { flex-wrap: wrap; row-gap: 8px; }
+}
 </style>

@@ -87,7 +87,7 @@
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 60% 40%,rgba(109,78,232,0.14),transparent);pointer-events:none"></div>
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse 50% 50% at 20% 80%,rgba(109,78,232,0.07),transparent);pointer-events:none"></div>
 
-      <div style="max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:10">
+      <div class="hero-grid" style="max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:10">
 
         <!-- Left — texte -->
         <div>
@@ -151,7 +151,7 @@
     <!-- FEATURE 1 — Video -->
     <section id="features" style="padding:96px 24px;border-top:1px solid var(--border);position:relative;overflow:hidden">
       <div style="position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(ellipse 80% 60% at 90% 40%,rgba(109,78,232,0.06),transparent 70%);pointer-events:none"></div>
-      <div style="max-width:1152px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+      <div class="split-grid" style="max-width:1152px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
 
         <!-- Left — texte -->
         <div data-aos="fade-right">
@@ -287,7 +287,7 @@
           </p>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+        <div class="cards-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
           <!-- Card 1: Bot Detection -->
           <div data-glow data-aos="fade-up" data-aos-delay="0"
             style="--base:155;--spread:120;--radius:14;--border:1;--size:260;border:1px solid var(--border);border-radius:20px;padding:32px;position:relative">
@@ -380,7 +380,7 @@
       <div style="max-width:1152px;margin:0 auto;padding-bottom:120px;position:relative;z-index:1">
 
         <!-- Header -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:48px">
+        <div class="split-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:48px">
           <div data-aos="fade-right">
             <p style="color:#A78BFA;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px">VSL Analytics</p>
             <h2 style="font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;font-size:clamp(1.8rem,3.5vw,2.8rem)">
@@ -596,10 +596,10 @@
         <!-- Decorative orb -->
         <div style="position:absolute;top:0;right:5%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(109,78,232,0.08),transparent 70%);pointer-events:none"></div>
 
-        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:56px">
+        <div class="footer-grid" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:56px">
 
           <!-- Col 1 — Brand + newsletter -->
-          <div style="position:relative">
+          <div class="footer-brand" style="position:relative">
             <!-- Logo -->
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
               <LogoMark :size="28" />
@@ -919,9 +919,19 @@ const socials = [
   color: #fff;
 }
 
+/* Safety net: never let a stray wide element create horizontal scroll on phones */
+.page-root { overflow-x: clip; }
+
 @media (max-width: 768px) {
   .nav-desktop { display: none !important; }
   .nav-mobile  { display: flex !important; }
+
+  /* Collapse multi-column layouts so nothing is squished/cropped on phones */
+  .hero-grid,
+  .split-grid  { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .cards-3     { grid-template-columns: 1fr !important; }
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+  .footer-brand { grid-column: 1 / -1 !important; }
 }
 
 @keyframes drawer-in {

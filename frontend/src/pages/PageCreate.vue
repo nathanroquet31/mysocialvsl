@@ -11,17 +11,17 @@
       </div>
     </div>
 
-    <div :style="{display:'flex',flexDirection:'column',height:'100vh',background:C.bg,fontFamily:'Inter,sans-serif',overflow:'hidden'}">
+    <div :style="{display:'flex',flexDirection:'column',height:'100dvh',background:C.bg,fontFamily:'Inter,sans-serif',overflow:'hidden'}">
 
       <!-- TOP BAR -->
-      <div :style="{height:'60px',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 32px',borderBottom:`1px solid ${C.borderLight}`,flexShrink:0}">
+      <div class="bld-topbar" :style="{height:'60px',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 32px',borderBottom:`1px solid ${C.borderLight}`,flexShrink:0}">
         <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
           <div :style="{width:'28px',height:'28px',background:'linear-gradient(135deg,#6D4EE8,#A78BFA)',borderRadius:'8px',flexShrink:0}"></div>
           <span :style="{fontSize:'15px',fontWeight:700,color:C.text}">MySocialVSL</span>
         </div>
 
         <!-- Step indicator with connecting line -->
-        <div :style="{position:'relative',display:'flex',alignItems:'center',gap:0}">
+        <div class="bld-steps" :style="{position:'relative',display:'flex',alignItems:'center',gap:0}">
           <!-- Background rail -->
           <div :style="{position:'absolute',top:'50%',left:'14px',right:'14px',height:'2px',background:C.stepRail,transform:'translateY(-50%)',zIndex:0}"></div>
           <!-- Progress fill -->
@@ -68,7 +68,7 @@
       <div :style="{flex:1,display:'flex',overflow:'hidden'}">
 
         <!-- LEFT: Form steps -->
-        <div :style="{flex:1,overflowY:'auto',padding:'48px 56px'}">
+        <div class="bld-form" :style="{flex:1,overflowY:'auto',padding:'48px 56px'}">
 
           <Transition :name="stepDir === 'forward' ? 'step-fwd' : 'step-back'" mode="out-in">
 
@@ -91,7 +91,7 @@
               <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Create your conversion page</h2>
               <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'28px'}">Two formats available depending on your goal.</p>
 
-              <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}">
+              <div class="bld-grid" :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',marginBottom:'20px'}">
 
                 <!-- Card Page VSL -->
                 <div @click="form.page_type='vsl'"
@@ -311,7 +311,7 @@
                       </p>
                     </div>
 
-                    <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
+                    <div class="bld-grid" :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
                       <!-- Normal deeplink -->
                       <div :style="{background:C.surface,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'14px'}">
                         <p :style="{fontSize:'11px',fontWeight:700,color:C.text2,marginBottom:'6px',display:'flex',alignItems:'center',gap:'5px'}">
@@ -361,7 +361,7 @@
                       </p>
                     </div>
 
-                    <div :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
+                    <div class="bld-grid" :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
                       <div :style="{background:'rgba(16,185,129,0.06)',border:'1px solid rgba(16,185,129,0.14)',borderRadius:'12px',padding:'14px'}">
                         <p :style="{fontSize:'11px',fontWeight:700,color:'#10b981',marginBottom:'8px'}">✓ What it blocks</p>
                         <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
@@ -481,7 +481,7 @@
             <h2 :style="{fontSize:'24px',fontWeight:700,color:C.text,marginBottom:'6px'}">Choose your template</h2>
             <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">They all keep the video front and center — it just comes down to how many links you need.</p>
 
-            <div :style="{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'14px'}">
+            <div class="bld-grid" :style="{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'14px'}">
 
               <!-- ── Card 1: VSL Pure ── -->
               <div @click="form.template='vsl-classic'"
@@ -851,7 +851,7 @@
         </div>
 
         <!-- RIGHT: VSL Preview -->
-        <div :style="{width:'380px',background:C.panel,borderLeft:`1px solid ${C.borderLight}`,display:'flex',flexDirection:'column',alignItems:'center',padding:'24px 20px',flexShrink:0,overflowY:'auto'}">
+        <div class="bld-preview" :style="{width:'380px',background:C.panel,borderLeft:`1px solid ${C.borderLight}`,display:'flex',flexDirection:'column',alignItems:'center',padding:'24px 20px',flexShrink:0,overflowY:'auto'}">
 
           <p :style="{fontSize:'11px',fontWeight:600,color:C.textMuted,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'20px',alignSelf:'flex-start'}">Live preview</p>
 
@@ -960,7 +960,7 @@
       </div>
 
       <!-- BOTTOM BAR -->
-      <div :style="{height:'72px',background:C.bg,borderTop:`1px solid ${C.borderLight}`,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 40px',flexShrink:0}">
+      <div class="bld-bottombar" :style="{height:'72px',background:C.bg,borderTop:`1px solid ${C.borderLight}`,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 40px',flexShrink:0}">
         <button v-if="canGoBack" @click="prevStep"
           :style="{padding:'10px 22px',border:`1px solid ${C.cancelBorder}`,borderRadius:'10px',background:'transparent',color:C.text,fontSize:'14px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:'6px'}"
           @mouseover="(e:any)=>e.currentTarget.style.background=C.surface2"
@@ -1400,5 +1400,18 @@ async function save() {
 @keyframes pulse-dot {
   0%, 100% { opacity: 1 }
   50%       { opacity: 0.4 }
+}
+
+/* ── Mobile: the builder is desktop-first. On phones the 380px live preview
+   can't sit next to the form, so we hide it (preview via the published page),
+   give the form the full width, drop the redundant top step-rail (the bottom
+   bar already navigates), and collapse the option grids to a single column. ── */
+@media (max-width: 768px) {
+  .bld-steps   { display: none !important; }
+  .bld-preview { display: none !important; }
+  .bld-form    { padding: 24px 16px !important; }
+  .bld-topbar,
+  .bld-bottombar { padding: 0 16px !important; }
+  .bld-grid    { grid-template-columns: 1fr !important; }
 }
 </style>

@@ -2,7 +2,7 @@
   <div :style="{minHeight:'100vh',background:theme.dark?'#0d0b1e':'#F9FAFB',display:'flex',fontFamily:'Inter,sans-serif',transition:'background 0.2s'}">
 
     <!-- Sidebar -->
-    <aside :style="{
+    <aside class="dash-sidebar" :class="{ 'dash-open': mobileNavOpen }" :style="{
       width: collapsed ? '64px' : '256px',
       minHeight:'100vh', background: theme.dark ? '#100e22' : '#fff',
       borderRight: theme.dark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #E5E7EB',
@@ -197,14 +197,24 @@
       </div>
     </aside>
 
+    <!-- Mobile drawer overlay (mobile only; closes the drawer on tap) -->
+    <div v-if="mobileNavOpen" @click="mobileNavOpen=false" class="dash-overlay"
+      style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:19"></div>
+
     <!-- Main wrapper -->
-    <div :style="{marginLeft: collapsed ? '64px' : '256px', flex:1, minWidth:0, minHeight:0, height:'100vh', overflow:'hidden', transition:'margin-left 0.2s ease', display:'flex', flexDirection:'column'}">
+    <div class="dash-main" :style="{marginLeft: collapsed ? '64px' : '256px', flex:1, minWidth:0, minHeight:0, height:'100vh', overflow:'hidden', transition:'margin-left 0.2s ease', display:'flex', flexDirection:'column'}">
 
       <!-- Top header -->
       <header :style="{height:'60px',background:theme.dark?'#100e22':'#fff',borderBottom:theme.dark?'1px solid rgba(255,255,255,0.06)':'1px solid #E5E7EB',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',position:'sticky',top:0,zIndex:10,flexShrink:0}">
-        <slot name="header-left">
-          <h1 :style="{fontSize:'15px',fontWeight:600,color:theme.dark?'#fff':'#111827',letterSpacing:'-0.01em',margin:0}">{{ title }}</h1>
-        </slot>
+        <div style="display:flex;align-items:center;gap:12px;min-width:0">
+          <button class="dash-burger" @click="mobileNavOpen=true" aria-label="Open menu"
+            :style="{background:'none',border:'none',cursor:'pointer',color:theme.dark?'#fff':'#111827',padding:'4px',alignItems:'center',justifyContent:'center',fontSize:'20px',lineHeight:1}">
+            <i class="bi bi-list"></i>
+          </button>
+          <slot name="header-left">
+            <h1 :style="{fontSize:'15px',fontWeight:600,color:theme.dark?'#fff':'#111827',letterSpacing:'-0.01em',margin:0,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}">{{ title }}</h1>
+          </slot>
+        </div>
         <div style="display:flex;align-items:center;gap:14px">
           <slot name="header-actions" />
           <NotificationBell />
@@ -223,7 +233,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
@@ -249,6 +259,10 @@ const router = useRouter()
 const collapsed = ref(false)
 const userMenuOpen = ref(false)
 const analyticsOpen = ref(false)
+const mobileNavOpen = ref(false)
+
+// Close the mobile drawer whenever the route changes (tapping a nav item navigates)
+watch(() => route.path, () => { mobileNavOpen.value = false })
 
 // Real usage quotas come from /me (auth.user); fall back to props if a page passes them.
 const fmtLimit = (n) => (n == null || n > 100000 ? '∞' : n)
@@ -282,3 +296,22 @@ async function handleLogout() {
   router.push('/login')
 }
 </script>
+
+<style>
+/* Desktop: hamburger + overlay hidden, fixed sidebar visible as usual. */
+.dash-burger, .dash-overlay { display: none; }
+
+/* Mobile: sidebar becomes an off-canvas drawer, content takes the full width. */
+@media (max-width: 768px) {
+  .dash-sidebar {
+    width: 264px !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease !important;
+    box-shadow: 0 0 40px rgba(0,0,0,0.45);
+  }
+  .dash-sidebar.dash-open { transform: translateX(0); }
+  .dash-main    { margin-left: 0 !important; height: 100dvh !important; }
+  .dash-burger  { display: flex; }
+  .dash-overlay { display: block; }
+}
+</style>

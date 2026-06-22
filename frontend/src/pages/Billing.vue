@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+      <div class="bill-plans" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
 
         <!-- Free -->
         <div :style="{border:currentPlan==='free'?'2px solid #6D4EE8':`1px solid ${border}`,borderRadius:'12px',padding:'20px',position:'relative',background:card}">
@@ -175,7 +175,7 @@
       </div>
       <p :style="{fontSize:'13px',color:sub,margin:'0 0 24px'}">Add packs of 100 extra pages or 100 extra direct links, billed on top of your Pro subscription. The difference is charged pro rata right away.</p>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="bill-packs" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
 
         <!-- Pages packs -->
         <div :style="{border:`1px solid ${border}`,borderRadius:'12px',padding:'18px',background:subtleBg}">
@@ -569,3 +569,11 @@ onMounted(async () => {
   linksPacks.value = Math.round((auth.user?.extra_links ?? 0) / 100)
 })
 </script>
+
+<style scoped>
+/* Mobile: plan cards and add-on packs stack instead of squishing */
+@media (max-width: 768px) {
+  .bill-plans { grid-template-columns: 1fr !important; }
+  .bill-packs { grid-template-columns: 1fr !important; }
+}
+</style>

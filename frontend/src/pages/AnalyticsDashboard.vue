@@ -294,7 +294,7 @@
         </div>
 
         <!-- Countries + Event feed -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0">
+        <div class="adash-charts" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0">
 
           <!-- Top countries -->
           <div>
@@ -770,4 +770,13 @@ onUnmounted(() => {
 
 @keyframes adash-pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(22,163,74,0.4) } 70%{ box-shadow:0 0 0 8px rgba(22,163,74,0) } }
 @keyframes adash-spin  { to { transform: rotate(360deg) } }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  /* KPI overview: hero full width, the stat cells in 2 columns instead of 4 */
+  .adash-ov-body { grid-template-columns: 1fr 1fr !important; }
+  .adash-ov-hero { grid-column: 1 / -1 !important; padding-right: 0 !important; }
+  /* Countries + live event feed stack instead of two cramped halves */
+  .adash-charts  { grid-template-columns: 1fr !important; }
+}
 </style>

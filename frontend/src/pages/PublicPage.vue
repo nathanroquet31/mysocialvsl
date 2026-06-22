@@ -13,7 +13,7 @@
   </div>
 
   <!-- ─── VSL PAGE ─────────────────────────────────────────────────────────────── -->
-  <div v-else style="background:#0d0d0d;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif">
+  <div v-else style="background:#0d0d0d;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif">
 
     <!-- 9:16 video container -->
     <div style="position:relative;width:100%;max-width:380px;border-radius:20px;overflow:hidden;background:#000;aspect-ratio:9/16">
@@ -123,7 +123,7 @@
       <div v-if="isBandeau && drawerOpen"
         style="position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px)"
         @click.self="drawerOpen = false">
-        <div style="background:#111;border-radius:24px 24px 0 0;padding:16px 20px 44px;max-width:480px;width:100%;border:1px solid rgba(255,255,255,0.08);border-bottom:none;animation:bandeau-up 0.32s cubic-bezier(0.16,1,0.3,1)">
+        <div style="background:#111;border-radius:24px 24px 0 0;padding:16px 20px 44px;max-width:480px;width:100%;max-height:88dvh;overflow-y:auto;border:1px solid rgba(255,255,255,0.08);border-bottom:none;animation:bandeau-up 0.32s cubic-bezier(0.16,1,0.3,1)">
           <!-- Handle -->
           <div style="display:flex;justify-content:center;margin-bottom:20px">
             <div style="width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:999px"></div>
@@ -229,7 +229,7 @@
   <!-- ─── Popup central (template vsl-popup) ───────────────────────────────── -->
   <Teleport to="body">
     <div v-if="isPopup && popupVisible"
-      style="position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px)"
+      style="position:fixed;inset:0;z-index:80;display:flex;align-items:safe center;justify-content:center;padding:24px;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);overflow-y:auto"
       @click.self="popupVisible = false">
       <div style="position:relative;background:#13101f;border-radius:24px;padding:0;max-width:330px;width:100%;border:1px solid rgba(255,255,255,0.09);box-shadow:0 32px 80px rgba(0,0,0,0.7);overflow:hidden;animation:popup-bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both">
 
@@ -319,7 +319,7 @@
 
   <!-- ─── Age gate modal ─────────────────────────────────────────────────────── -->
   <Teleport to="body">
-    <div v-if="ageModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)">
+    <div v-if="ageModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:100;display:flex;align-items:safe center;justify-content:center;padding:24px;backdrop-filter:blur(4px);overflow-y:auto">
       <div style="background:#111;border-radius:24px;padding:40px 28px;max-width:360px;width:100%;text-align:center;border:1px solid rgba(255,255,255,0.08);box-shadow:0 24px 60px rgba(0,0,0,0.6)">
         <i class="bi bi-shield-x" style="font-size:56px;margin-bottom:12px;display:block;color:#F87171"></i>
         <h2 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px">18+ Content</h2>
