@@ -140,7 +140,7 @@
                   <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">VSL Page</p>
                   <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">A full-screen video that convinces<br/>before they even click.</p>
                   <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                    <div v-for="f in ['🎬 Vertical 9:16 video','🔓 Configurable CTA button','⏱ Delayed CTA reveal']" :key="f"
+                    <div v-for="f in ['🎬 Vertical 9:16 video','🔓 Configurable CTA button','🎯 Built to convert clicks']" :key="f"
                       :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
                   </div>
                   <div v-if="form.page_type==='vsl'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
@@ -630,26 +630,6 @@
             <p :style="{fontSize:'14px',color:C.textMuted,marginBottom:'36px'}">The video that sells. Upload it vertical (9:16) for a perfect look.</p>
 
             <VideoUpload v-model="form.video_url" @uploading="uploadingVideo = $event" />
-
-            <!-- CTA reveal -->
-            <div :style="{marginTop:'28px',background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'14px',padding:'20px'}">
-              <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'4px'}">
-                <span :style="{display:'inline-flex',alignItems:'center',gap:'6px'}">
-                  <i class="bi bi-clock" style="color:#A78BFA"></i>
-                  Button reveal (optional)
-                </span>
-              </label>
-              <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px',lineHeight:1.5}">
-                The button stays hidden until this point in the video. Leave it empty to show it right away.
-              </p>
-              <div :style="{display:'flex',alignItems:'center',gap:'10px'}">
-                <input v-model.number="form.cta_reveal_at" type="number" min="0" placeholder="e.g. 30"
-                  :style="{...inputStyle,width:'120px',textAlign:'center'}"
-                  @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
-                  @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
-                <span :style="{fontSize:'13px',color:C.textMuted}">seconds</span>
-              </div>
-            </div>
           </div>
 
           <!-- ===== STEP 4 — CTA ===== -->
