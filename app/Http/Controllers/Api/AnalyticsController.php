@@ -26,6 +26,13 @@ class AnalyticsController extends Controller
         ]);
 
         $ua = $request->userAgent() ?? '';
+
+        // Keep bots/crawlers/link-preview fetchers out of analytics entirely, so
+        // views/plays/retention reflect real humans (what Plausible/Fathom do).
+        if ($this->isBotUserAgent($ua)) {
+            return response()->json(['ok' => true]);
+        }
+
         $device = preg_match('/Mobile|Android|iPhone/i', $ua) ? 'mobile' : 'desktop';
 
         $country = null;
@@ -37,10 +44,18 @@ class AnalyticsController extends Controller
             // Catch Throwable (not Exception): location drivers can raise \TypeError/\Error.
         }
 
-        // Live presence: keep a heartbeat row alive in page_presence so the
-        // dashboard can show who's on the page right now and since when. The
-        // heartbeat fires every ~12s but never lands in analytics_events — that
-        // would bloat the table; presence is a single upserted row per session.
+        // video_position carries the furthest second watched. We don't store it as
+        // an event (that would append a row every second); we keep the MAX in place
+        // on the session's presence row → exact per-second retention, 1 row/session.
+        if ($request->type === 'video_position') {
+            if ($request->session_id) {
+                $this->touchPresence($page->id, $request->session_id, $country, $device, (int) $request->value);
+            }
+            return response()->json(['ok' => true]);
+        }
+
+        // Live presence: page_view / heartbeat keep the session's row alive so the
+        // dashboard can show who's on the page right now and since when.
         if ($request->session_id && in_array($request->type, ['page_view', 'heartbeat'], true)) {
             $this->touchPresence($page->id, $request->session_id, $country, $device);
         }
@@ -62,23 +77,42 @@ class AnalyticsController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    /** Upsert the live-presence row for a visitor session (started_at set once). */
-    private function touchPresence(int $pageId, string $sessionId, ?string $country, string $device): void
+    /** Known bots / crawlers / link-preview fetchers we never want in analytics. */
+    private function isBotUserAgent(string $ua): bool
+    {
+        if ($ua === '') return true; // no UA = almost always a script/bot
+        return (bool) preg_match(
+            '/bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegrambot|discordbot|slackbot|twitterbot|linkedinbot|embedly|preview|headless|phantom|puppeteer|playwright|python-requests|curl|wget|axios|okhttp|go-http|java\/|libwww|scrapy|semrush|ahrefs|mj12|dotbot|bytespider|petalbot/i',
+            $ua
+        );
+    }
+
+    /**
+     * Upsert the live-presence row for a visitor session. started_at is set once;
+     * last_seen_at and max_second move forward (max_second only ever grows — the
+     * furthest second the visit reached, for the retention curve).
+     */
+    private function touchPresence(int $pageId, string $sessionId, ?string $country, string $device, ?int $second = null): void
     {
         $now = Carbon::now();
-        $existing = DB::table('page_presence')
-            ->where('page_id', $pageId)->where('session_id', $sessionId)->exists();
+        $row = DB::table('page_presence')
+            ->where('page_id', $pageId)->where('session_id', $sessionId)->first();
 
-        if ($existing) {
+        if ($row) {
+            $update = ['last_seen_at' => $now, 'country' => $country, 'device' => $device];
+            if ($second !== null && $second > $row->max_second) {
+                $update['max_second'] = $second;
+            }
             DB::table('page_presence')
                 ->where('page_id', $pageId)->where('session_id', $sessionId)
-                ->update(['last_seen_at' => $now, 'country' => $country, 'device' => $device]);
+                ->update($update);
         } else {
             DB::table('page_presence')->insert([
                 'page_id'      => $pageId,
                 'session_id'   => $sessionId,
                 'country'      => $country,
                 'device'       => $device,
+                'max_second'   => max(0, (int) $second),
                 'started_at'   => $now,
                 'last_seen_at' => $now,
             ]);
@@ -230,8 +264,8 @@ class AnalyticsController extends Controller
      * watched at least up to s. Early seconds matter most — that's where you see
      * if the hook lands in the first 3s.
      *
-     * Cheaply per-second: each visit reports only the furthest second it reached
-     * (`video_position` = running max), so one MAX per session reconstructs the
+     * Cheaply per-second: each visit's furthest second is kept in place on its
+     * page_presence row (max_second), so one value per session reconstructs the
      * whole curve — no per-second event flood. Per-video on purpose (a 20s and a
      * 45s VSL can't share one curve). Capped to the 6 most-watched videos.
      */
@@ -251,12 +285,13 @@ class AnalyticsController extends Controller
             return ['pages' => []];
         }
 
-        // Furthest second reached per session (one row per session, per page).
-        $maxima = (clone $q)->where('type', 'video_position')->whereNotNull('session_id')
-            ->selectRaw('page_id, session_id, max(value) as mx')
-            ->groupBy('page_id', 'session_id')
-            ->get()
-            ->groupBy('page_id');
+        // Furthest second reached per session — read in place from presence rows
+        // (one per session). Filtered by when the visit started + country.
+        $pres = DB::table('page_presence')->whereIn('page_id', $pageIds)->where('max_second', '>', 0);
+        if ($from)    $pres->where('started_at', '>=', $from);
+        if ($to)      $pres->where('started_at', '<=', $to);
+        if ($country) $pres->where('country', $country);
+        $maxima = $pres->get(['page_id', 'max_second'])->groupBy('page_id');
 
         // Clicks per exact second watched (value = real seconds), per page.
         $clicks = (clone $q)->where('type', 'link_click')->whereNotNull('value')
@@ -278,7 +313,7 @@ class AnalyticsController extends Controller
             $histo  = [];
             $maxSec = 0;
             foreach ($maxima->get($pid, collect()) as $row) {
-                $m = min((int) $row->mx, self::RETENTION_MAX_SECONDS);
+                $m = min((int) $row->max_second, self::RETENTION_MAX_SECONDS);
                 if ($m <= 0) continue;
                 $histo[$m] = ($histo[$m] ?? 0) + 1;
                 if ($m > $maxSec) $maxSec = $m;
@@ -295,8 +330,10 @@ class AnalyticsController extends Controller
             for ($s = 1; $s <= $maxSec; $s++) {
                 $points[] = [
                     'sec'      => $s,
-                    'pct'      => round($survival[$s] / $playCount * 100, 1),
-                    'sessions' => $survival[$s],
+                    // Clamp: a session can have a max_second without its video_play
+                    // event landing (beacon loss), which would push pct over 100.
+                    'pct'      => min(100, round($survival[$s] / $playCount * 100, 1)),
+                    'sessions' => min($survival[$s], $playCount),
                     'clicks'   => (int) $pageClicks->get($s, 0),
                 ];
             }

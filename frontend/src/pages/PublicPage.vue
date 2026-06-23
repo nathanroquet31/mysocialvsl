@@ -533,10 +533,9 @@ function onVideoPlay() {
   postEvent('video_play')
 }
 
-// Persist the furthest whole second actually reached, so the dashboard can build
-// a per-second retention curve. We send the MAX reached (not a ping every second
-// — that would flood the table); the backend takes the max per session. Sent via
-// beacon so it survives the tab closing, which is exactly when someone drops off.
+// Report the furthest whole second reached. The backend keeps the MAX in place on
+// the session row (no row-per-second), so this is cheap to call often. Sent via
+// beacon so it survives the tab closing — exactly when someone drops off.
 function flushWatch() {
   const sec = Math.floor(maxWatched.value)
   if (sec > lastFlushedSecond.value) {
@@ -555,6 +554,11 @@ function onVideoTimeUpdate() {
   // Real watch time = furthest second actually reached in the video (not wall
   // clock, which over-counts on pause). Drives the retention curve + "avg watch".
   if (current > maxWatched.value) maxWatched.value = current
+
+  // The hook is decided in the first seconds, so flush each new second there —
+  // exact retention for 0–10s even if the viewer bails before any unload event.
+  // After that, the heartbeat + tab-hidden/pagehide flushes keep it accurate.
+  if (current <= 10) flushWatch()
 
   // CTA reveal
   if (!ctaVisible.value && page.value?.cta_reveal_at && current >= page.value.cta_reveal_at) {
