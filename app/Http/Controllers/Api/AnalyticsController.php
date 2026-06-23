@@ -23,6 +23,7 @@ class AnalyticsController extends Controller
             'value'        => 'nullable|numeric|min:0',
             'referrer'     => 'nullable|string|max:500',
             'session_id'   => 'nullable|string|max:40',
+            'visitor_id'   => 'nullable|string|max:40',
         ]);
 
         $ua = $request->userAgent() ?? '';
@@ -72,6 +73,7 @@ class AnalyticsController extends Controller
             'value'        => $request->value,
             'referrer'     => $request->referrer ? parse_url($request->referrer, PHP_URL_HOST) : null,
             'session_id'   => $request->session_id,
+            'visitor_id'   => $request->visitor_id,
         ]);
 
         return response()->json(['ok' => true]);
@@ -147,6 +149,8 @@ class AnalyticsController extends Controller
         $stats = [
             'period'        => $days,
             'page_views'    => $pageViews,
+            'unique_visitors' => $this->countPeople((clone $events)->where('type', 'page_view')),
+            'unique_clicks' => $this->countPeople((clone $events)->where('type', 'link_click')),
             'age_confirmed' => (clone $events)->where('type', 'age_confirmed')->count(),
             'link_clicks'   => $linkClicks,
             'video_plays'   => $videoPlays,
@@ -232,16 +236,24 @@ class AnalyticsController extends Controller
         if ($to)   $base->where('created_at', '<=', $to);
         if ($country) $base->where('country', $country);
 
-        // Real visitors, not raw events: distinct sessions. CTR then reads as the
-        // honest "% of visitors who clicked", never >100% from multi-click visits.
+        // Two views of the truth, like Linktree/Linko:
+        //  - total = distinct VISITS (session): each visit counted, repeats too.
+        //  - unique = distinct PEOPLE (visitor): same person across visits = 1.
         $pageViews   = $this->countVisits((clone $base)->where('type', 'page_view'));
         $linkClicks  = $this->countVisits((clone $base)->where('type', 'link_click'));
         $ctr         = $pageViews > 0 ? round($linkClicks / $pageViews * 100, 1) : 0;
+
+        $uniqueVisitors = $this->countPeople((clone $base)->where('type', 'page_view'));
+        $uniqueClicks   = $this->countPeople((clone $base)->where('type', 'link_click'));
+        $uniqueCtr      = $uniqueVisitors > 0 ? round($uniqueClicks / $uniqueVisitors * 100, 1) : 0;
 
         return response()->json([
             'page_views'         => $pageViews,
             'visits_with_clicks' => $linkClicks,
             'ctr'                => $ctr,
+            'unique_visitors'    => $uniqueVisitors,
+            'unique_clicks'      => $uniqueClicks,
+            'unique_ctr'         => $uniqueCtr,
             'series'             => $this->buildDailySeries($base, $from, $to, $preset),
             'top_links'          => $this->buildTopLinks($pageIds, $from, $to, $country),
             'by_country'         => $this->buildByCountry($base),
@@ -568,6 +580,27 @@ class AnalyticsController extends Controller
         return (int) ($row->aggregate ?? 0);
     }
 
+    /**
+     * SQL counting unique PEOPLE, not visits: distinct visitor_id (a localStorage
+     * id that survives reloads + return visits), so the same person coming back
+     * 10× counts ONCE. Falls back to session_id then row id for legacy/no-storage
+     * rows, so the number degrades to visit-level instead of breaking.
+     */
+    private function personCountExpr(): string
+    {
+        $idAsText = in_array($this->dbDriver(), ['mysql', 'mariadb'], true)
+            ? 'CAST(id AS CHAR)'
+            : 'CAST(id AS TEXT)';
+        return "COUNT(DISTINCT COALESCE(visitor_id, session_id, $idAsText))";
+    }
+
+    /** Run the distinct-person count over a query. Clone the query first if reused. */
+    private function countPeople($query): int
+    {
+        $row = $query->selectRaw($this->personCountExpr() . ' as aggregate')->first();
+        return (int) ($row->aggregate ?? 0);
+    }
+
     private function buildLive($pageIds, bool $detailed = false): array
     {
         $cutoff = Carbon::now()->subMinutes(30);
@@ -654,6 +687,9 @@ class AnalyticsController extends Controller
             'page_views'         => 0,
             'visits_with_clicks' => 0,
             'ctr'                => 0,
+            'unique_visitors'    => 0,
+            'unique_clicks'      => 0,
+            'unique_ctr'         => 0,
             'series'             => ['labels' => [], 'views' => [], 'clicks' => []],
             'top_links'          => [],
             'by_country'         => [],

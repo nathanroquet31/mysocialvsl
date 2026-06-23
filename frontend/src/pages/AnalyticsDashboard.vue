@@ -70,6 +70,9 @@
           </div>
           <p class="adash-ov-hero-label">Total views</p>
           <p class="adash-ov-hero-value">{{ formatNum(data.page_views) }}</p>
+          <p class="adash-ov-hero-sub" :title="'Real people — the same visitor returning is counted once'">
+            {{ formatNum(data.unique_visitors) }} unique visitor{{ data.unique_visitors === 1 ? '' : 's' }}
+          </p>
         </div>
 
         <!-- Column 1 -->
@@ -411,6 +414,7 @@ const pagesCount = ref(0)
 const pagesLimit = computed(() => auth.user?.plan === 'agency' ? 999 : auth.user?.plan === 'pro' ? 5 : 1)
 const data       = ref({
   page_views: 0, visits_with_clicks: 0, ctr: 0,
+  unique_visitors: 0, unique_clicks: 0, unique_ctr: 0,
   series: { labels: [], views: [], clicks: [] },
   top_links: [], by_country: {}, by_device: {}, by_referrer: {},
   hourly: Array(24).fill(0),
@@ -797,6 +801,7 @@ onUnmounted(() => {
 }
 .adash-ov-hero-label { font-size: 13px; font-weight: 600; color: #A78BFA; margin: 0 0 8px; }
 .adash-ov-hero-value { font-size: 38px; font-weight: 800; letter-spacing: -0.04em; color: #A78BFA; margin: 0; line-height: 1; }
+.adash-ov-hero-sub { font-size: 12px; font-weight: 600; color: #A78BFA; opacity: 0.72; margin: 8px 0 0; cursor: help; }
 .adash-ov-col {
   display: flex; flex-direction: column; justify-content: center; gap: 26px;
   padding: 0 22px;

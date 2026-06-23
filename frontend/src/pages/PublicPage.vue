@@ -358,17 +358,29 @@ const ageModal = ref(false)
 const pendingLink = ref(null)
 const pageStartTime = ref(0)
 
-// One id per visit: groups every event of this session so 1 visit = 1 view
-// (a viewer firing ~10 events counts once; a later re-watch is a new session).
-const sessionId = (() => {
+// Two ids per event, so the dashboard can show both numbers competitors show:
+//  - sessionId  : one per VISIT (per page load, lost on reload) → "total views"
+//    (a viewer firing ~10 events counts once; a later re-watch = a new visit).
+//  - visitorId  : one per PERSON, persisted in localStorage so it survives reloads
+//    and return visits → "unique visitors" (Linktree/Linko style). Same person
+//    coming back 10× counts once.
+const newId = () => {
   try { return crypto.randomUUID().slice(0, 36) }
   catch { return 'sx-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10) }
+}
+const sessionId = newId()
+const visitorId = (() => {
+  try {
+    let id = localStorage.getItem('msv_vid')
+    if (!id) { id = newId(); localStorage.setItem('msv_vid', id) }
+    return id
+  } catch { return sessionId } // private mode / storage blocked → degrade to visit-level
 })()
 
-// Every analytics call carries the session id so the backend can build the
-// retention curve and live presence per visit.
+// Every analytics call carries both ids so the backend can build the retention
+// curve + live presence per visit AND dedupe unique visitors per person.
 function postEvent(type, extra = {}) {
-  api.post(`/p/${slug}/event`, { type, session_id: sessionId, ...extra }).catch(() => {})
+  api.post(`/p/${slug}/event`, { type, session_id: sessionId, visitor_id: visitorId, ...extra }).catch(() => {})
 }
 
 // ─── VSL ───────────────────────────────────────────────────────────────────────
@@ -621,11 +633,11 @@ function confirmAge() {
 // Blob type is required so Laravel parses the body; a plain string arrives as
 // text/plain and is dropped by validation.
 function sendEvent(type, extra = {}) {
-  const payload = JSON.stringify({ type, session_id: sessionId, ...extra })
+  const payload = JSON.stringify({ type, session_id: sessionId, visitor_id: visitorId, ...extra })
   if (navigator.sendBeacon) {
     navigator.sendBeacon(`/api/p/${slug}/event`, new Blob([payload], { type: 'application/json' }))
   } else {
-    api.post(`/p/${slug}/event`, { type, session_id: sessionId, ...extra }).catch(() => {})
+    api.post(`/p/${slug}/event`, { type, session_id: sessionId, visitor_id: visitorId, ...extra }).catch(() => {})
   }
 }
 
