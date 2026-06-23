@@ -68,6 +68,11 @@ return [
         'agency_base_amount' => 49,
     ],
 
+    // Shared secret for the read-only /api/monitoring/digest endpoint (daily cron).
+    'monitoring' => [
+        'token' => env('MONITORING_TOKEN'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
