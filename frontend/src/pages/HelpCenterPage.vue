@@ -54,7 +54,7 @@ const articles = [
   {
     icon: 'rocket-takeoff',
     q: 'Create your first VSL page',
-    a: 'Go to <strong>Links → New page</strong> and pick <strong>VSL Page</strong>. Then follow the 4 steps: choose a template, upload your video, set your CTA button (paste your OnlyFans link), and publish. Your page goes live instantly at <strong>mysocialvsl.com/p/your-slug</strong> — paste that link in your Instagram bio and you’re done.',
+    a: 'Go to <strong>Links → New page</strong> and pick <strong>VSL Page</strong>. Then follow the 4 steps: choose a template, upload your video, set your CTA button (paste your OnlyFans link), and publish. Your page goes live instantly at <strong>mysocialvsl.com/your-slug</strong> — paste that link in your Instagram bio and you’re done.',
   },
   {
     icon: 'camera-video',

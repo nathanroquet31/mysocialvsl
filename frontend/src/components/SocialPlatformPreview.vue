@@ -57,7 +57,7 @@
                 cursor:'pointer',
               }" @click="() => {}">
                 <i class="bi bi-link-45deg" style="color:#0095f6;font-size:10px"></i>
-                <span style="font-size:9px;color:#0095f6;font-weight:600">mysocialvsl.com/p/{{ slug }}</span>
+                <span style="font-size:9px;color:#0095f6;font-weight:600">mysocialvsl.com/{{ slug }}</span>
               </div>
               <!-- Tap indicator -->
               <div v-if="step===0 && showTap" :style="{
@@ -113,7 +113,7 @@
               <!-- Bio link -->
               <div :style="{background:'rgba(255,255,255,0.08)',borderRadius:'6px',padding:'5px 10px',marginTop:'4px',display:'flex',alignItems:'center',gap:'4px'}">
                 <i class="bi bi-link-45deg" style="color:#fe2c55;font-size:10px"></i>
-                <span style="font-size:8px;color:rgba(255,255,255,0.7)">mysocialvsl.com/p/{{ slug }}</span>
+                <span style="font-size:8px;color:rgba(255,255,255,0.7)">mysocialvsl.com/{{ slug }}</span>
               </div>
               <!-- TikTok videos grid -->
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;width:100%;margin-top:10px">
@@ -144,7 +144,7 @@
               <p style="font-size:9px;color:rgba(0,0,0,0.5);margin:0 0 10px">@{{ handle }}</p>
               <div style="background:rgba(0,0,0,0.08);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:4px">
                 <i class="bi bi-link-45deg" style="color:#000;font-size:10px"></i>
-                <span style="font-size:8px;color:#000;font-weight:600">mysocialvsl.com/p/{{ slug }}</span>
+                <span style="font-size:8px;color:#000;font-weight:600">mysocialvsl.com/{{ slug }}</span>
               </div>
               <div style="display:flex;gap:8px;margin-top:12px">
                 <div style="background:rgba(0,0,0,0.1);border-radius:999px;padding:5px 14px;font-size:9px;font-weight:700;color:#000">+ Add Friend</div>
@@ -175,7 +175,7 @@
               <p style="font-size:9px;color:rgba(255,255,255,0.7);margin:0 0 4px"><i class="bi bi-stars" style="font-size:8px"></i> Content creator · 18+</p>
               <div style="display:flex;align-items:center;gap:3px;margin-bottom:8px">
                 <i class="bi bi-link-45deg" style="color:rgba(255,255,255,0.4);font-size:9px"></i>
-                <span style="font-size:8px;color:#1d9bf0">mysocialvsl.com/p/{{ slug }}</span>
+                <span style="font-size:8px;color:#1d9bf0">mysocialvsl.com/{{ slug }}</span>
               </div>
               <div style="display:flex;gap:12px">
                 <span style="font-size:9px;color:rgba(255,255,255,0.5)"><strong style="color:#fff">312</strong> Following</span>
@@ -203,7 +203,7 @@
               <p :style="{fontSize:'9px',color:platform.textColor+'88',margin:'0 0 8px'}">@{{ handle }}</p>
               <div :style="{background:platform.color+'22',borderRadius:'8px',padding:'5px 10px',display:'flex',alignItems:'center',gap:'4px'}">
                 <i class="bi bi-link-45deg" :style="{color:platform.color,fontSize:'10px'}"></i>
-                <span :style="{fontSize:'8px',color:platform.color,fontWeight:600}">mysocialvsl.com/p/{{ slug }}</span>
+                <span :style="{fontSize:'8px',color:platform.color,fontWeight:600}">mysocialvsl.com/{{ slug }}</span>
               </div>
             </div>
           </div>

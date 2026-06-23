@@ -106,7 +106,7 @@
                     <span :style="badge(p.page_type==='direct' ? '#D97706' : '#6D4EE8')">{{ p.page_type==='direct' ? 'Direct' : 'VSL' }}</span>
                     <span :style="{color: p.is_active ? '#10B981' : muted, fontWeight:600}">{{ p.is_active ? 'Live' : 'Off' }}</span>
                     <span :style="{color:sub}">{{ p.views }} views · {{ p.clicks }} clicks · {{ p.ctr }}%</span>
-                    <a :href="`/p/${p.slug}`" target="_blank" :style="{marginLeft:'auto',color:'#A78BFA',textDecoration:'none',fontWeight:600}">/{{ p.slug }} ↗</a>
+                    <a :href="`/${p.slug}`" target="_blank" :style="{marginLeft:'auto',color:'#A78BFA',textDecoration:'none',fontWeight:600}">/{{ p.slug }} ↗</a>
                   </div>
                 </div>
               </td>

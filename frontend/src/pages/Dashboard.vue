@@ -186,7 +186,7 @@
                 <!-- Info -->
                 <div style="flex:1;min-width:0">
                   <p style="font-size:13px;font-weight:600;color:var(--text);margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ page.model_name }}</p>
-                  <p style="font-size:11px;color:var(--text-dim);margin:0">mysocialvsl.com/p/{{ page.slug }}</p>
+                  <p style="font-size:11px;color:var(--text-dim);margin:0">mysocialvsl.com/{{ page.slug }}</p>
                 </div>
 
                 <!-- Badges -->
@@ -278,7 +278,7 @@
             </div>
             <div style="flex:1;min-width:0">
               <p style="font-size:16px;font-weight:700;color:var(--text);margin:0 0 3px">{{ selectedPage.model_name }}</p>
-              <p style="font-size:12px;color:var(--text-muted);margin:0 0 2px">mysocialvsl.com/p/{{ selectedPage.slug }}</p>
+              <p style="font-size:12px;color:var(--text-muted);margin:0 0 2px">mysocialvsl.com/{{ selectedPage.slug }}</p>
               <p style="font-size:11px;color:var(--text-faint);margin:0">Group: <span style="color:var(--text-muted)">Ungrouped</span></p>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -419,7 +419,7 @@ const copiedLink = ref('')
 // "Watch a live example" → opens a real public VSL page that showcases the product.
 // Points at the live Karine page; keep that page published (don't delete/rename
 // its slug) or this button 404s.
-const DEMO_VSL_URL = 'https://mysocialvsl.com/p/karine-ZSnjk'
+const DEMO_VSL_URL = 'https://mysocialvsl.com/karine-ZSnjk'
 function watchExample() {
   window.open(DEMO_VSL_URL, '_blank')
 }
@@ -469,13 +469,13 @@ async function toggleActive(page) {
 }
 
 function copyLink(slug) {
-  navigator.clipboard.writeText(`https://mysocialvsl.com/p/${slug}`)
+  navigator.clipboard.writeText(`https://mysocialvsl.com/${slug}`)
   copiedLink.value = slug
   setTimeout(() => { copiedLink.value = '' }, 2000)
 }
 
 function openPage(slug) {
-  window.open(`/p/${slug}`, '_blank')
+  window.open(`/${slug}`, '_blank')
 }
 
 async function setPeriod(p) {

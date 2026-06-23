@@ -12,6 +12,17 @@ class PageController extends Controller
 {
     use ResolvesPublicPages;
 
+    /**
+     * Slugs that would collide with an app/marketing route now that public pages
+     * live at mysocialvsl.com/{slug} (no /p/). Kept in sync with
+     * PublicPageController::RESERVED_PATHS.
+     */
+    private const RESERVED_SLUGS = [
+        'p', 'login', 'register', 'forgot-password', 'reset-password',
+        'dashboard', 'pages', 'billing', 'privacy', 'terms', 'cookies',
+        'api', 'storage', 'app',
+    ];
+
     public function index(Request $request)
     {
         return response()->json(
@@ -110,7 +121,7 @@ class PageController extends Controller
         $base = Str::slug($request->filled('slug') ? $request->slug : $request->model_name) ?: 'page';
         $slug = $base;
         $n = 2;
-        while (Page::where('slug', $slug)->exists()) {
+        while (Page::where('slug', $slug)->exists() || in_array($slug, self::RESERVED_SLUGS, true)) {
             $slug = $base . '-' . $n;
             $n++;
         }
@@ -205,7 +216,7 @@ class PageController extends Controller
 
         $request->validate([
             'model_name'    => 'sometimes|string|max:100',
-            'slug'          => 'sometimes|string|max:100|alpha_dash|unique:pages,slug,' . $page->id,
+            'slug'          => 'sometimes|string|max:100|alpha_dash|unique:pages,slug,' . $page->id . '|not_in:' . implode(',', self::RESERVED_SLUGS),
             'page_type'     => 'nullable|in:landing,direct',
             'direct_url'    => 'nullable|url:http,https|required_if:page_type,direct',
             'model_handle'  => 'nullable|string|max:100',
@@ -303,7 +314,9 @@ class PageController extends Controller
             ->where('id', '!=', $request->query('exclude'))
             ->exists();
 
-        return response()->json(['available' => ! $exists]);
+        $reserved = in_array(strtolower($slug), self::RESERVED_SLUGS, true);
+
+        return response()->json(['available' => ! $exists && ! $reserved]);
     }
 
     public function destroy(Request $request, string $id)

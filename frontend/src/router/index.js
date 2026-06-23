@@ -30,12 +30,17 @@ const routes = [
   { path: '/dashboard/help',       component: () => import('@/pages/HelpCenterPage.vue'),      meta: { auth: true } },
   { path: '/dashboard/legacy',     component: () => import('@/pages/LegacyPage.vue'),          meta: { auth: true } },
   { path: '/dashboard/admin',      component: () => import('@/pages/AdminPage.vue'),           meta: { auth: true, admin: true } },
+  // Old /p/:slug links still resolve (backward compat for already-shared links).
   { path: '/p/:slug',   component: () => import('@/pages/PublicPage.vue'), meta: {} },
 
   // Public legal pages (accessible to everyone — no guest/auth guard)
   { path: '/privacy', component: () => import('@/pages/legal/PrivacyPolicy.vue'), meta: {} },
   { path: '/terms',   component: () => import('@/pages/legal/Terms.vue'),         meta: {} },
   { path: '/cookies', component: () => import('@/pages/legal/Cookies.vue'),       meta: {} },
+
+  // Clean public links: mysocialvsl.com/{slug}. Kept LAST so every static app
+  // route above wins; only an otherwise-unmatched single segment lands here.
+  { path: '/:slug', component: () => import('@/pages/PublicPage.vue'), meta: {} },
 ]
 
 const router = createRouter({

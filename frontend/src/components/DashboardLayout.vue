@@ -4,7 +4,7 @@
     <!-- Sidebar -->
     <aside class="dash-sidebar" :class="{ 'dash-open': mobileNavOpen }" :style="{
       width: collapsed ? '64px' : '256px',
-      minHeight:'100vh', background: theme.dark ? '#100e22' : '#fff',
+      height:'100dvh', background: theme.dark ? '#100e22' : '#fff',
       borderRight: theme.dark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #E5E7EB',
       display:'flex', flexDirection:'column',
       position:'fixed', top:0, left:0, zIndex:20,
@@ -202,7 +202,7 @@
       style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:19"></div>
 
     <!-- Main wrapper -->
-    <div class="dash-main" :style="{marginLeft: collapsed ? '64px' : '256px', flex:1, minWidth:0, minHeight:0, height:'100vh', overflow:'hidden', transition:'margin-left 0.2s ease', display:'flex', flexDirection:'column'}">
+    <div class="dash-main" :style="{marginLeft: collapsed ? '64px' : '256px', flex:1, minWidth:0, minHeight:0, height:'100dvh', overflow:'hidden', transition:'margin-left 0.2s ease', display:'flex', flexDirection:'column'}">
 
       <!-- Top header -->
       <header :style="{height:'60px',background:theme.dark?'#100e22':'#fff',borderBottom:theme.dark?'1px solid rgba(255,255,255,0.06)':'1px solid #E5E7EB',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',position:'sticky',top:0,zIndex:10,flexShrink:0}">

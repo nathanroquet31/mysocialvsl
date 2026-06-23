@@ -31,3 +31,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Installed agent skills packs (local tooling)
+.agents/
+skills-lock.json

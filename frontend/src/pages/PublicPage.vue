@@ -15,8 +15,10 @@
   <!-- ─── VSL PAGE ─────────────────────────────────────────────────────────────── -->
   <div v-else style="background:#0d0d0d;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif">
 
-    <!-- 9:16 video container -->
-    <div style="position:relative;width:100%;max-width:380px;border-radius:20px;overflow:hidden;background:#000;aspect-ratio:9/16">
+    <!-- 9:16 video container — capped to the viewport height so the whole frame
+         (and the CTA at the bottom) always fits, even on a short laptop screen.
+         max-height drives the box down while keeping the 9:16 ratio. -->
+    <div style="position:relative;width:100%;max-width:380px;max-height:calc(100dvh - 32px);border-radius:20px;overflow:hidden;background:#000;aspect-ratio:9/16">
 
       <!-- Local video (direct upload) -->
       <video v-if="vslActive && isLocalVideo" ref="videoEl" :src="page.video_url"

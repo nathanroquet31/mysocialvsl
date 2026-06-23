@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ResolvesPublicPages;
+use App\Models\Page;
 use Illuminate\Http\Request;
 
 /**
@@ -47,10 +48,30 @@ class PublicPageController extends Controller
     }
 
     /**
-     * Catch-all for dashboard / marketing SPA routes.
+     * First path segments that are app / marketing routes, never page slugs.
+     * Keeps a clean /{slug} link from ever shadowing the dashboard, auth, etc.
      */
-    public function spa()
+    private const RESERVED_PATHS = [
+        'p', 'login', 'register', 'forgot-password', 'reset-password',
+        'dashboard', 'pages', 'billing', 'privacy', 'terms', 'cookies',
+    ];
+
+    /**
+     * Catch-all. Clean public links — mysocialvsl.com/{slug} (no /p/) — are
+     * served here: a single-segment, non-reserved path that matches an active
+     * page gets the full public page (same cloaking as /p/{slug}). Everything
+     * else is the SPA shell (dashboard / marketing / unknown routes).
+     */
+    public function spa(Request $request)
     {
+        $path = trim($request->path(), '/');
+
+        if ($path !== '' && ! str_contains($path, '/') && ! in_array($path, self::RESERVED_PATHS, true)) {
+            if (Page::where('slug', $path)->where('is_active', true)->exists()) {
+                return $this->show($request, $path);
+            }
+        }
+
         return $this->renderApp();
     }
 
