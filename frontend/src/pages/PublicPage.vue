@@ -641,6 +641,37 @@ function sendEvent(type, extra = {}) {
   }
 }
 
+// True inside a social in-app webview (Instagram/Facebook/TikTok), where the
+// OnlyFans session/login breaks and video playback is crippled — the visitor we
+// want to push out into the real browser.
+function isInAppBrowser() {
+  return /Instagram|FBAN|FBAV|TikTok/.test(navigator.userAgent || '')
+}
+
+// Single source of truth for the deep-link escape (was duplicated in goToLink +
+// applyDeepLinkBypass, so iOS could be fixed in one place and not the other).
+//  - Android: intent:// with an https fallback_url — reliable.
+//  - iOS 17+: the x-safari-https:// scheme opens Safari straight from the webview.
+//    (instagram://extbrowser was Meta's old trick and has been patched for years.)
+// Both fall back to a plain navigation after a beat so a click is never lost on
+// an OS/browser that ignores the scheme.
+function breakOutToBrowser(targetUrl) {
+  const ua = navigator.userAgent || ''
+  if (/Android/.test(ua)) {
+    try {
+      const u = new URL(targetUrl)
+      const enc = encodeURIComponent(targetUrl)
+      window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;S.browser_fallback_url=${enc};end`
+      return
+    } catch { /* malformed URL → plain nav below */ }
+  } else {
+    window.location.href = 'x-safari-' + targetUrl
+    setTimeout(() => { window.location.href = targetUrl }, 1200)
+    return
+  }
+  window.location.href = targetUrl
+}
+
 function goToLink(link) {
   const watched = Math.round(maxWatched.value)
   sendEvent('link_click', {
@@ -649,37 +680,16 @@ function goToLink(link) {
   })
   const url = withUtm(link.url)
   if (!url) return
-  if (page.value?.deep_link_enabled) {
-    const ua = navigator.userAgent || ''
-    const isAndroid = /Android/.test(ua)
-    const isInApp = /Instagram|FBAN|FBAV|TikTok/.test(ua)
-    if (isInApp) {
-      const enc = encodeURIComponent(url)
-      if (isAndroid) {
-        try { const u = new URL(url); window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;S.browser_fallback_url=${enc};end` }
-        catch { window.location.href = url }
-      } else {
-        window.location.href = `instagram://extbrowser/?url=${enc}`
-        setTimeout(() => { window.location.href = url }, 1500)
-      }
-      return
-    }
+  if (page.value?.deep_link_enabled && isInAppBrowser()) {
+    breakOutToBrowser(url)
+    return
   }
   window.location.href = url
 }
 
 function applyDeepLinkBypass() {
-  const ua = navigator.userAgent || ''
-  if (!/Instagram|FBAN|FBAV/.test(ua)) return
-  const url = window.location.href
-  const enc = encodeURIComponent(url)
-  if (/Android/.test(ua)) {
-    try { const u = new URL(url); window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;S.browser_fallback_url=${enc};end` }
-    catch {}
-  } else {
-    window.location.href = `instagram://extbrowser/?url=${enc}`
-    setTimeout(() => { window.location.href = url }, 1500)
-  }
+  if (!isInAppBrowser()) return
+  breakOutToBrowser(window.location.href)
 }
 
 // ─── Shield Protection™ ────────────────────────────────────────────────────────
