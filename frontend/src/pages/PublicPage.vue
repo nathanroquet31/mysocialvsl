@@ -21,7 +21,7 @@
       <!-- Local video (direct upload) -->
       <video v-if="vslActive && isLocalVideo" ref="videoEl" :src="page.video_url"
         autoplay muted loop playsinline preload="auto"
-        @play="onVideoPlay" @timeupdate="onVideoTimeUpdate"
+        @play="onVideoPlay" @timeupdate="onVideoTimeUpdate" @pause="flushWatch" @ended="flushWatch"
         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:none" />
 
       <!-- Iframe (Streamable, Vimeo…) -->
@@ -356,6 +356,19 @@ const ageModal = ref(false)
 const pendingLink = ref(null)
 const pageStartTime = ref(0)
 
+// One id per visit: groups every event of this session so 1 visit = 1 view
+// (a viewer firing ~10 events counts once; a later re-watch is a new session).
+const sessionId = (() => {
+  try { return crypto.randomUUID().slice(0, 36) }
+  catch { return 'sx-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10) }
+})()
+
+// Every analytics call carries the session id so the backend can build the
+// retention curve and live presence per visit.
+function postEvent(type, extra = {}) {
+  api.post(`/p/${slug}/event`, { type, session_id: sessionId, ...extra }).catch(() => {})
+}
+
 // ─── VSL ───────────────────────────────────────────────────────────────────────
 const vslActive = computed(() => !!page.value?.video_url && page.value?.vsl_enabled !== false)
 
@@ -511,15 +524,25 @@ const videoEl = ref(null)
 const videoMuted = ref(true)
 const videoPlayTracked = ref(false)
 const watchMilestonesTracked = ref(new Set<number>())
-const videoStartTime = ref<number | null>(null)
-const watchSeconds = ref(0)
-const lastVideoBucket = ref(-1)
+const maxWatched = ref(0)
+const lastFlushedSecond = ref(0)
 
 function onVideoPlay() {
   if (videoPlayTracked.value) return
   videoPlayTracked.value = true
-  videoStartTime.value = Date.now()
-  api.post(`/p/${slug}/event`, { type: 'video_play' }).catch(() => {})
+  postEvent('video_play')
+}
+
+// Persist the furthest whole second actually reached, so the dashboard can build
+// a per-second retention curve. We send the MAX reached (not a ping every second
+// — that would flood the table); the backend takes the max per session. Sent via
+// beacon so it survives the tab closing, which is exactly when someone drops off.
+function flushWatch() {
+  const sec = Math.floor(maxWatched.value)
+  if (sec > lastFlushedSecond.value) {
+    lastFlushedSecond.value = sec
+    sendEvent('video_position', { value: sec })
+  }
 }
 
 function onVideoTimeUpdate() {
@@ -529,29 +552,22 @@ function onVideoTimeUpdate() {
   const current = el.currentTime
   videoCurrentTime.value = current
 
-  // Tracking drop-off toutes les 10s
-  const bucket = Math.floor(current / 10)
-  if (bucket > 0 && bucket !== lastVideoBucket.value) {
-    lastVideoBucket.value = bucket
-    api.post(`/p/${slug}/event`, { type: 'video_position', value: bucket * 10 }).catch(() => {})
-  }
+  // Real watch time = furthest second actually reached in the video (not wall
+  // clock, which over-counts on pause). Drives the retention curve + "avg watch".
+  if (current > maxWatched.value) maxWatched.value = current
 
   // CTA reveal
   if (!ctaVisible.value && page.value?.cta_reveal_at && current >= page.value.cta_reveal_at) {
     ctaVisible.value = true
   }
 
-  // Milestones (analytics compatibility)
+  // Milestones (kept for the per-page stats endpoint)
   const pct = Math.floor((current / el.duration) * 100)
   for (const milestone of [25, 50, 75, 100]) {
     if (pct >= milestone && !watchMilestonesTracked.value.has(milestone)) {
       watchMilestonesTracked.value.add(milestone)
-      api.post(`/p/${slug}/event`, { type: 'video_progress', value: milestone }).catch(() => {})
+      postEvent('video_progress', { value: milestone })
     }
-  }
-
-  if (videoStartTime.value) {
-    watchSeconds.value = Math.floor((Date.now() - videoStartTime.value) / 1000)
   }
 }
 
@@ -566,7 +582,7 @@ function toggleMute() {
   videoMuted.value = !videoMuted.value
   if (videoEl.value) (videoEl.value as HTMLVideoElement).muted = videoMuted.value
   if (!videoMuted.value) {
-    api.post(`/p/${slug}/event`, { type: 'video_unmute' }).catch(() => {})
+    postEvent('video_unmute')
   }
 }
 
@@ -587,7 +603,7 @@ function handleLinkClick(link) {
 }
 
 function confirmAge() {
-  api.post(`/p/${slug}/event`, { type: 'age_confirmed' }).catch(() => {})
+  postEvent('age_confirmed')
   ageModal.value = false
   goToLink(pendingLink.value)
   pendingLink.value = null
@@ -599,18 +615,19 @@ function confirmAge() {
 // Blob type is required so Laravel parses the body; a plain string arrives as
 // text/plain and is dropped by validation.
 function sendEvent(type, extra = {}) {
-  const payload = JSON.stringify({ type, ...extra })
+  const payload = JSON.stringify({ type, session_id: sessionId, ...extra })
   if (navigator.sendBeacon) {
     navigator.sendBeacon(`/api/p/${slug}/event`, new Blob([payload], { type: 'application/json' }))
   } else {
-    api.post(`/p/${slug}/event`, { type, ...extra }).catch(() => {})
+    api.post(`/p/${slug}/event`, { type, session_id: sessionId, ...extra }).catch(() => {})
   }
 }
 
 function goToLink(link) {
+  const watched = Math.round(maxWatched.value)
   sendEvent('link_click', {
     page_link_id: link.id,
-    value: watchSeconds.value > 0 ? watchSeconds.value : null,
+    value: watched > 0 ? watched : null,
   })
   const url = withUtm(link.url)
   if (!url) return
@@ -686,6 +703,26 @@ function serveDecoyPage() {
   `
 }
 
+// ─── Live presence heartbeat ─────────────────────────────────────────────────────
+// Pings every 12s while the tab is visible so the dashboard knows this visitor
+// is still on the page (and since when). Pauses when the tab is hidden.
+let heartbeatTimer = null
+function startHeartbeat() {
+  if (heartbeatTimer) return
+  heartbeatTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      postEvent('heartbeat')
+      flushWatch() // fallback so long, uninterrupted views still get recorded
+    }
+  }, 12000)
+}
+
+// Capture the drop-off point reliably: the tab going hidden or closing is the
+// most common way people leave, and that's exactly the second we need.
+function onVisibilityChange() {
+  if (document.visibilityState === 'hidden') flushWatch()
+}
+
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
 onMounted(async () => {
   applyDeepLinkBypass()
@@ -696,7 +733,7 @@ onMounted(async () => {
 
     if (data.bot_protection) {
       if (isMetaBot()) {
-        api.post(`/p/${slug}/event`, { type: 'bot_blocked', ua: navigator.userAgent }).catch(() => {})
+        postEvent('bot_blocked')
         serveDecoyPage()
         return
       }
@@ -708,7 +745,10 @@ onMounted(async () => {
 
     pageStartTime.value = Date.now()
     const referrer = document.referrer ? document.referrer.slice(0, 500) : null
-    api.post(`/p/${slug}/event`, { type: 'page_view', referrer }).catch(() => {})
+    postEvent('page_view', { referrer })
+    startHeartbeat()
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('pagehide', flushWatch)
 
     if (data.link_preview_enabled !== false) applySeoMeta(data)
 
@@ -726,6 +766,10 @@ onMounted(async () => {
 onUnmounted(() => {
   if (popupTimer) clearTimeout(popupTimer)
   if (fomoTimer) clearTimeout(fomoTimer)
+  if (heartbeatTimer) clearInterval(heartbeatTimer)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+  window.removeEventListener('pagehide', flushWatch)
+  flushWatch()
   if (pageStartTime.value && page.value) {
     const secs = Math.round((Date.now() - pageStartTime.value) / 1000)
     if (secs >= 2) {

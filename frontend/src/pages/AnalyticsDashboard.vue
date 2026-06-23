@@ -6,7 +6,7 @@
       <!-- Greeting -->
       <div>
         <h2 :style="{fontSize:'22px',fontWeight:700,color:textPrimary,margin:'0 0 2px',letterSpacing:'-0.02em'}">
-          {{ greeting }}, {{ firstName }} 👋
+          {{ greeting }}, {{ firstName }}
         </h2>
         <p :style="{fontSize:'13px',color:textMuted,margin:0}">Here's what's happening with your pages.</p>
       </div>
@@ -168,37 +168,54 @@
       </div>
     </div>
 
-    <!-- ── VSL Watch Funnel (real watch-time engagement) ──────────────────── -->
-    <div class="adash-card" :style="{marginBottom:'20px'}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+    <!-- ── Audience Retention Curve (Pro/Agency) ──────────────────────────── -->
+    <div class="adash-card" :style="{marginBottom:'20px',position:'relative'}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px">
         <div>
-          <h3 class="adash-card-title" style="margin:0">VSL Watch Funnel</h3>
-          <p class="adash-card-sub">How far your audience watches before clicking</p>
+          <h3 class="adash-card-title" style="margin:0">
+            Audience retention
+            <span :style="{fontSize:'10px',fontWeight:700,color:'#A78BFA',background:theme.dark?'rgba(109,78,232,0.2)':'#EEE9FF',borderRadius:'999px',padding:'2px 8px',marginLeft:'6px',verticalAlign:'middle'}">PRO</span>
+          </h3>
+          <p class="adash-card-sub">% of viewers still watching, second by second — one line per video. The first seconds tell you if the hook lands.</p>
         </div>
-        <div :style="{display:'flex',gap:'20px',flexWrap:'wrap'}">
-          <div style="text-align:right">
-            <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ data.vsl?.play_rate ?? 0 }}%</p>
-            <p :style="{margin:0,fontSize:'11px',color:textMuted}">play rate</p>
-          </div>
-          <div style="text-align:right">
-            <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ data.vsl?.avg_watch_before_click != null ? data.vsl.avg_watch_before_click + 's' : '—' }}</p>
-            <p :style="{margin:0,fontSize:'11px',color:textMuted}">avg watch → click</p>
-          </div>
-          <div style="text-align:right">
-            <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ data.vsl?.avg_time_on_page != null ? data.vsl.avg_time_on_page + 's' : '—' }}</p>
-            <p :style="{margin:0,fontSize:'11px',color:textMuted}">avg time on page</p>
-          </div>
+        <div v-if="isPaid && retentionTotalPlays" style="text-align:right">
+          <p :style="{margin:0,fontSize:'18px',fontWeight:700,color:theme.dark?'#fff':'#111827'}">{{ retentionTotalPlays }}</p>
+          <p :style="{margin:0,fontSize:'11px',color:textMuted}">video plays analysed</p>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:9px">
-        <div v-for="step in vslFunnel" :key="step.label" style="display:flex;align-items:center;gap:14px">
-          <div :style="{width:'140px',flexShrink:0,fontSize:'12px',color:textMuted}">{{ step.label }}</div>
-          <div :style="{flex:1,background:theme.dark?'rgba(255,255,255,0.04)':'#F3F4F6',borderRadius:'999px',height:'28px',position:'relative',overflow:'hidden'}">
-            <div :style="{position:'absolute',left:0,top:0,bottom:0,width:Math.max(step.pct,2)+'%',borderRadius:'999px',transition:'width 0.8s cubic-bezier(0.4,0,0.2,1)',background: step.green ? 'linear-gradient(90deg,#059669,#34d399)' : 'linear-gradient(90deg,#5B2FD4,#8B6FF0)'}"></div>
-          </div>
-          <div :style="{width:'46px',flexShrink:0,textAlign:'right',fontSize:'12px',fontWeight:700,color: step.green ? '#34d399' : (theme.dark?'rgba(255,255,255,0.6)':'#6B7280')}">{{ step.pct }}%</div>
+      <!-- Locked state for Free -->
+      <div v-if="!isPaid" :style="{textAlign:'center',padding:'40px 16px'}">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6" stroke-linecap="round" style="margin-bottom:10px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <p :style="{fontSize:'14px',fontWeight:700,color:textPrimary,margin:'0 0 4px'}">Retention curve is a Pro feature</p>
+        <p :style="{fontSize:'12px',color:textMuted,margin:'0 0 14px'}">See second by second when your audience drops off and converts.</p>
+        <router-link to="/billing" :style="{display:'inline-block',padding:'8px 18px',borderRadius:'9px',background:'#6D4EE8',color:'#fff',fontSize:'13px',fontWeight:600,textDecoration:'none'}">Upgrade to Pro</router-link>
+      </div>
+
+      <!-- Empty state (paid, no data yet) -->
+      <div v-else-if="!retentionPages.length" :style="{textAlign:'center',padding:'40px 16px'}">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:8px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <p :style="{fontSize:'13px',color:textMuted,margin:'0 0 4px',fontWeight:600}">No watch data yet</p>
+        <p :style="{fontSize:'12px',color:textMuted,margin:0,opacity:0.7}">Once people watch your VSL, the retention curve appears here.</p>
+      </div>
+
+      <div v-else>
+        <div :style="{height:'260px',position:'relative'}">
+          <canvas ref="retentionCanvas" style="width:100%;height:100%"></canvas>
         </div>
+        <!-- Per-video legend -->
+        <div :style="{display:'flex',gap:'14px',flexWrap:'wrap',marginTop:'12px'}">
+          <span v-for="p in retentionPages" :key="p.id" :style="{display:'flex',alignItems:'center',gap:'6px',fontSize:'11px',color:textSecondary}">
+            <span :style="{display:'inline-block',width:'12px',height:'3px',borderRadius:'2px',background:retentionColor(p.id)}"></span>
+            {{ p.name }}
+            <span :style="{color:textMuted}">· {{ p.plays }} plays</span>
+            <span v-if="retentionPeakClick(p) != null" :style="{color:'#16A34A',fontWeight:600}">· clic ~{{ retentionPeakClick(p) }}s</span>
+          </span>
+          <span v-if="retentionPages.length === 1" :style="{display:'flex',alignItems:'center',gap:'6px',fontSize:'11px',color:textMuted}">
+            <span :style="{display:'inline-block',width:'10px',height:'10px',borderRadius:'2px',background:'#16A34A'}"></span> clicks per second
+          </span>
+        </div>
+        <p v-if="retentionInsight" :style="{margin:'10px 0 0',fontSize:'11px',color:textMuted}"><i class="bi bi-lightbulb"></i> {{ retentionInsight }}</p>
       </div>
     </div>
 
@@ -206,7 +223,7 @@
     <div :style="{marginBottom:'20px'}">
       <div class="adash-card">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-          <span style="font-size:18px">🏆</span>
+          <i class="bi bi-trophy-fill" :style="{fontSize:'16px',color:'#F5A623'}"></i>
           <h3 class="adash-card-title" style="margin:0">Top links</h3>
         </div>
         <div v-if="!data.top_links?.length" :style="{textAlign:'center',padding:'32px 16px'}">
@@ -293,6 +310,28 @@
           </div>
         </div>
 
+        <!-- Watching right now (live presence) — Pro/Agency -->
+        <div>
+          <p :style="{fontSize:'10px',fontWeight:700,color:textMuted,textTransform:'uppercase',letterSpacing:'0.08em',margin:'0 0 8px'}">
+            On the page right now
+            <span v-if="isPaid && data.live?.visitors?.length" :style="{color:'#16A34A',marginLeft:'6px'}">{{ data.live.visitors_now }} live</span>
+            <span v-else-if="!isPaid" :style="{fontSize:'9px',color:'#A78BFA',background:theme.dark?'rgba(109,78,232,0.2)':'#EEE9FF',borderRadius:'999px',padding:'1px 6px',marginLeft:'6px'}">PRO</span>
+          </p>
+          <div v-if="!isPaid" :style="{fontSize:'12px',color:textMuted}">
+            <router-link to="/billing" :style="{color:'#A78BFA',textDecoration:'none',fontWeight:600}">Upgrade</router-link> to see who's on your pages live.
+          </div>
+          <div v-else-if="!data.live?.visitors?.length" :style="{fontSize:'12px',color:textMuted}">Nobody on your pages right now</div>
+          <div v-else style="display:flex;flex-wrap:wrap;gap:6px">
+            <div v-for="(v,i) in data.live.visitors.slice(0,12)" :key="i"
+              :style="{display:'flex',alignItems:'center',gap:'6px',padding:'4px 9px',borderRadius:'999px',background:hoverBg,fontSize:'11px',color:textSecondary}">
+              <span class="adash-live-dot" style="margin:0;width:6px;height:6px"></span>
+              <span>{{ countryFlag(v.country) }}</span>
+              <i :class="v.device === 'mobile' ? 'bi bi-phone' : 'bi bi-laptop'" :style="{color:textMuted}"></i>
+              <span :style="{color:textMuted,fontFamily:'monospace'}">{{ formatDuration(v.seconds) }}</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Countries + Event feed -->
         <div class="adash-charts" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0">
 
@@ -322,10 +361,10 @@
             <div v-else style="display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1">
               <div v-for="(ev,i) in [...(data.live.events)].reverse().slice(0,14)" :key="i"
                 :style="{display:'flex',alignItems:'center',gap:'6px',padding:'4px 7px',borderRadius:'6px',background:hoverBg,fontSize:'11px',flexShrink:0}">
-                <span>{{ eventIcon(ev.type) }}</span>
+                <i :class="eventIcon(ev.type)" :style="{color:eventColor(ev.type),flexShrink:0}"></i>
                 <span :style="{flex:1,color:textSecondary,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">{{ eventLabel(ev.type) }}</span>
                 <span v-if="ev.country" :style="{flexShrink:0}">{{ countryFlag(ev.country) }}</span>
-                <span :style="{color:textMuted,flexShrink:0}">{{ ev.device === 'mobile' ? '📱' : '💻' }}</span>
+                <i :class="ev.device === 'mobile' ? 'bi bi-phone' : 'bi bi-laptop'" :style="{color:textMuted,flexShrink:0}"></i>
               </div>
             </div>
           </div>
@@ -375,23 +414,13 @@ const data       = ref({
   series: { labels: [], views: [], clicks: [] },
   top_links: [], by_country: {}, by_device: {}, by_referrer: {},
   hourly: Array(24).fill(0),
-  live: { visitors_now: 0, views_30m: 0, clicks_30m: 0, top_country: null, events: [] },
+  live: { visitors_now: 0, views_30m: 0, clicks_30m: 0, top_country: null, events: [], visitors: [] },
   per_link: [], pages: [],
-  vsl: { plays: 0, play_rate: 0, milestones: { 25: 0, 50: 0, 75: 0, 100: 0 }, avg_watch_before_click: null, avg_time_on_page: null },
+  is_paid: false,
+  retention: null,
 })
 
-// VSL watch funnel rows (real data) — narrows from views down to clicks.
-const vslFunnel = computed(() => {
-  const v = data.value.vsl || {}
-  const m = v.milestones || {}
-  return [
-    { label: 'Page views',      pct: 100,                 green: false },
-    { label: 'Played the video', pct: v.play_rate || 0,    green: false },
-    { label: 'Watched halfway',  pct: m[50] ?? 0,          green: false },
-    { label: 'Watched to the end', pct: m[100] ?? 0,       green: false },
-    { label: 'Clicked → OnlyFans', pct: data.value.ctr || 0, green: true },
-  ]
-})
+const isPaid = computed(() => data.value.is_paid || auth.user?.plan === 'pro' || auth.user?.plan === 'agency' || auth.user?.is_admin)
 
 // ── Filters ───────────────────────────────────────────────────────────────
 const dateRange      = ref({ preset: '30d', start: null, end: null })
@@ -409,6 +438,49 @@ const chartBreakdown = ref('total')
 const chartMetrics   = [{ label: 'Page views', value: 'views' }, { label: 'Clicks', value: 'clicks' }]
 const chartBreakdowns = [{ label: 'Total', value: 'total' }, { label: 'By link', value: 'links' }, { label: 'By country', value: 'country' }]
 let chartInstance    = null
+
+// ── Retention curve (one line per video, per second) ─────────────────────────
+const retentionCanvas = ref(null)
+let retentionChart    = null
+const retentionPages  = computed(() => data.value.retention?.pages || [])
+const retentionTotalPlays = computed(() => retentionPages.value.reduce((s, p) => s + (p.plays || 0), 0))
+
+// Distinct, stable colour per video line (light blue / red / green first, à la Lucas).
+const RETENTION_COLORS = ['#38BDF8', '#EF4444', '#22C55E', '#A855F7', '#F59E0B', '#EC4899']
+function retentionColor(pageId) {
+  const idx = retentionPages.value.findIndex(p => p.id === pageId)
+  return RETENTION_COLORS[(idx < 0 ? 0 : idx) % RETENTION_COLORS.length]
+}
+
+// The second where this video gets the most clicks — "when the fan clicked".
+function retentionPeakClick(page) {
+  let bestSec = null, best = 0
+  for (const pt of page.points || []) {
+    if ((pt.clicks || 0) > best) { best = pt.clicks; bestSec = pt.sec }
+  }
+  return bestSec
+}
+
+// Plain-language takeaway, only when a single video is shown (otherwise the lines
+// speak for themselves): hook strength at 3s, biggest drop, best converting second.
+const retentionInsight = computed(() => {
+  if (retentionPages.value.length !== 1) return ''
+  const pts = retentionPages.value[0].points || []
+  if (pts.length < 2) return ''
+  const at = (s) => pts.find(p => p.sec === s)
+  const parts = []
+  const hook = at(3)
+  if (hook) parts.push(`${hook.pct}% still watching at 3s`)
+  let maxDrop = 0, dropAt = 0
+  for (let i = 1; i < pts.length; i++) {
+    const d = pts[i - 1].pct - pts[i].pct
+    if (d > maxDrop) { maxDrop = d; dropAt = pts[i].sec }
+  }
+  if (maxDrop >= 5) parts.push(`biggest drop at ${dropAt}s`)
+  const bestClick = [...pts].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0]
+  if (bestClick && bestClick.clicks > 0) parts.push(`most clicks around ${bestClick.sec}s`)
+  return parts.join(' · ')
+})
 
 // ── Greeting ──────────────────────────────────────────────────────────────
 const firstName = computed(() => auth.user?.name?.split(' ')[0] || 'Creator')
@@ -497,6 +569,7 @@ async function loadData() {
     loading.value = false
     await nextTick()
     renderChart()
+    renderRetention()
   }
 }
 
@@ -558,7 +631,81 @@ function renderChart() {
   })
 }
 
+// ── Retention chart — one line per video, per-second X axis ───────────────────
+function renderRetention() {
+  if (retentionChart) { retentionChart.destroy(); retentionChart = null }
+  if (!retentionCanvas.value) return
+  const pages = retentionPages.value
+  if (!pages.length) return
+
+  const isDark = theme.dark
+  const single = pages.length === 1
+
+  // Shared per-second X axis spanning the longest video; each line stops at its
+  // own end (null beyond), so different video lengths coexist on one axis.
+  const maxSec = Math.max(...pages.map(p => p.points.length ? p.points[p.points.length - 1].sec : 0))
+  const labels = Array.from({ length: maxSec + 1 }, (_, s) => s + 's')
+
+  const datasets = pages.map((p) => {
+    const color = retentionColor(p.id)
+    const arr = new Array(maxSec + 1).fill(null)
+    for (const pt of p.points) arr[pt.sec] = pt.pct
+    return {
+      type: 'line', label: p.name, data: arr, yAxisID: 'y',
+      borderColor: color, backgroundColor: color + '22', borderWidth: 2.5,
+      pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: color,
+      tension: 0.3, fill: single, spanGaps: false, order: 2,
+    }
+  })
+
+  // Click bars only in single-video view (overlapping bars across videos = noise).
+  if (single) {
+    const clicks = new Array(maxSec + 1).fill(0)
+    for (const pt of pages[0].points) clicks[pt.sec] = pt.clicks || 0
+    datasets.push({
+      type: 'bar', label: 'Clicks', data: clicks, yAxisID: 'yClicks',
+      backgroundColor: 'rgba(34,197,94,0.7)', borderRadius: 3, borderSkipped: false,
+      barThickness: 'flex', maxBarThickness: 12, order: 1,
+    })
+  }
+
+  const ctx = retentionCanvas.value.getContext('2d')
+  retentionChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? '#1a1733' : '#fff',
+          titleColor: isDark ? '#fff' : '#111827',
+          bodyColor: isDark ? 'rgba(255,255,255,0.7)' : '#6B7280',
+          borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB',
+          borderWidth: 1, padding: 10, cornerRadius: 8,
+          callbacks: {
+            label: (c) => c.dataset.label === 'Clicks'
+              ? ` ${c.parsed.y} click${c.parsed.y === 1 ? '' : 's'}`
+              : ` ${c.dataset.label}: ${c.parsed.y}% still watching`,
+          },
+        },
+      },
+      scales: {
+        x: { grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }, ticks: { color: isDark ? 'rgba(255,255,255,0.3)' : '#9CA3AF', font: { size: 10, family: 'Inter,sans-serif' }, maxTicksLimit: 14, autoSkip: true }, border: { display: false } },
+        y: { min: 0, max: 100, grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }, ticks: { color: isDark ? 'rgba(255,255,255,0.3)' : '#9CA3AF', font: { size: 10, family: 'Inter,sans-serif' }, callback: (v) => v + '%' }, border: { display: false } },
+        yClicks: { display: single, position: 'right', min: 0, grid: { display: false }, ticks: { color: isDark ? 'rgba(255,255,255,0.25)' : '#C7CCD4', font: { size: 10, family: 'Inter,sans-serif' }, precision: 0 }, border: { display: false } },
+      },
+    },
+  })
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────
+function formatDuration(s) {
+  s = Math.max(0, Math.round(s || 0))
+  const m = Math.floor(s / 60)
+  return m + ':' + String(s % 60).padStart(2, '0')
+}
 function formatNum(n) {
   if (n == null) return '—'
   if (n >= 1e6) return (n/1e6).toFixed(1)+'M'
@@ -567,8 +714,9 @@ function formatNum(n) {
 }
 const FLAGS = {FR:'🇫🇷',US:'🇺🇸',GB:'🇬🇧',DE:'🇩🇪',ES:'🇪🇸',IT:'🇮🇹',CA:'🇨🇦',AU:'🇦🇺',BR:'🇧🇷',MX:'🇲🇽',JP:'🇯🇵',KR:'🇰🇷',NL:'🇳🇱',BE:'🇧🇪',CH:'🇨🇭',PT:'🇵🇹',PL:'🇵🇱',RU:'🇷🇺',UA:'🇺🇦',NG:'🇳🇬',MA:'🇲🇦',TN:'🇹🇳',DZ:'🇩🇿',SN:'🇸🇳',CI:'🇨🇮',CM:'🇨🇲',GH:'🇬🇭',ZA:'🇿🇦',EG:'🇪🇬',IN:'🇮🇳',CN:'🇨🇳',TR:'🇹🇷',SA:'🇸🇦',AE:'🇦🇪',AR:'🇦🇷',CO:'🇨🇴',SG:'🇸🇬',TH:'🇹🇭',VN:'🇻🇳',PH:'🇵🇭',ID:'🇮🇩',MY:'🇲🇾',SE:'🇸🇪',NO:'🇳🇴',DK:'🇩🇰',FI:'🇫🇮',GR:'🇬🇷',RO:'🇷🇴',HU:'🇭🇺',AT:'🇦🇹',IL:'🇮🇱',QA:'🇶🇦',KE:'🇰🇪'}
 function countryFlag(c) { return FLAGS[c] || '🌍' }
-function eventIcon(t)  { return {page_view:'👁️',link_click:'⚡',age_confirmed:'✅',video_play:'▶️'}[t]||'•' }
-function eventLabel(t) { return {page_view:'Page view',link_click:'Link click',age_confirmed:'Age confirmed',video_play:'Video play'}[t]||t }
+function eventIcon(t)  { return 'bi ' + ({page_view:'bi-eye-fill',link_click:'bi-lightning-charge-fill',age_confirmed:'bi-shield-check',video_play:'bi-play-circle-fill',video_position:'bi-clock-fill',video_progress:'bi-bar-chart-fill',video_unmute:'bi-volume-up-fill'}[t]||'bi-dot') }
+function eventColor(t) { return {page_view:'#6D4EE8',link_click:'#16A34A',age_confirmed:'#0EA5E9',video_play:'#A78BFA',video_position:'#9CA3AF',video_progress:'#F59E0B',video_unmute:'#EC4899'}[t]||'#9CA3AF' }
+function eventLabel(t) { return {page_view:'Page view',link_click:'Link click',age_confirmed:'Age confirmed',video_play:'Video play',video_position:'Still watching',video_progress:'Watch milestone',video_unmute:'Unmuted video'}[t]||t }
 // ── Live polling (8s, dedicated endpoint) ─────────────────────────────────
 let liveTimer = null
 async function pollLive() {
@@ -587,6 +735,7 @@ function handleOutsideClick(e) {
 
 watch([filterLinkId, filterCountry], loadData)
 watch([chartMetric, chartType, () => theme.dark], () => nextTick(renderChart))
+watch(() => theme.dark, () => nextTick(renderRetention))
 
 onMounted(async () => {
   // Load pages first so the dropdown + banner work regardless of analytics state
@@ -603,6 +752,7 @@ onMounted(async () => {
 })
 onUnmounted(() => {
   if (chartInstance) chartInstance.destroy()
+  if (retentionChart) retentionChart.destroy()
   if (liveTimer) clearInterval(liveTimer)
   document.removeEventListener('click', handleOutsideClick)
 })

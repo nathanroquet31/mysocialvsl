@@ -5,7 +5,7 @@
     <div v-if="successMsg"
       :style="{position:'fixed',inset:0,background:'rgba(0,0,0,0.85)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Inter,sans-serif'}">
       <div :style="{textAlign:'center'}">
-        <div :style="{fontSize:'48px',marginBottom:'12px'}">{{ isEditMode ? '✅' : '🚀' }}</div>
+        <i :class="isEditMode ? 'bi bi-check-circle-fill' : 'bi bi-rocket-takeoff-fill'" :style="{fontSize:'46px',marginBottom:'12px',display:'block',color: isEditMode ? '#22C55E' : '#A78BFA'}"></i>
         <p :style="{fontSize:'22px',fontWeight:700,color:'#fff',marginBottom:'6px'}">{{ isEditMode ? 'Page updated!' : 'Page published!' }}</p>
         <p :style="{fontSize:'14px',color:'rgba(255,255,255,0.5)'}">Redirecting…</p>
       </div>
@@ -140,8 +140,8 @@
                   <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">VSL Page</p>
                   <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">A full-screen video that convinces<br/>before they even click.</p>
                   <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                    <div v-for="f in ['🎬 Vertical 9:16 video','🔓 Configurable CTA button','🎯 Built to convert clicks']" :key="f"
-                      :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
+                    <div v-for="f in [{i:'bi-camera-video-fill',t:'Vertical 9:16 video'},{i:'bi-unlock-fill',t:'Configurable CTA button'},{i:'bi-bullseye',t:'Built to convert clicks'}]" :key="f.t"
+                      :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4,display:'flex',alignItems:'center',gap:'6px'}"><i :class="'bi '+f.i" :style="{color:'#A78BFA'}"></i>{{ f.t }}</div>
                   </div>
                   <div v-if="form.page_type==='vsl'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
                     <div :style="{background:'#6D4EE8',borderRadius:'999px',padding:'3px 12px',fontSize:'10px',fontWeight:700,color:'#fff',display:'inline-flex',alignItems:'center',gap:'4px'}">
@@ -187,8 +187,8 @@
                   <p :style="{fontSize:'14px',fontWeight:700,color:C.text,textAlign:'center',marginBottom:'4px'}">Direct link</p>
                   <p :style="{fontSize:'11px',color:C.textMuted,textAlign:'center',lineHeight:1.5,marginBottom:'12px'}">Instant redirect with<br/>deeplink bypass included.</p>
                   <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
-                    <div v-for="f in ['⚡ Instant redirect','🔗 Automatic deeplink bypass','📱 Works with Instagram, TikTok…']" :key="f"
-                      :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4}">{{ f }}</div>
+                    <div v-for="f in [{i:'bi-lightning-charge-fill',t:'Instant redirect'},{i:'bi-link-45deg',t:'Automatic deeplink bypass'},{i:'bi-phone-fill',t:'Works with Instagram, TikTok…'}]" :key="f.t"
+                      :style="{fontSize:'10px',color:C.textMuted,lineHeight:1.4,display:'flex',alignItems:'center',gap:'6px'}"><i :class="'bi '+f.i" :style="{color:'#A78BFA'}"></i>{{ f.t }}</div>
                   </div>
                   <div v-if="form.page_type==='direct'" :style="{marginTop:'12px',display:'flex',justifyContent:'center'}">
                     <div :style="{background:'#6D4EE8',borderRadius:'999px',padding:'3px 12px',fontSize:'10px',fontWeight:700,color:'#fff',display:'inline-flex',alignItems:'center',gap:'4px'}">
@@ -319,7 +319,7 @@
                           Normal deeplink
                         </p>
                         <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Smooth redirect. Visitors are sent straight to Safari. A frictionless experience.</p>
-                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#10b981',fontWeight:600}">✓ Best conversion rate</div>
+                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#10b981',fontWeight:600,display:'flex',alignItems:'center',gap:'5px'}"><i class="bi bi-check-circle-fill"></i>Best conversion rate</div>
                       </div>
                       <!-- Strict -->
                       <div :style="{background:'rgba(109,78,232,0.07)',border:'1px solid rgba(109,78,232,0.18)',borderRadius:'12px',padding:'14px'}">
@@ -328,7 +328,7 @@
                           Strict Deeplink
                         </p>
                         <p :style="{fontSize:'11px',color:C.textDim,lineHeight:1.6}">Mandatory interstitial screen. Guarantees the link opens in the browser even if the deeplink fails.</p>
-                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#A78BFA',fontWeight:600}">✓ Guaranteed open</div>
+                        <div :style="{marginTop:'8px',fontSize:'10px',color:'#A78BFA',fontWeight:600,display:'flex',alignItems:'center',gap:'5px'}"><i class="bi bi-check-circle-fill"></i>Guaranteed open</div>
                       </div>
                     </div>
 
@@ -363,7 +363,7 @@
 
                     <div class="bld-grid" :style="{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}">
                       <div :style="{background:'rgba(16,185,129,0.06)',border:'1px solid rgba(16,185,129,0.14)',borderRadius:'12px',padding:'14px'}">
-                        <p :style="{fontSize:'11px',fontWeight:700,color:'#10b981',marginBottom:'8px'}">✓ What it blocks</p>
+                        <p :style="{fontSize:'11px',fontWeight:700,color:'#10b981',marginBottom:'8px',display:'flex',alignItems:'center',gap:'5px'}"><i class="bi bi-shield-check"></i>What it blocks</p>
                         <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
                           <p v-for="item in ['Crawlers & scrapers','Spam bots','Social media link previews','Competitor analytics tools']" :key="item"
                             :style="{fontSize:'11px',color:C.textMuted,display:'flex',alignItems:'center',gap:'5px',lineHeight:1.4}">
@@ -372,7 +372,7 @@
                         </div>
                       </div>
                       <div :style="{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.16)',borderRadius:'12px',padding:'14px'}">
-                        <p :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B',marginBottom:'8px'}">⚠ Side effects</p>
+                        <p :style="{fontSize:'11px',fontWeight:700,color:'#F59E0B',marginBottom:'8px',display:'flex',alignItems:'center',gap:'5px'}"><i class="bi bi-exclamation-triangle-fill"></i>Side effects</p>
                         <div :style="{display:'flex',flexDirection:'column',gap:'4px'}">
                           <p v-for="item in ['No more preview when you share the link','Instagram won\'t generate a preview','Organic reach impacted if you post the link']" :key="item"
                             :style="{fontSize:'11px',color:C.textMuted,display:'flex',alignItems:'center',gap:'5px',lineHeight:1.4}">
@@ -789,7 +789,7 @@
                     @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
                 </div>
                 <div :style="{background:C.surface2,borderRadius:'10px',padding:'12px',fontSize:'12px',color:C.textMuted,lineHeight:1.6}">
-                  💡 The popup button uses the same text and color as your main CTA below.
+                  <i class="bi bi-lightbulb"></i> The popup button uses the same text and color as your main CTA below.
                 </div>
               </div>
 

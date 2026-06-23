@@ -18,10 +18,11 @@ class AnalyticsController extends Controller
         $page = Page::where('slug', $slug)->where('is_active', true)->firstOrFail();
 
         $request->validate([
-            'type'         => 'required|in:page_view,link_click,age_confirmed,video_play,video_progress,video_unmute,bot_blocked,time_on_page',
+            'type'         => 'required|in:page_view,link_click,age_confirmed,video_play,video_progress,video_position,video_unmute,bot_blocked,time_on_page,heartbeat',
             'page_link_id' => 'nullable|integer|exists:page_links,id',
             'value'        => 'nullable|numeric|min:0',
             'referrer'     => 'nullable|string|max:500',
+            'session_id'   => 'nullable|string|max:40',
         ]);
 
         $ua = $request->userAgent() ?? '';
@@ -36,6 +37,17 @@ class AnalyticsController extends Controller
             // Catch Throwable (not Exception): location drivers can raise \TypeError/\Error.
         }
 
+        // Live presence: keep a heartbeat row alive in page_presence so the
+        // dashboard can show who's on the page right now and since when. The
+        // heartbeat fires every ~12s but never lands in analytics_events — that
+        // would bloat the table; presence is a single upserted row per session.
+        if ($request->session_id && in_array($request->type, ['page_view', 'heartbeat'], true)) {
+            $this->touchPresence($page->id, $request->session_id, $country, $device);
+        }
+        if ($request->type === 'heartbeat') {
+            return response()->json(['ok' => true]);
+        }
+
         AnalyticsEvent::create([
             'page_id'      => $page->id,
             'type'         => $request->type,
@@ -44,9 +56,33 @@ class AnalyticsController extends Controller
             'device'       => $device,
             'value'        => $request->value,
             'referrer'     => $request->referrer ? parse_url($request->referrer, PHP_URL_HOST) : null,
+            'session_id'   => $request->session_id,
         ]);
 
         return response()->json(['ok' => true]);
+    }
+
+    /** Upsert the live-presence row for a visitor session (started_at set once). */
+    private function touchPresence(int $pageId, string $sessionId, ?string $country, string $device): void
+    {
+        $now = Carbon::now();
+        $existing = DB::table('page_presence')
+            ->where('page_id', $pageId)->where('session_id', $sessionId)->exists();
+
+        if ($existing) {
+            DB::table('page_presence')
+                ->where('page_id', $pageId)->where('session_id', $sessionId)
+                ->update(['last_seen_at' => $now, 'country' => $country, 'device' => $device]);
+        } else {
+            DB::table('page_presence')->insert([
+                'page_id'      => $pageId,
+                'session_id'   => $sessionId,
+                'country'      => $country,
+                'device'       => $device,
+                'started_at'   => $now,
+                'last_seen_at' => $now,
+            ]);
+        }
     }
 
     // GET /api/pages/{id}/analytics?period=7 — stats pour le dashboard manager
@@ -123,14 +159,14 @@ class AnalyticsController extends Controller
         if ($allIds->isEmpty()) {
             return response()->json([
                 'visitors_now' => 0, 'views_30m' => 0,
-                'clicks_30m'   => 0, 'top_country' => null, 'events' => [],
+                'clicks_30m'   => 0, 'top_country' => null, 'events' => [], 'visitors' => [],
             ]);
         }
 
         $linkFilter = array_filter((array) $request->query('link_ids', []));
         $pageIds    = $linkFilter ? $allIds->intersect($linkFilter) : $allIds;
 
-        return response()->json($this->buildLive($pageIds));
+        return response()->json($this->buildLive($pageIds, $user->isPaid()));
     }
 
     // GET /api/analytics/dashboard — aggregated cross-page view for the main dashboard
@@ -140,7 +176,7 @@ class AnalyticsController extends Controller
         $allIds  = $user->pages()->pluck('id');
 
         if ($allIds->isEmpty()) {
-            return response()->json($this->emptyDashboard());
+            return response()->json($this->emptyDashboard($user->isPaid()));
         }
 
         $preset      = $request->query('preset', '30d');
@@ -175,11 +211,108 @@ class AnalyticsController extends Controller
             'by_device'          => $this->buildByDevice($base),
             'by_referrer'        => $this->buildByReferrer($base),
             'hourly'             => $this->buildHourly($pageIds, $from, $to),
-            'live'               => $this->buildLive($pageIds),
+            'live'               => $this->buildLive($pageIds, $user->isPaid()),
             'per_link'           => $this->buildPerLink($pageIds, $from, $to, $country),
             'vsl'                => $this->buildVslEngagement($base, $pageViews),
+            // Retention curve + detailed live presence are Pro/Agency features.
+            'is_paid'            => $user->isPaid(),
+            'retention'          => $user->isPaid() ? $this->buildRetention($pageIds, $from, $to, $country) : null,
             'pages'              => $user->pages()->get(['id', 'model_name', 'slug'])->toArray(),
         ]);
+    }
+
+    /** Hard cap on retention-curve length (seconds), to bound payload + chart size. */
+    private const RETENTION_MAX_SECONDS = 600;
+
+    /**
+     * Per-second audience-retention curve, ONE SERIES PER VIDEO (page). It's a
+     * survival curve: for each second s, the % of a video's viewing sessions that
+     * watched at least up to s. Early seconds matter most — that's where you see
+     * if the hook lands in the first 3s.
+     *
+     * Cheaply per-second: each visit reports only the furthest second it reached
+     * (`video_position` = running max), so one MAX per session reconstructs the
+     * whole curve — no per-second event flood. Per-video on purpose (a 20s and a
+     * 45s VSL can't share one curve). Capped to the 6 most-watched videos.
+     */
+    private function buildRetention($pageIds, $from, $to, ?string $country): array
+    {
+        $q = AnalyticsEvent::whereIn('page_id', $pageIds);
+        if ($from)    $q->where('created_at', '>=', $from);
+        if ($to)      $q->where('created_at', '<=', $to);
+        if ($country) $q->where('country', $country);
+
+        // Denominator per page: distinct sessions that actually started the video.
+        $plays = (clone $q)->where('type', 'video_play')->whereNotNull('session_id')
+            ->selectRaw('page_id, count(distinct session_id) as sessions')
+            ->groupBy('page_id')->pluck('sessions', 'page_id');
+
+        if ($plays->isEmpty()) {
+            return ['pages' => []];
+        }
+
+        // Furthest second reached per session (one row per session, per page).
+        $maxima = (clone $q)->where('type', 'video_position')->whereNotNull('session_id')
+            ->selectRaw('page_id, session_id, max(value) as mx')
+            ->groupBy('page_id', 'session_id')
+            ->get()
+            ->groupBy('page_id');
+
+        // Clicks per exact second watched (value = real seconds), per page.
+        $clicks = (clone $q)->where('type', 'link_click')->whereNotNull('value')
+            ->get(['page_id', 'value'])
+            ->groupBy('page_id')
+            ->map(fn ($rows) => $rows->groupBy(fn ($e) => (int) round($e->value))->map->count());
+
+        $names = Page::whereIn('id', $plays->keys())->pluck('model_name', 'id');
+
+        $series = [];
+        foreach ($plays as $pid => $playCount) {
+            $playCount = (int) $playCount;
+            if ($playCount === 0) continue;
+
+            $pageClicks = $clicks->get($pid, collect());
+
+            // Histogram of furthest-second-reached, then a suffix sum turns it into
+            // survival counts: survival[s] = sessions whose max >= s.
+            $histo  = [];
+            $maxSec = 0;
+            foreach ($maxima->get($pid, collect()) as $row) {
+                $m = min((int) $row->mx, self::RETENTION_MAX_SECONDS);
+                if ($m <= 0) continue;
+                $histo[$m] = ($histo[$m] ?? 0) + 1;
+                if ($m > $maxSec) $maxSec = $m;
+            }
+
+            // s = 0 is everyone who played (100%).
+            $points  = [['sec' => 0, 'pct' => 100, 'sessions' => $playCount, 'clicks' => (int) $pageClicks->get(0, 0)]];
+            $running = 0;
+            $survival = [];
+            for ($s = $maxSec; $s >= 1; $s--) {
+                $running += $histo[$s] ?? 0;
+                $survival[$s] = $running;
+            }
+            for ($s = 1; $s <= $maxSec; $s++) {
+                $points[] = [
+                    'sec'      => $s,
+                    'pct'      => round($survival[$s] / $playCount * 100, 1),
+                    'sessions' => $survival[$s],
+                    'clicks'   => (int) $pageClicks->get($s, 0),
+                ];
+            }
+
+            $series[] = [
+                'id'     => $pid,
+                'name'   => $names->get($pid) ?: 'Untitled',
+                'plays'  => $playCount,
+                'points' => $points,
+            ];
+        }
+
+        // Most-watched videos first, capped so the chart stays readable.
+        usort($series, fn ($a, $b) => $b['plays'] <=> $a['plays']);
+
+        return ['pages' => array_slice($series, 0, 6)];
     }
 
     /**
@@ -370,7 +503,7 @@ class AnalyticsController extends Controller
         };
     }
 
-    private function buildLive($pageIds): array
+    private function buildLive($pageIds, bool $detailed = false): array
     {
         $cutoff = Carbon::now()->subMinutes(30);
         $q      = AnalyticsEvent::whereIn('page_id', $pageIds)
@@ -379,12 +512,28 @@ class AnalyticsController extends Controller
         $views30  = (clone $q)->where('type', 'page_view')->count();
         $clicks30 = (clone $q)->where('type', 'link_click')->count();
 
-        // "Visitors now" = page loads in the last 5 min. Count page_view only:
-        // counting every event inflated it wildly, since one visitor fires ~10
-        // events per visit (video_play, 4× video_progress, unmute, click…).
-        $visitorsNow = AnalyticsEvent::whereIn('page_id', $pageIds)
-            ->where('type', 'page_view')
-            ->where('created_at', '>=', Carbon::now()->subMinutes(5))->count();
+        // "Visitors now" = distinct sessions whose heartbeat fired in the last
+        // 30s (a real presence ping every ~12s on the open page), so it reflects
+        // who is genuinely on a page right now — not page loads in a 5-min window.
+        $liveCutoff = Carbon::now()->subSeconds(30);
+        $presence   = DB::table('page_presence')->whereIn('page_id', $pageIds)
+            ->where('last_seen_at', '>=', $liveCutoff);
+
+        $visitorsNow = (clone $presence)->distinct('session_id')->count('session_id');
+
+        // Detailed live visitors: country, device, and how long they've been on
+        // the page (drives the "who's watching right now" list, ligne.me-style).
+        // The list itself is a Pro/Agency feature; the raw count stays visible.
+        $now      = Carbon::now();
+        $visitors = $detailed
+            ? (clone $presence)->orderByDesc('started_at')->limit(30)
+                ->get(['session_id', 'country', 'device', 'started_at'])
+                ->map(fn ($v) => [
+                    'country' => $v->country,
+                    'device'  => $v->device,
+                    'seconds' => (int) Carbon::parse($v->started_at)->diffInSeconds($now),
+                ])->all()
+            : [];
 
         $topCountry = (clone $q)->whereNotNull('country')
             ->selectRaw('country, count(*) as total')
@@ -406,6 +555,7 @@ class AnalyticsController extends Controller
             'clicks_30m'   => $clicks30,
             'top_country'  => $topCountry,
             'events'       => $recentEvents,
+            'visitors'     => $visitors,
         ];
     }
 
@@ -433,7 +583,7 @@ class AnalyticsController extends Controller
             })->sortByDesc('views')->values()->all();
     }
 
-    private function emptyDashboard(): array
+    private function emptyDashboard(bool $isPaid = false): array
     {
         return [
             'page_views'         => 0,
@@ -445,9 +595,11 @@ class AnalyticsController extends Controller
             'by_device'          => [],
             'by_referrer'        => [],
             'hourly'             => array_fill(0, 24, 0),
-            'live'               => ['visitors_now' => 0, 'views_30m' => 0, 'clicks_30m' => 0, 'top_country' => null, 'events' => []],
+            'live'               => ['visitors_now' => 0, 'views_30m' => 0, 'clicks_30m' => 0, 'top_country' => null, 'events' => [], 'visitors' => []],
             'per_link'           => [],
             'vsl'                => ['plays' => 0, 'play_rate' => 0, 'milestones' => [25 => 0, 50 => 0, 75 => 0, 100 => 0], 'avg_watch_before_click' => null, 'avg_time_on_page' => null],
+            'is_paid'            => $isPaid,
+            'retention'          => null,
             'pages'              => [],
         ];
     }
