@@ -129,14 +129,15 @@ class AnalyticsController extends Controller
 
         $events = $page->analytics()->where('created_at', '>=', $from);
 
-        $pageViews  = (clone $events)->where('type', 'page_view')->count();
-        $linkClicks = (clone $events)->where('type', 'link_click')->count();
-        $videoPlays = (clone $events)->where('type', 'video_play')->count();
+        // Distinct visitors (sessions), not raw events — see visitCountExpr().
+        $pageViews  = $this->countVisits((clone $events)->where('type', 'page_view'));
+        $linkClicks = $this->countVisits((clone $events)->where('type', 'link_click'));
+        $videoPlays = $this->countVisits((clone $events)->where('type', 'video_play'));
 
         // VSL milestones: % of video plays that reached each checkpoint
         $milestones = [];
         foreach ([25, 50, 75, 100] as $pct) {
-            $count = (clone $events)->where('type', 'video_progress')->where('value', $pct)->count();
+            $count = $this->countVisits((clone $events)->where('type', 'video_progress')->where('value', $pct));
             $milestones[$pct] = $videoPlays > 0 ? round(($count / $videoPlays) * 100, 1) : 0;
         }
 
@@ -152,18 +153,18 @@ class AnalyticsController extends Controller
             'play_rate'     => $pageViews > 0 ? round(($videoPlays / $pageViews) * 100, 1) : 0,
             'milestones'    => $milestones,
             'avg_watch_before_click' => $avgWatch ? round($avgWatch, 1) : null,
-            'by_device'     => (clone $events)->selectRaw('device, count(*) as total')
+            'by_device'     => (clone $events)->selectRaw('device, ' . $this->visitCountExpr() . ' as total')
                                     ->groupBy('device')->pluck('total', 'device'),
             'by_link'       => (clone $events)->where('type', 'link_click')
-                                    ->selectRaw('page_link_id, count(*) as total')
+                                    ->selectRaw('page_link_id, ' . $this->visitCountExpr() . ' as total')
                                     ->groupBy('page_link_id')->pluck('total', 'page_link_id'),
             'daily'         => (clone $events)->where('type', 'page_view')
-                                    ->selectRaw($this->periodExpr('day') . ' as date, count(*) as total')
+                                    ->selectRaw($this->periodExpr('day') . ' as date, ' . $this->visitCountExpr() . ' as total')
                                     ->groupBy('date')
                                     ->orderBy('date')
                                     ->pluck('total', 'date'),
             'by_country'    => (clone $events)->whereNotNull('country')
-                                    ->selectRaw('country, count(*) as total')
+                                    ->selectRaw('country, ' . $this->visitCountExpr() . ' as total')
                                     ->groupBy('country')
                                     ->orderByDesc('total')
                                     ->pluck('total', 'country'),
@@ -174,7 +175,7 @@ class AnalyticsController extends Controller
             : 0;
 
         $stats['by_referrer'] = (clone $events)->where('type', 'page_view')->whereNotNull('referrer')
-            ->selectRaw('referrer, count(*) as total')
+            ->selectRaw('referrer, ' . $this->visitCountExpr() . ' as total')
             ->groupBy('referrer')->orderByDesc('total')
             ->pluck('total', 'referrer');
 
@@ -231,8 +232,10 @@ class AnalyticsController extends Controller
         if ($to)   $base->where('created_at', '<=', $to);
         if ($country) $base->where('country', $country);
 
-        $pageViews   = (clone $base)->where('type', 'page_view')->count();
-        $linkClicks  = (clone $base)->where('type', 'link_click')->count();
+        // Real visitors, not raw events: distinct sessions. CTR then reads as the
+        // honest "% of visitors who clicked", never >100% from multi-click visits.
+        $pageViews   = $this->countVisits((clone $base)->where('type', 'page_view'));
+        $linkClicks  = $this->countVisits((clone $base)->where('type', 'link_click'));
         $ctr         = $pageViews > 0 ? round($linkClicks / $pageViews * 100, 1) : 0;
 
         return response()->json([
@@ -359,11 +362,11 @@ class AnalyticsController extends Controller
      */
     private function buildVslEngagement($base, int $pageViews): array
     {
-        $plays = (clone $base)->where('type', 'video_play')->count();
+        $plays = $this->countVisits((clone $base)->where('type', 'video_play'));
 
         $milestones = [];
         foreach ([25, 50, 75, 100] as $pct) {
-            $count = (clone $base)->where('type', 'video_progress')->where('value', $pct)->count();
+            $count = $this->countVisits((clone $base)->where('type', 'video_progress')->where('value', $pct));
             $milestones[$pct] = $plays > 0 ? round($count / $plays * 100, 1) : 0;
         }
 
@@ -413,13 +416,15 @@ class AnalyticsController extends Controller
 
         $expr = $this->periodExpr($granularity);
 
+        $visits = $this->visitCountExpr();
+
         $views = (clone $base)->where('type', 'page_view')
-            ->selectRaw("$expr as period, count(*) as total")
+            ->selectRaw("$expr as period, $visits as total")
             ->groupBy('period')->orderBy('period')
             ->pluck('total', 'period');
 
         $clicks = (clone $base)->where('type', 'link_click')
-            ->selectRaw("$expr as period, count(*) as total")
+            ->selectRaw("$expr as period, $visits as total")
             ->groupBy('period')->orderBy('period')
             ->pluck('total', 'period');
 
@@ -440,11 +445,11 @@ class AnalyticsController extends Controller
         if ($country) $q->where('country', $country);
 
         $views  = (clone $q)->where('type', 'page_view')
-            ->selectRaw('page_id, count(*) as total')->groupBy('page_id')
+            ->selectRaw('page_id, ' . $this->visitCountExpr() . ' as total')->groupBy('page_id')
             ->pluck('total', 'page_id');
 
         $clicks = (clone $q)->where('type', 'link_click')
-            ->selectRaw('page_id, count(*) as total')->groupBy('page_id')
+            ->selectRaw('page_id, ' . $this->visitCountExpr() . ' as total')->groupBy('page_id')
             ->pluck('total', 'page_id');
 
         return Page::whereIn('id', $pageIds)->get(['id', 'model_name', 'slug'])
@@ -460,7 +465,7 @@ class AnalyticsController extends Controller
     private function buildByCountry($base): array
     {
         return (clone $base)->whereNotNull('country')
-            ->selectRaw('country, count(*) as total')
+            ->selectRaw('country, ' . $this->visitCountExpr() . ' as total')
             ->groupBy('country')->orderByDesc('total')
             ->pluck('total', 'country')->all();
     }
@@ -468,14 +473,14 @@ class AnalyticsController extends Controller
     private function buildByDevice($base): array
     {
         return (clone $base)
-            ->selectRaw('device, count(*) as total')
+            ->selectRaw('device, ' . $this->visitCountExpr() . ' as total')
             ->groupBy('device')->pluck('total', 'device')->all();
     }
 
     private function buildByReferrer($base): array
     {
         return (clone $base)->where('type', 'page_view')->whereNotNull('referrer')
-            ->selectRaw('referrer, count(*) as total')
+            ->selectRaw('referrer, ' . $this->visitCountExpr() . ' as total')
             ->groupBy('referrer')->orderByDesc('total')
             ->limit(10)->pluck('total', 'referrer')->all();
     }
@@ -486,7 +491,7 @@ class AnalyticsController extends Controller
         if ($from) $q->where('created_at', '>=', $from);
         if ($to)   $q->where('created_at', '<=', $to);
 
-        $rows = $q->selectRaw($this->hourExpr() . ' as hour, count(*) as total')
+        $rows = $q->selectRaw($this->hourExpr() . ' as hour, ' . $this->visitCountExpr() . ' as total')
             ->groupBy('hour')->pluck('total', 'hour');
 
         // Normalize keys to int (drivers return '00'..'23' or 0..23) so the lookup hits.
@@ -540,14 +545,37 @@ class AnalyticsController extends Controller
         };
     }
 
+    /**
+     * SQL counting REAL visits, not raw events: dedupe by session_id so one
+     * visitor firing ~10 events (page_view, video_play, 4× progress, heartbeats,
+     * clicks…) counts ONCE. That's the whole difference between "1700 events" and
+     * "the ~45 real people who actually showed up". Legacy rows that predate
+     * session tracking have no session_id, so they fall back to their row id and
+     * still count once each — no data lost, just deduped where we can.
+     */
+    private function visitCountExpr(): string
+    {
+        $idAsText = in_array($this->dbDriver(), ['mysql', 'mariadb'], true)
+            ? 'CAST(id AS CHAR)'
+            : 'CAST(id AS TEXT)';
+        return "COUNT(DISTINCT COALESCE(session_id, $idAsText))";
+    }
+
+    /** Run the distinct-visit count over a query. Clone the query first if reused. */
+    private function countVisits($query): int
+    {
+        $row = $query->selectRaw($this->visitCountExpr() . ' as aggregate')->first();
+        return (int) ($row->aggregate ?? 0);
+    }
+
     private function buildLive($pageIds, bool $detailed = false): array
     {
         $cutoff = Carbon::now()->subMinutes(30);
         $q      = AnalyticsEvent::whereIn('page_id', $pageIds)
                     ->where('created_at', '>=', $cutoff);
 
-        $views30  = (clone $q)->where('type', 'page_view')->count();
-        $clicks30 = (clone $q)->where('type', 'link_click')->count();
+        $views30  = $this->countVisits((clone $q)->where('type', 'page_view'));
+        $clicks30 = $this->countVisits((clone $q)->where('type', 'link_click'));
 
         // "Visitors now" = distinct sessions whose heartbeat fired in the last
         // 30s (a real presence ping every ~12s on the open page), so it reflects
@@ -573,7 +601,7 @@ class AnalyticsController extends Controller
             : [];
 
         $topCountry = (clone $q)->whereNotNull('country')
-            ->selectRaw('country, count(*) as total')
+            ->selectRaw('country, ' . $this->visitCountExpr() . ' as total')
             ->groupBy('country')->orderByDesc('total')->value('country');
 
         $recentEvents = (clone $q)->orderByDesc('created_at')->limit(20)
@@ -604,10 +632,10 @@ class AnalyticsController extends Controller
         if ($country) $q->where('country', $country);
 
         $views  = (clone $q)->where('type', 'page_view')
-            ->selectRaw('page_id, count(*) as total')->groupBy('page_id')
+            ->selectRaw('page_id, ' . $this->visitCountExpr() . ' as total')->groupBy('page_id')
             ->pluck('total', 'page_id');
         $clicks = (clone $q)->where('type', 'link_click')
-            ->selectRaw('page_id, count(*) as total')->groupBy('page_id')
+            ->selectRaw('page_id, ' . $this->visitCountExpr() . ' as total')->groupBy('page_id')
             ->pluck('total', 'page_id');
 
         return Page::whereIn('id', $pageIds)->get(['id', 'model_name', 'slug', 'group_name'])
