@@ -38,7 +38,7 @@
               <button class="adash-drop-item" :class="{active:!filterCountry}" @click="filterCountry='';linksDropOpen=false">All countries</button>
               <button v-for="(count, code) in data.by_country" :key="code" class="adash-drop-item"
                 :class="{active:filterCountry===code}" @click="filterCountry=code;linksDropOpen=false">
-                {{ countryFlag(code) }} {{ code }}
+                {{ countryLabel(code) }}
                 <span :style="{marginLeft:'auto',fontSize:'11px',opacity:0.5}">{{ count }}</span>
               </button>
             </div>
@@ -106,7 +106,7 @@
             <div class="adash-ov-icon" style="background:rgba(16,185,129,0.14)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></div>
           </div>
           <div class="adash-ov-cell">
-            <div><p class="adash-ov-val">{{ topCountries.length ? countryFlag(topCountries[0].code) + ' ' + topCountries[0].code : '—' }}</p><p class="adash-ov-lbl">Top country</p></div>
+            <div><p class="adash-ov-val">{{ topCountries.length ? countryLabel(topCountries[0].code) : '—' }}</p><p class="adash-ov-lbl">Top country</p></div>
             <div class="adash-ov-icon" style="background:rgba(236,72,153,0.14)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
           </div>
         </div>
@@ -208,7 +208,7 @@
         </div>
         <!-- Per-video legend -->
         <div :style="{display:'flex',gap:'14px',flexWrap:'wrap',marginTop:'12px'}">
-          <span v-for="p in retentionPages" :key="p.id" :style="{display:'flex',alignItems:'center',gap:'6px',fontSize:'11px',color:textSecondary}">
+          <span v-for="p in retentionPages" :key="p.id" @click="toggleRetentionLine(p.id)" :title="selectedRetentionId === p.id ? 'Show all videos' : 'Show only this video'" :style="{display:'flex',alignItems:'center',gap:'6px',fontSize:'11px',color:textSecondary,cursor:'pointer',opacity: selectedRetentionId && selectedRetentionId !== p.id ? 0.4 : 1,transition:'opacity 0.15s'}">
             <span :style="{display:'inline-block',width:'12px',height:'3px',borderRadius:'2px',background:retentionColor(p.id)}"></span>
             {{ p.name }}
             <span :style="{color:textMuted}">· {{ p.plays }} plays</span>
@@ -218,6 +218,9 @@
             <span :style="{display:'inline-block',width:'10px',height:'10px',borderRadius:'2px',background:'#16A34A'}"></span> clicks per second
           </span>
         </div>
+        <p v-if="retentionPages.length > 1" :style="{margin:'8px 0 0',fontSize:'10px',color:textMuted}">
+          {{ selectedRetentionId ? 'Showing one video — click it again in the legend to show all.' : 'Tip: click a video in the legend to isolate its line.' }}
+        </p>
         <p v-if="retentionInsight" :style="{margin:'10px 0 0',fontSize:'11px',color:textMuted}"><i class="bi bi-lightbulb"></i> {{ retentionInsight }}</p>
       </div>
     </div>
@@ -328,7 +331,7 @@
             <div v-for="(v,i) in data.live.visitors.slice(0,12)" :key="i"
               :style="{display:'flex',alignItems:'center',gap:'6px',padding:'4px 9px',borderRadius:'999px',background:hoverBg,fontSize:'11px',color:textSecondary}">
               <span class="adash-live-dot" style="margin:0;width:6px;height:6px"></span>
-              <span>{{ countryFlag(v.country) }}</span>
+              <span :style="{color:textMuted}">{{ countryLabel(v.country) }}</span>
               <i :class="v.device === 'mobile' ? 'bi bi-phone' : 'bi bi-laptop'" :style="{color:textMuted}"></i>
               <span :style="{color:textMuted,fontFamily:'monospace'}">{{ formatDuration(v.seconds) }}</span>
             </div>
@@ -340,16 +343,21 @@
 
           <!-- Top countries -->
           <div>
-            <p :style="{fontSize:'10px',fontWeight:700,color:textMuted,textTransform:'uppercase',letterSpacing:'0.08em',margin:'0 0 10px'}">
-              Top Countries
-              <span v-if="topCountries.length" :style="{color:'#16A34A',marginLeft:'6px'}">
-                {{ formatNum(Object.values(data.by_country||{}).reduce((a,b)=>a+b,0)) }} visits
-              </span>
-            </p>
+            <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'8px',margin:'0 0 10px'}">
+              <p :style="{fontSize:'10px',fontWeight:700,color:textMuted,textTransform:'uppercase',letterSpacing:'0.08em',margin:0}">
+                Top Countries
+                <span v-if="topCountries.length" :style="{color:'#16A34A',marginLeft:'6px'}">
+                  {{ formatNum(Object.values(data.by_country||{}).reduce((a,b)=>a+b,0)) }} visits
+                </span>
+              </p>
+              <div :style="{display:'inline-flex',gap:'2px',padding:'2px',borderRadius:'7px',background:hoverBg,border:`1px solid ${dividerBg}`,flexShrink:0}">
+                <button @click="countryMode='code'" :style="ctyTab('code')">Code</button>
+                <button @click="countryMode='name'" :style="ctyTab('name')">Name</button>
+              </div>
+            </div>
             <div v-if="!topCountries.length" :style="{fontSize:'12px',color:textMuted}">No data yet</div>
             <div v-for="item in topCountries.slice(0,7)" :key="item.code" :style="{display:'flex',alignItems:'center',gap:'7px',marginBottom:'7px'}">
-              <span style="font-size:14px;width:20px;flex-shrink:0">{{ countryFlag(item.code) }}</span>
-              <span :style="{fontSize:'12px',fontWeight:500,color:textSecondary,width:'28px',flexShrink:0}">{{ item.code }}</span>
+              <span :style="{fontSize:'12px',fontWeight:600,color:textSecondary,minWidth:'28px',maxWidth:'130px',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',flexShrink:0}">{{ countryLabel(item.code) }}</span>
               <div :style="{flex:1,height:'4px',background:dividerBg,borderRadius:'999px',overflow:'hidden'}">
                 <div :style="{height:'100%',width:item.pct+'%',background:'linear-gradient(90deg,#6D4EE8,#A78BFA)',borderRadius:'999px',transition:'width 0.6s ease'}"></div>
               </div>
@@ -366,7 +374,7 @@
                 :style="{display:'flex',alignItems:'center',gap:'6px',padding:'4px 7px',borderRadius:'6px',background:hoverBg,fontSize:'11px',flexShrink:0}">
                 <i :class="eventIcon(ev.type)" :style="{color:eventColor(ev.type),flexShrink:0}"></i>
                 <span :style="{flex:1,color:textSecondary,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">{{ eventLabel(ev.type) }}</span>
-                <span v-if="ev.country" :style="{flexShrink:0}">{{ countryFlag(ev.country) }}</span>
+                <span v-if="ev.country" :style="{flexShrink:0,color:textMuted,fontSize:'10px'}">{{ countryLabel(ev.country) }}</span>
                 <i :class="ev.device === 'mobile' ? 'bi bi-phone' : 'bi bi-laptop'" :style="{color:textMuted,flexShrink:0}"></i>
               </div>
             </div>
@@ -448,6 +456,9 @@ const retentionCanvas = ref(null)
 let retentionChart    = null
 const retentionPages  = computed(() => data.value.retention?.pages || [])
 const retentionTotalPlays = computed(() => retentionPages.value.reduce((s, p) => s + (p.plays || 0), 0))
+// Click a legend item to isolate its line (null = show every video).
+const selectedRetentionId = ref(null)
+function toggleRetentionLine(id) { selectedRetentionId.value = selectedRetentionId.value === id ? null : id }
 
 // Distinct, stable colour per video line (light blue / red / green first, à la Lucas).
 const RETENTION_COLORS = ['#38BDF8', '#EF4444', '#22C55E', '#A855F7', '#F59E0B', '#EC4899']
@@ -639,7 +650,10 @@ function renderChart() {
 function renderRetention() {
   if (retentionChart) { retentionChart.destroy(); retentionChart = null }
   if (!retentionCanvas.value) return
-  const pages = retentionPages.value
+  const all = retentionPages.value
+  // Isolate one video if selected (and the id still exists), else show all.
+  const sel = selectedRetentionId.value && all.some(p => p.id === selectedRetentionId.value) ? selectedRetentionId.value : null
+  const pages = sel ? all.filter(p => p.id === sel) : all
   if (!pages.length) return
 
   const isDark = theme.dark
@@ -716,8 +730,15 @@ function formatNum(n) {
   if (n >= 1e3) return (n/1e3).toFixed(1)+'K'
   return String(n)
 }
-const FLAGS = {FR:'🇫🇷',US:'🇺🇸',GB:'🇬🇧',DE:'🇩🇪',ES:'🇪🇸',IT:'🇮🇹',CA:'🇨🇦',AU:'🇦🇺',BR:'🇧🇷',MX:'🇲🇽',JP:'🇯🇵',KR:'🇰🇷',NL:'🇳🇱',BE:'🇧🇪',CH:'🇨🇭',PT:'🇵🇹',PL:'🇵🇱',RU:'🇷🇺',UA:'🇺🇦',NG:'🇳🇬',MA:'🇲🇦',TN:'🇹🇳',DZ:'🇩🇿',SN:'🇸🇳',CI:'🇨🇮',CM:'🇨🇲',GH:'🇬🇭',ZA:'🇿🇦',EG:'🇪🇬',IN:'🇮🇳',CN:'🇨🇳',TR:'🇹🇷',SA:'🇸🇦',AE:'🇦🇪',AR:'🇦🇷',CO:'🇨🇴',SG:'🇸🇬',TH:'🇹🇭',VN:'🇻🇳',PH:'🇵🇭',ID:'🇮🇩',MY:'🇲🇾',SE:'🇸🇪',NO:'🇳🇴',DK:'🇩🇰',FI:'🇫🇮',GR:'🇬🇷',RO:'🇷🇴',HU:'🇭🇺',AT:'🇦🇹',IL:'🇮🇱',QA:'🇶🇦',KE:'🇰🇪'}
-function countryFlag(c) { return FLAGS[c] || '🌍' }
+// Countries are shown as a 2-letter code or full name (user toggle), no flags.
+const countryMode = ref('code') // 'code' | 'name'
+const REGION_NAMES = (typeof Intl !== 'undefined' && Intl.DisplayNames) ? new Intl.DisplayNames(['en'], { type: 'region' }) : null
+function countryName(c) { try { return (c && REGION_NAMES?.of(c)) || c } catch { return c } }
+function countryLabel(c) { return countryMode.value === 'name' ? countryName(c) : c }
+function ctyTab(mode) {
+  const on = countryMode.value === mode
+  return { border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif', fontSize: '10px', fontWeight: 600, padding: '3px 9px', borderRadius: '5px', color: on ? '#fff' : (theme.dark ? 'rgba(255,255,255,0.45)' : '#6B7280'), background: on ? '#6D4EE8' : 'transparent', transition: 'all 0.12s' }
+}
 function eventIcon(t)  { return 'bi ' + ({page_view:'bi-eye-fill',link_click:'bi-lightning-charge-fill',age_confirmed:'bi-shield-check',video_play:'bi-play-circle-fill',video_position:'bi-clock-fill',video_progress:'bi-bar-chart-fill',video_unmute:'bi-volume-up-fill'}[t]||'bi-dot') }
 function eventColor(t) { return {page_view:'#6D4EE8',link_click:'#16A34A',age_confirmed:'#0EA5E9',video_play:'#A78BFA',video_position:'#9CA3AF',video_progress:'#F59E0B',video_unmute:'#EC4899'}[t]||'#9CA3AF' }
 function eventLabel(t) { return {page_view:'Page view',link_click:'Link click',age_confirmed:'Age confirmed',video_play:'Video play',video_position:'Still watching',video_progress:'Watch milestone',video_unmute:'Unmuted video'}[t]||t }
@@ -740,6 +761,7 @@ function handleOutsideClick(e) {
 watch([filterLinkId, filterCountry], loadData)
 watch([chartMetric, chartType, () => theme.dark], () => nextTick(renderChart))
 watch(() => theme.dark, () => nextTick(renderRetention))
+watch(selectedRetentionId, () => nextTick(renderRetention))
 
 onMounted(async () => {
   // Load pages first so the dropdown + banner work regardless of analytics state
