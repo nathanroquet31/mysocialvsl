@@ -1,38 +1,44 @@
 <template>
   <DashboardLayout title="What's New">
 
-    <div style="max-width:760px;margin:0 auto">
-      <!-- Header -->
-      <div style="text-align:center;margin-bottom:26px">
-        <h1 :style="{fontSize:'28px',fontWeight:800,color:tx,margin:'0 0 8px',letterSpacing:'-0.02em'}">What's New</h1>
-        <p :style="{fontSize:'14px',color:txMuted,margin:0}">Every feature, improvement and fix we ship — newest first.</p>
-      </div>
+    <div style="position:relative;max-width:740px;margin:0 auto">
+      <!-- Brand glow blob -->
+      <div aria-hidden="true" style="position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:420px;height:300px;background:radial-gradient(ellipse,rgba(109,78,232,0.20),transparent 70%);filter:blur(55px);pointer-events:none;z-index:0"></div>
 
-      <!-- Filters -->
-      <div style="display:flex;justify-content:center;margin-bottom:28px">
-        <div :style="{display:'inline-flex',gap:'4px',padding:'4px',borderRadius:'999px',background: theme.dark ? 'rgba(255,255,255,0.05)' : '#F3F4F6',border:`1px solid ${bd}`}">
-          <button v-for="f in filters" :key="f.key" @click="active = f.key"
-            :style="tabStyle(f.key)">
-            {{ f.label }} <span :style="{opacity:0.6,fontWeight:600}">{{ counts[f.key] }}</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Timeline -->
-      <div style="position:relative">
-        <div v-for="(e, i) in visible" :key="i"
-          style="display:grid;grid-template-columns:64px 1fr;gap:16px;align-items:start">
-          <!-- Left rail: date + dot -->
-          <div style="text-align:right;padding-top:18px">
-            <p :style="{fontSize:'12px',fontWeight:700,color:tx,margin:0,whiteSpace:'nowrap'}">{{ e.date }}</p>
+      <div style="position:relative;z-index:1">
+        <!-- Hero -->
+        <div style="text-align:center;margin-bottom:30px">
+          <div style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(109,78,232,0.3);border-radius:999px;padding:6px 15px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#A78BFA;background:rgba(109,78,232,0.08);margin-bottom:22px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#A78BFA;box-shadow:0 0 8px #A78BFA"></span>
+            Shipping fast
           </div>
-          <!-- Card with connecting line -->
-          <div :style="{position:'relative',paddingLeft:'22px',paddingBottom:'16px',borderLeft:`1px solid ${bd}`}">
-            <span :style="{position:'absolute',left:'-5px',top:'22px',width:'9px',height:'9px',borderRadius:'50%',background: typeColor(e.type),boxShadow:`0 0 0 3px ${theme.dark ? '#0b0a14' : '#fff'}`}"></span>
-            <div :style="card">
-              <span :style="badge(e.type)">{{ e.type.toUpperCase() }}</span>
-              <p :style="{fontSize:'15px',fontWeight:700,color:tx,margin:'10px 0 6px'}">{{ e.title }}</p>
-              <p :style="{fontSize:'13px',color:txMuted,margin:0,lineHeight:1.6}">{{ e.desc }}</p>
+          <h1 style="font-size:34px;font-weight:800;letter-spacing:-0.03em;margin:0 0 10px;color:var(--text)">
+            What's <span style="background:linear-gradient(135deg,#A78BFA,#6D4EE8,#8B6FF0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">New</span>
+          </h1>
+          <p style="font-size:14px;color:var(--text-muted);margin:0">Every feature, improvement and fix we ship — newest first.</p>
+        </div>
+
+        <!-- Filters -->
+        <div style="display:flex;justify-content:center;margin-bottom:36px">
+          <div style="display:inline-flex;gap:4px;padding:5px;border-radius:999px;background:var(--pill-bg);border:1px solid var(--border)">
+            <button v-for="f in filters" :key="f.key" @click="active = f.key" :style="tab(f.key)">
+              {{ f.label }} <span style="opacity:0.55;margin-left:1px">{{ counts[f.key] }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div v-for="(e, i) in visible" :key="e.title"
+          style="display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:start">
+          <div style="text-align:right;padding-top:20px">
+            <p style="font-size:12px;font-weight:700;color:var(--text);margin:0;white-space:nowrap">{{ e.date }}</p>
+          </div>
+          <div style="position:relative;padding-left:24px;padding-bottom:14px;border-left:1px solid var(--border)">
+            <span :style="dot(e.type)"></span>
+            <div :style="card(i)" @mouseenter="hover = i" @mouseleave="hover = null">
+              <span :style="badge(e.type)">{{ e.type }}</span>
+              <p style="font-size:15px;font-weight:700;color:var(--text);margin:11px 0 6px">{{ e.title }}</p>
+              <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.6">{{ e.desc }}</p>
             </div>
           </div>
         </div>
@@ -44,11 +50,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useThemeStore } from '@/stores/theme'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 
-const theme = useThemeStore()
 const active = ref('all')
+const hover = ref(null)
 
 const filters = [
   { key: 'all',      label: 'All' },
@@ -82,26 +87,49 @@ const counts = computed(() => ({
 
 const visible = computed(() => active.value === 'all' ? entries : entries.filter(e => e.type === active.value))
 
-const tx      = computed(() => theme.dark ? '#fff' : '#111827')
-const txMuted = computed(() => theme.dark ? 'rgba(255,255,255,0.45)' : '#6B7280')
-const bd      = computed(() => theme.dark ? 'rgba(255,255,255,0.1)' : '#E5E7EB')
-const card    = computed(() => ({ background: theme.dark ? 'rgba(255,255,255,0.04)' : '#fff', border:`1px solid ${theme.dark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`, borderRadius:'12px', padding:'18px' }))
-
 function typeColor(type) {
-  return type === 'new' ? '#10B981' : type === 'fixed' ? '#F59E0B' : '#8B6CF0'
+  return type === 'new' ? '#10B981' : type === 'fixed' ? '#F59E0B' : '#A78BFA'
 }
+
+function dot(type) {
+  const c = typeColor(type)
+  return {
+    position: 'absolute', left: '-5px', top: '21px', width: '9px', height: '9px',
+    borderRadius: '50%', background: c,
+    boxShadow: `0 0 0 4px var(--bg), 0 0 10px ${c}`,
+  }
+}
+
 function badge(type) {
   const c = typeColor(type)
-  return { display:'inline-block', fontSize:'10px', fontWeight:700, letterSpacing:'0.05em', color:c, background:`${c}22`, border:`1px solid ${c}44`, borderRadius:'999px', padding:'3px 9px' }
+  return {
+    display: 'inline-block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em',
+    textTransform: 'uppercase', color: c, background: `${c}1f`, border: `1px solid ${c}3d`,
+    borderRadius: '999px', padding: '3px 10px',
+  }
 }
-function tabStyle(key) {
+
+function card(i) {
+  const on = hover.value === i
+  return {
+    background: 'var(--card-bg)',
+    border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'var(--border)'}`,
+    borderRadius: '16px', padding: '18px',
+    boxShadow: on ? '0 0 28px rgba(109,78,232,0.15)' : 'none',
+    transform: on ? 'translateX(2px)' : 'none',
+    transition: 'all 0.18s ease',
+  }
+}
+
+function tab(key) {
   const on = active.value === key
   return {
-    border:'none', cursor:'pointer', fontFamily:'Inter,sans-serif',
-    fontSize:'12px', fontWeight:600, padding:'7px 14px', borderRadius:'999px',
-    color: on ? '#fff' : txMuted.value,
-    background: on ? '#6D4EE8' : 'transparent',
-    transition:'all 0.12s',
+    border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif',
+    fontSize: '12px', fontWeight: 600, padding: '7px 15px', borderRadius: '999px',
+    color: on ? '#fff' : 'var(--text-muted)',
+    background: on ? 'linear-gradient(135deg,#6D4EE8,#8B6FF0)' : 'transparent',
+    boxShadow: on ? '0 0 18px rgba(109,78,232,0.45)' : 'none',
+    transition: 'all 0.15s',
   }
 }
 </script>
