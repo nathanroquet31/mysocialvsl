@@ -530,13 +530,18 @@
               </div>
 
               <!-- ── Card 2: VSL + Popup ── -->
-              <div @click="form.template='vsl-popup'"
+              <div @click="selectTemplate('vsl-popup')"
                 :style="{borderRadius:'18px',padding:'20px 16px 16px',cursor:'pointer',transition:'all 0.25s',border:'2px solid',position:'relative',overflow:'hidden',
+                  opacity: isTemplateLocked('vsl-popup') ? 0.55 : 1,
                   borderColor: form.template==='vsl-popup' ? '#6D4EE8' : C.border,
                   background: form.template==='vsl-popup' ? 'rgba(109,78,232,0.12)' : C.surface}">
                 <div v-if="form.template==='vsl-popup'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
                   <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
                   Selected
+                </div>
+                <div v-else-if="isTemplateLocked('vsl-popup')" :style="{position:'absolute',top:'10px',right:'10px',display:'flex',alignItems:'center',gap:'4px',padding:'2px 9px',borderRadius:'999px',background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.3)'}">
+                  <i class="bi bi-lock-fill" style="font-size:9px;color:#F59E0B"></i>
+                  <span style="font-size:9px;font-weight:700;color:#F59E0B">Paid</span>
                 </div>
                 <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)'}">
                   <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
@@ -572,13 +577,18 @@
               </div>
 
               <!-- ── Card 3: VSL + Bandeau ── -->
-              <div @click="form.template='vsl-bandeau'"
+              <div @click="selectTemplate('vsl-bandeau')"
                 :style="{borderRadius:'18px',padding:'20px 16px 16px',cursor:'pointer',transition:'all 0.25s',border:'2px solid',position:'relative',overflow:'hidden',
+                  opacity: isTemplateLocked('vsl-bandeau') ? 0.55 : 1,
                   borderColor: form.template==='vsl-bandeau' ? '#6D4EE8' : C.border,
                   background: form.template==='vsl-bandeau' ? 'rgba(109,78,232,0.12)' : C.surface}">
                 <div v-if="form.template==='vsl-bandeau'" :style="{position:'absolute',top:'10px',right:'10px',background:'#6D4EE8',borderRadius:'999px',padding:'2px 9px',fontSize:'9px',fontWeight:700,color:'#fff',display:'flex',alignItems:'center',gap:'4px'}">
                   <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
                   Selected
+                </div>
+                <div v-else-if="isTemplateLocked('vsl-bandeau')" :style="{position:'absolute',top:'10px',right:'10px',display:'flex',alignItems:'center',gap:'4px',padding:'2px 9px',borderRadius:'999px',background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.3)'}">
+                  <i class="bi bi-lock-fill" style="font-size:9px;color:#F59E0B"></i>
+                  <span style="font-size:9px;font-weight:700;color:#F59E0B">Paid</span>
                 </div>
                 <div :style="{width:'100px',margin:'0 auto 16px',background:'#111',borderRadius:'20px',padding:'4px',boxShadow:'0 16px 40px rgba(0,0,0,0.7)'}">
                   <div :style="{borderRadius:'17px',overflow:'hidden',background:'#000'}">
@@ -1066,6 +1076,17 @@ const theme  = useThemeStore()
 const auth   = useAuthStore()
 // Deeplink bypass is a paid feature — gate the toggle for free-plan owners.
 const isFreePlan = computed(() => { const p = (auth.user as any)?.plan; return !p || p === 'free' })
+// Popup/Drawer templates are paid-only — free users see the cards but can't select them.
+const isPaidUser = computed(() => {
+  const p = (auth.user as any)?.plan
+  return p === 'pro' || p === 'agency' || !!(auth.user as any)?.is_admin
+})
+const PAID_TEMPLATES = ['vsl-popup', 'vsl-bandeau']
+const isTemplateLocked = (tpl: string) => PAID_TEMPLATES.includes(tpl) && !isPaidUser.value
+const selectTemplate = (tpl: string) => {
+  if (isTemplateLocked(tpl)) { router.push('/billing'); return }
+  form.value.template = tpl
+}
 
 const editPageId = computed(() => route.params.id as string | undefined)
 const isEditMode = computed(() => !!editPageId.value)
