@@ -757,6 +757,18 @@ function onVisibilityChange() {
 // ─── Lifecycle ─────────────────────────────────────────────────────────────────
 onMounted(async () => {
   applyDeepLinkBypass()
+  // Inside a social in-app webview, applyDeepLinkBypass() has just kicked the
+  // visitor out to the system browser, where the page reloads fresh and logs the
+  // real view (and can actually click through). This webview context is throwaway:
+  // record a lightweight bounce marker — so we can quantify how many loads are
+  // bounces vs real views — then stop. Logging page_view here would double-count
+  // one human as two views (sessionId is regenerated per load and doesn't survive
+  // the webview→browser jump) while only the browser session can ever convert,
+  // structurally halving the CTR shown to managers.
+  if (isInAppBrowser()) {
+    sendEvent('deeplink_bounce')
+    return
+  }
   try {
     const { data } = await api.get(`/p/${slug}`)
     page.value = data

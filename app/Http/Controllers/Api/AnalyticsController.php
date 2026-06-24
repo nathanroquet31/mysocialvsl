@@ -18,7 +18,7 @@ class AnalyticsController extends Controller
         $page = Page::where('slug', $slug)->where('is_active', true)->firstOrFail();
 
         $request->validate([
-            'type'         => 'required|in:page_view,link_click,age_confirmed,video_play,video_progress,video_position,video_unmute,bot_blocked,time_on_page,heartbeat',
+            'type'         => 'required|in:page_view,link_click,age_confirmed,video_play,video_progress,video_position,video_unmute,bot_blocked,time_on_page,heartbeat,deeplink_bounce',
             'page_link_id' => 'nullable|integer|exists:page_links,id',
             'value'        => 'nullable|numeric|min:0',
             'referrer'     => 'nullable|string|max:500',
