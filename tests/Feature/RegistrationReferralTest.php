@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Api\AuthController;
 use App\Models\User;
+use App\Notifications\Welcome;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 /**
@@ -73,5 +75,19 @@ class RegistrationReferralTest extends TestCase
             ->assertCreated();
 
         $this->assertSame('free', User::where('email', 'new@example.com')->first()->plan);
+    }
+
+    public function test_registration_sends_the_welcome_notification(): void
+    {
+        Notification::fake();
+
+        $this->postJson('/api/register', $this->registerPayload())
+            ->assertCreated();
+
+        $user = User::where('email', 'new@example.com')->first();
+
+        Notification::assertSentTo($user, Welcome::class, function (Welcome $notification) use ($user) {
+            return in_array('mail', $notification->via($user));
+        });
     }
 }

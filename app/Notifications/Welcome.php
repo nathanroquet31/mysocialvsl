@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
@@ -15,7 +16,19 @@ class Welcome extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['mail', 'database'];
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $name = $notifiable->name ? explode(' ', $notifiable->name)[0] : 'there';
+        $dashboardUrl = rtrim(config('app.frontend_url'), '/') . '/dashboard';
+
+        return (new MailMessage)
+            ->subject('Welcome to MySocialVSL')
+            ->greeting("Welcome to MySocialVSL, {$name}!")
+            ->line('You can now create your first page and add your links to get started.')
+            ->action('Go to dashboard', $dashboardUrl);
     }
 
     public function toDatabase(object $notifiable): array
