@@ -1,45 +1,48 @@
 <template>
   <DashboardLayout title="What's New">
 
-    <div style="position:relative;max-width:740px;margin:0 auto">
+    <div style="position:relative;max-width:1060px;margin:0 auto">
       <!-- Brand glow blob -->
-      <div aria-hidden="true" style="position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:420px;height:300px;background:radial-gradient(ellipse,rgba(109,78,232,0.20),transparent 70%);filter:blur(55px);pointer-events:none;z-index:0"></div>
+      <div aria-hidden="true" style="position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:460px;height:300px;background:radial-gradient(ellipse,rgba(109,78,232,0.18),transparent 70%);filter:blur(60px);pointer-events:none;z-index:0"></div>
 
       <div style="position:relative;z-index:1">
         <!-- Hero -->
-        <div style="text-align:center;margin-bottom:30px">
-          <div style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(109,78,232,0.3);border-radius:999px;padding:6px 15px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#A78BFA;background:rgba(109,78,232,0.08);margin-bottom:22px">
+        <div style="text-align:center;margin-bottom:34px">
+          <div style="display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(109,78,232,0.3);border-radius:999px;padding:6px 15px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#A78BFA;background:rgba(109,78,232,0.08);margin-bottom:20px">
             <span style="width:6px;height:6px;border-radius:50%;background:#A78BFA;box-shadow:0 0 8px #A78BFA"></span>
             Shipping fast
           </div>
           <h1 style="font-size:34px;font-weight:800;letter-spacing:-0.03em;margin:0 0 10px;color:var(--text)">
             What's <span style="background:linear-gradient(135deg,#A78BFA,#6D4EE8,#8B6FF0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">New</span>
           </h1>
-          <p style="font-size:14px;color:var(--text-muted);margin:0">Every feature, improvement and fix we ship — newest first.</p>
+          <p style="font-size:14px;color:var(--text-muted);margin:0">What we're building, what just shipped, what we improved and fixed.</p>
         </div>
 
-        <!-- Filters -->
-        <div style="display:flex;justify-content:center;margin-bottom:36px">
-          <div style="display:inline-flex;gap:4px;padding:5px;border-radius:999px;background:var(--pill-bg);border:1px solid var(--border)">
-            <button v-for="f in filters" :key="f.key" @click="active = f.key" :style="tab(f.key)">
-              {{ f.label }} <span style="opacity:0.55;margin-left:1px">{{ counts[f.key] }}</span>
-            </button>
-          </div>
-        </div>
+        <!-- Board -->
+        <div style="display:flex;gap:16px;overflow-x:auto;padding-bottom:10px">
+          <div v-for="col in columns" :key="col.key"
+            style="flex:1;min-width:234px;display:flex;flex-direction:column;gap:12px">
 
-        <!-- Timeline -->
-        <div v-for="(e, i) in visible" :key="e.title"
-          style="display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:start">
-          <div style="text-align:right;padding-top:20px">
-            <p style="font-size:12px;font-weight:700;color:var(--text);margin:0;white-space:nowrap">{{ e.date }}</p>
-          </div>
-          <div style="position:relative;padding-left:24px;padding-bottom:14px;border-left:1px solid var(--border)">
-            <span :style="dot(e.type)"></span>
-            <div :style="card(i)" @mouseenter="hover = i" @mouseleave="hover = null">
-              <span :style="badge(e.type)">{{ e.type }}</span>
-              <p style="font-size:15px;font-weight:700;color:var(--text);margin:11px 0 6px">{{ e.title }}</p>
-              <p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.6">{{ e.desc }}</p>
+            <!-- Column header -->
+            <div style="display:flex;align-items:center;gap:8px;padding:0 2px 4px">
+              <span :style="{width:'8px',height:'8px',borderRadius:'50%',background:col.color,boxShadow:`0 0 8px ${col.color}`}"></span>
+              <span style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)">{{ col.label }}</span>
+              <span :style="countPill(col.color)">{{ col.items.length }}</span>
             </div>
+
+            <!-- Cards -->
+            <div v-for="(it, i) in col.items" :key="it.title"
+              :style="cardStyle(col, `${col.key}-${i}`)"
+              @mouseenter="hover = `${col.key}-${i}`" @mouseleave="hover = null">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+                <p style="font-size:13.5px;font-weight:700;color:var(--text);margin:0;line-height:1.35">{{ it.title }}</p>
+                <span v-if="it.date" style="font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0">{{ it.date }}</span>
+                <span v-else :style="{fontSize:'9px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:col.color,flexShrink:0}">soon</span>
+              </div>
+              <p :style="descStyle">{{ it.desc }}</p>
+            </div>
+
+            <div v-if="col.items.length === 0" :style="emptyStyle">Nothing here yet.</div>
           </div>
         </div>
       </div>
@@ -52,84 +55,67 @@
 import { ref, computed } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 
-const active = ref('all')
 const hover = ref(null)
 
-const filters = [
-  { key: 'all',      label: 'All' },
-  { key: 'new',      label: 'New' },
-  { key: 'improved', label: 'Improved' },
-  { key: 'fixed',    label: 'Fixed' },
-]
-
-// Edit this list to ship a changelog entry. Newest first.
+// Shipped — edit to add a changelog entry. Newest first.
 const entries = [
-  { date: 'Jun 23', type: 'new',      title: 'Real visitors, not raw hits', desc: 'Analytics now count unique visitors and unique clicks with a persistent visitor ID — so your numbers reflect real people, not repeated page loads.' },
-  { date: 'Jun 23', type: 'improved', title: 'Per-second VSL retention + live viewers', desc: 'See exactly where viewers drop off second by second, who is watching right now, and the true average watch time of your VSL.' },
-  { date: 'Jun 23', type: 'improved', title: 'Stronger iPhone escape from the Instagram browser', desc: 'Deeplinks now break out of the in-app Instagram webview more reliably on iOS 17+, so more of your traffic lands in a real browser.' },
-  { date: 'Jun 23', type: 'improved', title: 'Clean public links', desc: 'Your pages now live at a clean address (yourname) — shorter, sharper, and easier to share.' },
-  { date: 'Jun 22', type: 'improved', title: 'Smarter CTA popup', desc: 'Set a 1–45s reveal delay, your popup settings now persist, and after closing it the bottom button goes straight to your link.' },
-  { date: 'Jun 22', type: 'fixed',    title: 'Duplicating a page now copies its links', desc: 'Duplicate a page and the copy actually carries over all of its links, ready to tweak.' },
-  { date: 'Jun 22', type: 'new',      title: 'How to film a converting VSL', desc: 'A short walkthrough built into the page builder shows you how to shoot a VSL that actually converts.' },
-  { date: 'Jun 21', type: 'new',      title: 'Light mode', desc: 'Switch the whole app and landing between light and dark — your choice is remembered.' },
-  { date: 'Jun 20', type: 'new',      title: 'In-app notifications', desc: 'A notification bell keeps you on top of billing, security and account events as they happen.' },
-  { date: 'Jun 20', type: 'new',      title: 'VSL Watch Funnel', desc: 'A new dashboard funnel shows how far visitors get through your video — view, watch, and click in one glance.' },
-  { date: 'Jun 19', type: 'improved', title: 'White-label on Agency', desc: 'Agency plans now fully remove our branding from public pages.' },
-  { date: 'Jun 19', type: 'improved', title: 'Reliable video uploads', desc: 'Uploads now accept web-playable video (MP4/WebM) and tell you the real reason when something is off — no more silent failures.' },
+  { date: 'Jun 23', type: 'new',      title: 'Real visitors, not raw hits', desc: 'Unique visitors and unique clicks with a persistent visitor ID — real people, not repeated page loads.' },
+  { date: 'Jun 23', type: 'improved', title: 'Per-second VSL retention + live viewers', desc: 'See where viewers drop off second by second, who is watching now, and your true average watch time.' },
+  { date: 'Jun 23', type: 'improved', title: 'Stronger iPhone escape', desc: 'Deeplinks break out of the in-app Instagram browser more reliably on iOS 17+.' },
+  { date: 'Jun 23', type: 'improved', title: 'Clean public links', desc: 'Your pages now live at a clean address — shorter, sharper, easier to share.' },
+  { date: 'Jun 22', type: 'improved', title: 'Smarter CTA popup', desc: '1–45s reveal delay, settings that persist, and a close that sends straight to your link.' },
+  { date: 'Jun 22', type: 'fixed',    title: 'Duplicating a page copies its links', desc: 'The copy now carries over all of its links, ready to tweak.' },
+  { date: 'Jun 22', type: 'new',      title: 'How to film a converting VSL', desc: 'A short walkthrough in the builder shows you how to shoot a VSL that converts.' },
+  { date: 'Jun 21', type: 'new',      title: 'Light mode', desc: 'Switch the app and landing between light and dark — your choice is remembered.' },
+  { date: 'Jun 20', type: 'new',      title: 'In-app notifications', desc: 'A bell keeps you on top of billing, security and account events as they happen.' },
+  { date: 'Jun 20', type: 'new',      title: 'VSL Watch Funnel', desc: 'See how far visitors get through your video — view, watch, and click in one glance.' },
+  { date: 'Jun 19', type: 'improved', title: 'White-label on Agency', desc: 'Agency plans fully remove our branding from public pages.' },
+  { date: 'Jun 19', type: 'fixed',    title: 'Reliable video uploads', desc: 'Web-playable video only (MP4/WebM), with the real reason surfaced when something is off.' },
 ]
 
-const counts = computed(() => ({
-  all:      entries.length,
-  new:      entries.filter(e => e.type === 'new').length,
-  improved: entries.filter(e => e.type === 'improved').length,
-  fixed:    entries.filter(e => e.type === 'fixed').length,
-}))
+// Coming soon — the roadmap teaser. No date; rendered as "soon".
+const soon = [
+  { title: 'VSL templates', desc: 'Start from a proven layout instead of a blank page.' },
+  { title: 'Instagram & TikTok analytics', desc: 'Your real social stats, right next to your VSL numbers.' },
+  { title: 'Team seats', desc: 'Invite your team to manage pages together.' },
+  { title: 'Fresh CTA styles', desc: 'New urgency and reveal animations for your button.' },
+]
 
-const visible = computed(() => active.value === 'all' ? entries : entries.filter(e => e.type === active.value))
+const columns = computed(() => [
+  { key: 'soon',     label: 'Coming soon', color: '#A78BFA', items: soon },
+  { key: 'new',      label: 'New',         color: '#10B981', items: entries.filter(e => e.type === 'new') },
+  { key: 'improved', label: 'Improved',    color: '#3B82F6', items: entries.filter(e => e.type === 'improved') },
+  { key: 'fixed',    label: 'Fixed',       color: '#F59E0B', items: entries.filter(e => e.type === 'fixed') },
+])
 
-function typeColor(type) {
-  return type === 'new' ? '#10B981' : type === 'fixed' ? '#F59E0B' : '#A78BFA'
+const descStyle = {
+  fontSize: '12px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.55,
+  display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
 }
 
-function dot(type) {
-  const c = typeColor(type)
+const emptyStyle = {
+  fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center', padding: '18px',
+  border: '1px dashed var(--border)', borderRadius: '12px',
+}
+
+function countPill(color) {
   return {
-    position: 'absolute', left: '-5px', top: '21px', width: '9px', height: '9px',
-    borderRadius: '50%', background: c,
-    boxShadow: `0 0 0 4px var(--bg), 0 0 10px ${c}`,
+    marginLeft: 'auto', fontSize: '10px', fontWeight: 700, color,
+    background: `${color}1f`, border: `1px solid ${color}3d`, borderRadius: '999px', padding: '1px 8px',
   }
 }
 
-function badge(type) {
-  const c = typeColor(type)
-  return {
-    display: 'inline-block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em',
-    textTransform: 'uppercase', color: c, background: `${c}1f`, border: `1px solid ${c}3d`,
-    borderRadius: '999px', padding: '3px 10px',
-  }
-}
-
-function card(i) {
-  const on = hover.value === i
+function cardStyle(col, id) {
+  const on = hover.value === id
+  const isSoon = col.key === 'soon'
   return {
     background: 'var(--card-bg)',
-    border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'var(--border)'}`,
-    borderRadius: '16px', padding: '18px',
-    boxShadow: on ? '0 0 28px rgba(109,78,232,0.15)' : 'none',
-    transform: on ? 'translateX(2px)' : 'none',
+    border: on ? `1px solid ${col.color}88` : (isSoon ? '1px dashed var(--border)' : '1px solid var(--border)'),
+    borderRadius: '14px', padding: '14px',
+    boxShadow: on ? `0 0 24px ${col.color}26` : 'none',
+    transform: on ? 'translateY(-2px)' : 'none',
     transition: 'all 0.18s ease',
-  }
-}
-
-function tab(key) {
-  const on = active.value === key
-  return {
-    border: 'none', cursor: 'pointer', fontFamily: 'Inter,sans-serif',
-    fontSize: '12px', fontWeight: 600, padding: '7px 15px', borderRadius: '999px',
-    color: on ? '#fff' : 'var(--text-muted)',
-    background: on ? 'linear-gradient(135deg,#6D4EE8,#8B6FF0)' : 'transparent',
-    boxShadow: on ? '0 0 18px rgba(109,78,232,0.45)' : 'none',
-    transition: 'all 0.15s',
+    cursor: 'default',
   }
 }
 </script>
