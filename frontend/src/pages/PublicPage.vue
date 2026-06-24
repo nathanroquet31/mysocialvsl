@@ -651,8 +651,10 @@ function isInAppBrowser() {
 // Single source of truth for the deep-link escape (was duplicated in goToLink +
 // applyDeepLinkBypass, so iOS could be fixed in one place and not the other).
 //  - Android: intent:// with an https fallback_url — reliable.
-//  - iOS 17+: the x-safari-https:// scheme opens Safari straight from the webview.
-//    (instagram://extbrowser was Meta's old trick and has been patched for years.)
+//  - iOS: instagram://extbrowser opens the system browser from the webview. This
+//    is the method validated working on a real iPhone (20 Jun 2026). A previous
+//    switch to x-safari-https:// left iOS visitors trapped in the Instagram
+//    webview in production, so it was reverted.
 // Both fall back to a plain navigation after a beat so a click is never lost on
 // an OS/browser that ignores the scheme.
 function breakOutToBrowser(targetUrl) {
@@ -665,8 +667,9 @@ function breakOutToBrowser(targetUrl) {
       return
     } catch { /* malformed URL → plain nav below */ }
   } else {
-    window.location.href = 'x-safari-' + targetUrl
-    setTimeout(() => { window.location.href = targetUrl }, 1200)
+    const enc = encodeURIComponent(targetUrl)
+    window.location.href = `instagram://extbrowser/?url=${enc}`
+    setTimeout(() => { window.location.href = targetUrl }, 1500)
     return
   }
   window.location.href = targetUrl

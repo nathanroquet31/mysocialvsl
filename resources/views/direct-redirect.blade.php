@@ -50,11 +50,13 @@
               return;
             } catch (e) { /* fall through to plain redirect */ }
           } else {
-            // iOS 17+ in-app browser: x-safari-https:// opens Safari straight
-            // from the webview (instagram://extbrowser is Meta's old, patched
-            // trick). Fall back to a plain redirect if the scheme is ignored.
-            window.location.href = 'x-safari-' + url;
-            setTimeout(function () { window.location.replace(url); }, 1200);
+            // iOS in-app browser: instagram://extbrowser opens the system browser
+            // from the webview — the method validated working on a real iPhone
+            // (20 Jun 2026). x-safari-https:// was tried but left iOS visitors
+            // trapped in production, so it was reverted. Fall back to a plain
+            // redirect if the scheme is ignored.
+            window.location.href = 'instagram://extbrowser/?url=' + enc;
+            setTimeout(function () { window.location.replace(url); }, 1500);
             return;
           }
         }
