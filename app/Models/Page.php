@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'bg_color', 'btn_color',
     'verified_badge', 'show_avatar', 'age_gate', 'is_active',
     'online_status', 'location', 'response_time', 'countdown_end', 'promo_text',
-    'bot_protection', 'deep_link_enabled', 'strict_deep_link', 'link_preview_enabled', 'custom_domain',
+    'bot_protection', 'deep_link_enabled', 'strict_deep_link', 'link_preview_enabled', 'show_branding', 'custom_domain',
     'video_fit', 'overlay_opacity', 'card_position',
     'vsl_enabled', 'vsl_position', 'cta_reveal_at',
     'fomo_enabled', 'fomo_title', 'fomo_message', 'fomo_cta_label', 'fomo_delay_seconds',
@@ -21,6 +21,15 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 ])]
 class Page extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            // Cast so the white-label flag is a real bool in JSON + comparisons
+            // (the older toggles predate this and still ride as 0/1 — harmless).
+            'show_branding' => 'boolean',
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

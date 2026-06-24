@@ -58,6 +58,7 @@ class PageController extends Controller
             'deep_link_enabled'    => 'boolean',
             'strict_deep_link'     => 'boolean',
             'link_preview_enabled' => 'boolean',
+            'show_branding' => 'boolean',
             'custom_domain' => 'nullable|string|max:255',
             'video_fit'     => 'nullable|in:cover,contain',
             'overlay_opacity' => 'nullable|numeric|min:0|max:1',
@@ -152,6 +153,11 @@ class PageController extends Controller
             'deep_link_enabled'    => $request->deep_link_enabled ?? true,
             'strict_deep_link'     => $request->strict_deep_link ?? false,
             'link_preview_enabled' => $request->link_preview_enabled ?? true,
+            // White-label is Agency-only: ignore the field for any other plan so a
+            // crafted request can't strip the "Powered by" footer (default false =
+            // white-label for Agency; the server rule in ResolvesPublicPages forces
+            // it shown for everyone else regardless of what's stored).
+            'show_branding' => $request->user()->isAgency() ? $request->boolean('show_branding') : false,
             'custom_domain' => $request->custom_domain,
             'video_fit'     => $request->video_fit ?? 'contain',
             'overlay_opacity' => $request->overlay_opacity ?? 0.6,
@@ -239,6 +245,7 @@ class PageController extends Controller
             'deep_link_enabled'    => 'boolean',
             'strict_deep_link'     => 'boolean',
             'link_preview_enabled' => 'boolean',
+            'show_branding' => 'boolean',
             'custom_domain' => 'nullable|string|max:255',
             'is_active'     => 'boolean',
             'video_fit'     => 'nullable|in:cover,contain',
@@ -285,6 +292,13 @@ class PageController extends Controller
             'meta_title', 'meta_description', 'og_image_url', 'utm_passthrough',
             'popup_title', 'popup_subtitle', 'popup_text', 'popup_image_url', 'popup_delay_seconds',
         ]));
+
+        // White-label is Agency-only: apply show_branding separately and only for
+        // Agency, so it's never in the mass-assigned set for another plan (a crafted
+        // request can't strip the "Powered by" footer).
+        if ($request->has('show_branding') && $request->user()->isAgency()) {
+            $page->update(['show_branding' => $request->boolean('show_branding')]);
+        }
 
         if ($request->has('links')) {
             $page->links()->delete();

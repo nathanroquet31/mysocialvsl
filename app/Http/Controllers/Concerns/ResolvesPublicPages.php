@@ -37,9 +37,12 @@ trait ResolvesPublicPages
             $page->setRelation('geoRules', collect());
         }
 
-        // White-label: only the Agency plan hides the "Powered by" footer
-        // (matches GetMySocial — Creator/Pro still shows branding).
-        $page->setAttribute('show_branding', ! $page->user->isAgency());
+        // White-label: only the Agency plan can hide the "Powered by" footer, set
+        // per page (pages.show_branding, default false = removed) from the page
+        // editor. Every other plan always shows it — it's a paid perk they can't
+        // turn off (matches GetMySocial — Creator/Pro still shows it).
+        $showBranding = $page->user->isAgency() ? (bool) $page->show_branding : true;
+        $page->setAttribute('show_branding', $showBranding);
 
         // Drop the owner relation so the public JSON never leaks user data
         // (email, Stripe ids…) — we only needed the plan above.

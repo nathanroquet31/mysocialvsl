@@ -767,6 +767,30 @@
                 </div>
               </div> <!-- end color/v-if-text div -->
 
+              <!-- ── White label (Agency-only) ── -->
+              <div :style="{background:C.surface2,border:`1px solid ${C.border}`,borderRadius:'14px',padding:'18px 20px',display:'flex',flexDirection:'column',gap:'12px'}">
+                <div :style="{display:'flex',alignItems:'center',gap:'8px'}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.8l6.9-.7z"/></svg>
+                  <p :style="{fontSize:'13px',fontWeight:700,color:C.text,margin:0}">White label</p>
+                  <span v-if="!isAgency" :style="{fontSize:'10px',color:'#A78BFA',fontWeight:700,background:'rgba(109,78,232,0.15)',padding:'2px 8px',borderRadius:'999px',marginLeft:'auto'}">Agency</span>
+                </div>
+                <div :style="{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}">
+                  <div>
+                    <p :style="{fontSize:'13px',fontWeight:600,color:C.text,marginBottom:'2px'}">Show "Powered by MySocialVSL"</p>
+                    <p :style="{fontSize:'11px',color:C.textDim}">{{ isAgency ? 'Turn off to make this page fully white-label — no footer.' : 'Removing the footer is an Agency feature.' }}</p>
+                  </div>
+                  <div v-if="!isAgency" @click="router.push('/billing')"
+                    :style="{display:'flex',alignItems:'center',gap:'5px',padding:'5px 12px',borderRadius:'999px',cursor:'pointer',background:'rgba(109,78,232,0.12)',border:'1px solid rgba(109,78,232,0.3)',flexShrink:0}">
+                    <i class="bi bi-lock-fill" style="font-size:10px;color:#A78BFA"></i>
+                    <span :style="{fontSize:'11px',fontWeight:700,color:'#A78BFA'}">Agency</span>
+                  </div>
+                  <div v-else @click="form.show_branding = !form.show_branding"
+                    :style="{width:'40px',height:'22px',borderRadius:'999px',cursor:'pointer',background:form.show_branding?'#6D4EE8':C.toggleInactive,position:'relative',transition:'background 0.2s',flexShrink:0}">
+                    <div :style="{width:'16px',height:'16px',borderRadius:'50%',background:'#fff',position:'absolute',top:'3px',transition:'left 0.2s',left:form.show_branding?'21px':'3px',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}"></div>
+                  </div>
+                </div>
+              </div>
+
               <!-- ── Popup config (vsl-popup only) ── -->
               <div v-if="form.template === 'vsl-popup'"
                 :style="{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.18)',borderRadius:'14px',padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}">
@@ -1081,6 +1105,11 @@ const isPaidUser = computed(() => {
   const p = (auth.user as any)?.plan
   return p === 'pro' || p === 'agency' || !!(auth.user as any)?.is_admin
 })
+// White-label (hide the "Powered by" footer) is Agency-only.
+const isAgency = computed(() => {
+  const p = (auth.user as any)?.plan
+  return p === 'agency' || !!(auth.user as any)?.is_admin
+})
 const PAID_TEMPLATES = ['vsl-popup', 'vsl-bandeau']
 const isTemplateLocked = (tpl: string) => PAID_TEMPLATES.includes(tpl) && !isPaidUser.value
 const selectTemplate = (tpl: string) => {
@@ -1254,6 +1283,7 @@ const form = ref({
   deep_link_enabled:  true,
   strict_deep_link:   false,
   bot_protection:     true,
+  show_branding:      false,
   cta_reveal_at:    null as number | null,
   extra_links:      [] as Array<{ type?: string; label: string; url: string; color: string }>,
   popup_title:      'Join me in private 🔥',
@@ -1329,6 +1359,7 @@ async function loadPageForEdit() {
     form.value.deep_link_enabled  = data.deep_link_enabled  !== false
     form.value.strict_deep_link   = !!data.strict_deep_link
     form.value.bot_protection     = !!data.bot_protection
+    form.value.show_branding      = !!data.show_branding
     form.value.cta_reveal_at    = data.cta_reveal_at ?? null
     form.value.extra_links      = extraLinks
     form.value.popup_title      = data.popup_title    || 'Join me in private 🔥'
@@ -1406,6 +1437,7 @@ async function save() {
       deep_link_enabled:  form.value.deep_link_enabled,
       strict_deep_link:   form.value.strict_deep_link,
       bot_protection:     form.value.bot_protection,
+      show_branding:      form.value.show_branding,
       popup_title:         form.value.popup_title || undefined,
       popup_subtitle:      form.value.popup_subtitle || undefined,
       popup_delay_seconds: form.value.popup_delay,
