@@ -142,19 +142,26 @@
         </div>
       </div>
 
-      <!-- Agency configurator (shown when agency is selected or current plan) -->
-      <div v-if="showAgencyConfig" :style="{marginBottom:'20px'}">
-        <div :style="{display:'flex',alignItems:'center',gap:'8px',marginBottom:'14px'}">
-          <div style="height:1px;flex:1" :style="{background:divider}"></div>
-          <span :style="{fontSize:'11px',fontWeight:600,color:muted,letterSpacing:'0.1em'}">AGENCY PLAN CONFIGURATOR</span>
-          <div style="height:1px;flex:1" :style="{background:divider}"></div>
+      <!-- Agency custom plan — always visible, the scalable upsell (impossible to miss) -->
+      <div :style="{position:'relative',borderRadius:'16px',padding:'1px',background:'linear-gradient(135deg,rgba(109,78,232,0.65),rgba(139,111,240,0.22))',marginBottom:'20px',boxShadow:'0 0 32px rgba(109,78,232,0.12)'}">
+        <div :style="{borderRadius:'15px',padding:'20px',background: theme.dark ? 'rgba(20,17,40,0.65)' : '#fff'}">
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:4px">
+            <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#6D4EE8,#8B6FF0);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 18px rgba(109,78,232,0.45)">
+              <i class="bi bi-sliders" style="color:#fff;font-size:15px"></i>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <p :style="{fontSize:'14px',fontWeight:800,color:text,margin:0}">Build your Agency plan</p>
+                <span style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#A78BFA;background:rgba(109,78,232,0.12);border:1px solid rgba(109,78,232,0.3);border-radius:999px;padding:2px 8px">Custom</span>
+              </div>
+              <p :style="{fontSize:'12px',color:sub,margin:'2px 0 0'}">Scale pages &amp; links from 25 to unlimited — pay only for what you need.</p>
+            </div>
+          </div>
+          <div style="margin-top:16px">
+            <AgencyConfigurator :dark="theme.dark" :billing="billing" :current-plan="currentPlan" @checkout="checkoutAgency" />
+          </div>
         </div>
-        <AgencyConfigurator :dark="theme.dark" :billing="billing" :current-plan="currentPlan" @checkout="checkoutAgency" />
       </div>
-      <button v-if="!showAgencyConfig" @click="showAgencyConfig=true"
-        :style="{width:'100%',padding:'10px',borderRadius:'8px',border:`1px dashed ${border}`,background:'transparent',color:sub,fontSize:'13px',fontWeight:500,cursor:'pointer',fontFamily:'Inter,sans-serif',marginBottom:'20px',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px'}">
-        <i class="bi bi-sliders"></i> Configure Agency Plan
-      </button>
 
       <!-- Promo code -->
       <div :style="{display:'flex',gap:'10px',alignItems:'center',paddingTop:'16px',borderTop:`1px solid ${divider}`}">
@@ -401,7 +408,6 @@ const billing = ref('monthly')
 const promoCode = ref('')
 const invoices = ref([])
 const faqOpen = ref(null)
-const showAgencyConfig = ref(false)
 
 const PACK_PRICE = 9
 const pagesPacks = ref(0)
