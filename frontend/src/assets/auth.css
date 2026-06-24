@@ -114,8 +114,8 @@
 }
 .field-label i { margin-right: 6px; }
 /* Float up when focused or filled (placeholder is a single space → :not(:placeholder-shown)) */
-.field-input:focus + .field-label,
-.field-input:not(:placeholder-shown) + .field-label {
+.field-input:focus ~ .field-label,
+.field-input:not(:placeholder-shown) ~ .field-label {
   transform: translateY(-22px) scale(0.78);
   color: #A78BFA;
 }
@@ -172,8 +172,8 @@
 [data-theme="light"] .field-input { color: #111827 !important; border-bottom-color: #D1D5DB !important; }
 [data-theme="light"] .field-input:focus { border-bottom-color: #7C3AED !important; }
 [data-theme="light"] .field-label { color: #6B7280; }
-[data-theme="light"] .field-input:focus + .field-label,
-[data-theme="light"] .field-input:not(:placeholder-shown) + .field-label { color: #7C3AED; }
+[data-theme="light"] .field-input:focus ~ .field-label,
+[data-theme="light"] .field-input:not(:placeholder-shown) ~ .field-label { color: #7C3AED; }
 [data-theme="light"] .field-toggle-password { color: #9CA3AF; }
 [data-theme="light"] .field-toggle-password:hover { color: #6B7280; }
 
