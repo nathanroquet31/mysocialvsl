@@ -26,7 +26,10 @@
         </div>
 
         <div class="field">
-          <input v-model="form.password" type="password" id="login_password" class="field-input" placeholder=" " required />
+          <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="login_password" class="field-input" placeholder=" " required />
+          <button type="button" class="field-toggle-password" @click="showPassword = !showPassword" tabindex="-1">
+            <i :class="['bi', showPassword ? 'bi-eye-slash' : 'bi-eye']"></i>
+          </button>
           <label for="login_password" class="field-label"><i class="bi bi-lock"></i> Password</label>
         </div>
 
@@ -63,6 +66,7 @@ const form = ref({ email: '', password: '' })
 const error = ref('')
 const loading = ref(false)
 const justReset = ref(route.query.reset === '1')
+const showPassword = ref(false)
 
 async function submit() {
   loading.value = true

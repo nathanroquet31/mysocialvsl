@@ -30,12 +30,18 @@
         </div>
 
         <div class="field">
-          <input v-model="form.password" type="password" id="reg_password" class="field-input" placeholder=" " required />
+          <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="reg_password" class="field-input" placeholder=" " required />
+          <button type="button" class="field-toggle-password" @click="showPassword = !showPassword" tabindex="-1">
+            <i :class="['bi', showPassword ? 'bi-eye-slash' : 'bi-eye']"></i>
+          </button>
           <label for="reg_password" class="field-label"><i class="bi bi-lock"></i> Password</label>
         </div>
 
         <div class="field">
-          <input v-model="form.password_confirmation" type="password" id="reg_password2" class="field-input" placeholder=" " required />
+          <input v-model="form.password_confirmation" :type="showPasswordConfirm ? 'text' : 'password'" id="reg_password2" class="field-input" placeholder=" " required />
+          <button type="button" class="field-toggle-password" @click="showPasswordConfirm = !showPasswordConfirm" tabindex="-1">
+            <i :class="['bi', showPasswordConfirm ? 'bi-eye-slash' : 'bi-eye']"></i>
+          </button>
           <label for="reg_password2" class="field-label"><i class="bi bi-shield-lock"></i> Confirm Password</label>
         </div>
 
@@ -69,6 +75,8 @@ const refCode = route.query.ref || null
 const form = ref({ name: '', email: '', password: '', password_confirmation: '' })
 const error = ref('')
 const loading = ref(false)
+const showPassword = ref(false)
+const showPasswordConfirm = ref(false)
 
 async function submit() {
   loading.value = true

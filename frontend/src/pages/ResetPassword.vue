@@ -19,12 +19,18 @@
 
       <form class="auth-form" @submit.prevent="submit">
         <div class="field">
-          <input v-model="form.password" type="password" id="reset_password" class="field-input" placeholder=" " required minlength="8" />
+          <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="reset_password" class="field-input" placeholder=" " required minlength="8" />
+          <button type="button" class="field-toggle-password" @click="showPassword = !showPassword" tabindex="-1">
+            <i :class="['bi', showPassword ? 'bi-eye-slash' : 'bi-eye']"></i>
+          </button>
           <label for="reset_password" class="field-label"><i class="bi bi-lock"></i> New Password</label>
         </div>
 
         <div class="field">
-          <input v-model="form.password_confirmation" type="password" id="reset_password2" class="field-input" placeholder=" " required minlength="8" />
+          <input v-model="form.password_confirmation" :type="showPasswordConfirm ? 'text' : 'password'" id="reset_password2" class="field-input" placeholder=" " required minlength="8" />
+          <button type="button" class="field-toggle-password" @click="showPasswordConfirm = !showPasswordConfirm" tabindex="-1">
+            <i :class="['bi', showPasswordConfirm ? 'bi-eye-slash' : 'bi-eye']"></i>
+          </button>
           <label for="reset_password2" class="field-label"><i class="bi bi-shield-lock"></i> Confirm Password</label>
         </div>
 
@@ -58,6 +64,8 @@ const email = String(route.query.email ?? '')
 const form = ref({ password: '', password_confirmation: '' })
 const error = ref('')
 const loading = ref(false)
+const showPassword = ref(false)
+const showPasswordConfirm = ref(false)
 
 async function submit() {
   error.value = ''
