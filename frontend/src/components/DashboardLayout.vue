@@ -113,6 +113,7 @@
         <div :style="{height:'1px',background:border,margin:'8px 2px'}"></div>
         <p v-if="!collapsed" :style="{fontSize:'10px',fontWeight:600,color:textMuted,textTransform:'uppercase',letterSpacing:'0.1em',padding:'0 8px',margin:'8px 0 4px',whiteSpace:'nowrap'}">Help</p>
 
+        <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/whats-new" :active="route.path==='/dashboard/whats-new'" label="What's New" icon="whatsnew" />
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/help" :active="route.path==='/dashboard/help'" label="Help Center" icon="help" />
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/guide" :active="route.path==='/dashboard/guide'" label="Creator Guide" icon="guide" />
         <NavItem :collapsed="collapsed" :dark="theme.dark" href="/dashboard/support" :active="route.path==='/dashboard/support'" label="Support" icon="support" />

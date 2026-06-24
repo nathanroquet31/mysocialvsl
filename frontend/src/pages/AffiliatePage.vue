@@ -2,14 +2,29 @@
   <DashboardLayout title="Affiliate Program">
 
     <div v-if="loading" :style="{fontSize:'13px',color:txMuted}">Loading…</div>
+
+    <!-- Invite-only: only flagged affiliates see the dashboard. -->
+    <div v-else-if="!data || !data.enrolled" :style="card" style="text-align:center;padding:48px 28px">
+      <div :style="{width:'48px',height:'48px',borderRadius:'12px',background:'#EEE9FF',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}">
+        <i class="bi bi-people" style="color:#6D4EE8;font-size:22px"></i>
+      </div>
+      <p :style="{fontSize:'15px',fontWeight:700,color:tx,margin:'0 0 6px'}">The affiliate program is invite-only</p>
+      <p :style="{fontSize:'13px',color:txMuted,margin:0,lineHeight:1.65,maxWidth:'420px',marginInline:'auto'}">
+        Earn 20% recurring on every customer you bring. Reach out to get your affiliate link.
+      </p>
+    </div>
+
     <template v-else>
 
       <!-- Hero: code + link -->
       <div :style="card" style="margin-bottom:20px">
         <p :style="{fontSize:'15px',fontWeight:700,color:tx,margin:'0 0 6px'}">Earn 20% recurring</p>
-        <p :style="{fontSize:'13px',color:txMuted,margin:'0 0 18px',lineHeight:1.65}">
+        <p :style="{fontSize:'13px',color:txMuted,margin:'0 0 16px',lineHeight:1.65}">
           Share your link. Every creator who subscribes through it earns you 20% of their plan, every month.
         </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <span v-for="term in terms" :key="term" :style="termPill">{{ term }}</span>
+        </div>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;max-width:640px">
           <span :style="{fontSize:'12px',fontWeight:600,color:txMuted}">Your code</span>
           <div style="display:flex;gap:8px;align-items:center">
@@ -35,12 +50,12 @@
           <p :style="statValue">{{ data.paying_referrals }}</p>
         </div>
         <div :style="card">
-          <p :style="statLabel">Est. monthly revenue</p>
-          <p :style="statValue">${{ data.estimated_monthly_revenue }}</p>
+          <p :style="statLabel">Total earned</p>
+          <p :style="statValue">${{ data.total_earned }}</p>
         </div>
         <div :style="card">
-          <p :style="statLabel">Payout status</p>
-          <p :style="[statValue, {fontSize:'16px'}]">{{ payoutLabel }}</p>
+          <p :style="statLabel">Pending payout</p>
+          <p :style="statValue">${{ data.pending_payout }}</p>
         </div>
       </div>
 
@@ -83,12 +98,9 @@ const copiedWhat = ref('')
 // Extensible — can be moved to the database/API later
 const partners = ref([])
 
-const payoutLabel = computed(() => {
-  const s = data.value?.payout_status
-  if (s === 'pending') return 'Pending'
-  if (s === 'paid') return 'Paid'
-  return 'No payout yet'
-})
+// The locked deal, shown up-front so affiliates know the rules at a glance.
+const terms = ['20% recurring · lifetime', 'Paid on real sales only', '$50 minimum payout', 'Paid monthly · PayPal or crypto']
+const termPill = computed(() => ({ fontSize:'11px', fontWeight:600, color: tx.value, background: theme.dark ? 'rgba(167,139,250,0.12)' : '#F1EDFF', border:`1px solid ${theme.dark ? 'rgba(167,139,250,0.25)' : '#E2D9FF'}`, borderRadius:'999px', padding:'5px 11px' }))
 
 const tx      = computed(() => theme.dark ? '#fff' : '#111827')
 const txMuted = computed(() => theme.dark ? 'rgba(255,255,255,0.45)' : '#6B7280')

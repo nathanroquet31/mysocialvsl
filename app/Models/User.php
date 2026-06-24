@@ -28,9 +28,21 @@ class User extends Authenticatable
         return $this->hasMany(SocialAccount::class);
     }
 
+    /** Commissions earned by this user as the referring affiliate. */
+    public function commissions()
+    {
+        return $this->hasMany(Commission::class, 'affiliate_id');
+    }
+
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    /** Hand-picked affiliate (founder-only flag): earns 20% recurring commissions. */
+    public function isAffiliate(): bool
+    {
+        return (bool) $this->is_affiliate;
     }
 
     /** Free plan: no paid features. Admins are never treated as free. */
@@ -146,6 +158,7 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_beta' => 'boolean',
             'is_beta_partner' => 'boolean',
+            'is_affiliate' => 'boolean',
             'preferences' => 'array',
             'trial_ends_at' => 'datetime',
             'trial_reminders' => 'array',

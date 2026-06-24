@@ -26,6 +26,7 @@ const routes = [
   { path: '/dashboard/guide',    component: () => import('@/pages/CreatorGuide.vue'),  meta: { auth: true } },
   { path: '/dashboard/api',        component: () => import('@/pages/ApiAccessPage.vue'),       meta: { auth: true } },
   { path: '/dashboard/affiliates', component: () => import('@/pages/AffiliatePage.vue'),       meta: { auth: true } },
+  { path: '/dashboard/whats-new',  component: () => import('@/pages/WhatsNewPage.vue'),        meta: { auth: true } },
   { path: '/dashboard/analytics/instagram', component: () => import('@/pages/SocialAnalyticsPage.vue'), meta: { auth: true } },
   { path: '/dashboard/help',       component: () => import('@/pages/HelpCenterPage.vue'),      meta: { auth: true } },
   { path: '/dashboard/legacy',     component: () => import('@/pages/LegacyPage.vue'),          meta: { auth: true } },

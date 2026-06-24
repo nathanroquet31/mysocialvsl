@@ -362,6 +362,7 @@ class StripeController extends Controller
             'customer.subscription.updated'       => $this->handleSubscriptionUpdated($event->data->object),
             'customer.subscription.deleted'       => $this->handleSubscriptionDeleted($event->data->object),
             'invoice.payment_failed'              => $this->handlePaymentFailed($event->data->object),
+            'invoice.payment_succeeded'           => $this->handlePaymentSucceeded($event->data->object),
             default                               => null,
         };
 
@@ -541,5 +542,43 @@ class StripeController extends Controller
 
         User::where('stripe_customer_id', $customerId)->first()
             ?->notify(new PaymentFailed());
+    }
+
+    /** 20% commission rate paid to affiliates on each referred customer's payment. */
+    private const AFFILIATE_RATE = 0.20;
+
+    /**
+     * Record a 20% recurring commission whenever a referred customer actually pays —
+     * the first invoice (from Checkout) and every renewal/proration after it. Fires on
+     * every paid invoice, so the affiliate keeps earning for as long as the customer stays.
+     *
+     * Guards: customer must map to a user who was referred by a *flagged affiliate*
+     * (beta-partner referrals earn nothing). Idempotent on the invoice id, so webhook
+     * retries or duplicate deliveries can never double-credit.
+     */
+    private function handlePaymentSucceeded(object $invoice): void
+    {
+        $customerId = $invoice->customer ?? null;
+        $amountPaid = (int) ($invoice->amount_paid ?? 0); // cents
+        if (!$customerId || $amountPaid <= 0) return;
+
+        $customer = User::where('stripe_customer_id', $customerId)->first();
+        if (!$customer || !$customer->referred_by) return;
+
+        $affiliate = User::find($customer->referred_by);
+        if (!$affiliate || !$affiliate->is_affiliate) return;
+
+        \App\Models\Commission::firstOrCreate(
+            ['stripe_invoice_id' => $invoice->id],
+            [
+                'affiliate_id'      => $affiliate->id,
+                'referred_user_id'  => $customer->id,
+                'amount_paid_cents' => $amountPaid,
+                'commission_cents'  => (int) round($amountPaid * self::AFFILIATE_RATE),
+                'currency'          => strtolower($invoice->currency ?? 'usd'),
+                'rate'              => self::AFFILIATE_RATE,
+                'status'            => 'pending',
+            ]
+        );
     }
 }
