@@ -82,7 +82,17 @@
             <div class="adash-ov-icon" style="background:rgba(234,88,12,0.14)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
           </div>
           <div class="adash-ov-cell">
-            <div><p class="adash-ov-val">{{ data.ctr }}%</p><p class="adash-ov-lbl">Click-through rate</p></div>
+            <div>
+              <p class="adash-ov-val">{{ data.ctr }}%</p>
+              <p class="adash-ov-lbl">Click-through rate</p>
+              <!-- The fair VSL read: of people who actually watched the video, how
+                   many clicked. Raw CTR above is diluted by drive-by visitors who
+                   never engaged — not comparable to a link-list page. -->
+              <p v-if="data.vsl?.watchers" :title="`${data.vsl.engaged_clicks} of ${data.vsl.watchers} video watchers clicked`"
+                :style="{margin:'4px 0 0',fontSize:'11px',fontWeight:600,color:theme.dark?'#A78BFA':'#6D4EE8'}">
+                {{ data.vsl.engaged_ctr }}% of watchers clicked
+              </p>
+            </div>
             <div class="adash-ov-icon" style="background:rgba(22,163,74,0.14)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
           </div>
         </div>
@@ -430,6 +440,7 @@ const data       = ref({
   per_link: [], pages: [],
   is_paid: false,
   retention: null,
+  vsl: { plays: 0, play_rate: 0, milestones: {}, avg_watch_before_click: null, avg_time_on_page: null, watchers: 0, engaged_clicks: 0, engaged_ctr: 0 },
 })
 
 const isPaid = computed(() => data.value.is_paid || auth.user?.plan === 'pro' || auth.user?.plan === 'agency' || auth.user?.is_admin)

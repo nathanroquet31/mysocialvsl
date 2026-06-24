@@ -385,12 +385,28 @@ class AnalyticsController extends Controller
         $avgWatch = (clone $base)->where('type', 'link_click')->whereNotNull('value')->avg('value');
         $avgTime  = (clone $base)->where('type', 'time_on_page')->whereNotNull('value')->avg('value');
 
+        // Engaged CTR — the honest "this VSL converts" number: of the sessions that
+        // actually started the video, the % that went on to click the CTA. Unlike
+        // raw CTR (clicks ÷ all views) it drops drive-by visitors who never engaged,
+        // so it's the fair read for a VSL — a link-list page (Linktree) has no video
+        // step to lose people at, so its raw CTR isn't comparable to ours. Bounded
+        // 0–100 by construction: the clickers counted are a subset of the watchers.
+        $watcherSessions = (clone $base)->where('type', 'video_play')->whereNotNull('session_id')->select('session_id');
+        $watchers = (clone $base)->where('type', 'video_play')->whereNotNull('session_id')->distinct()->count('session_id');
+        $engagedClicks = (clone $base)->where('type', 'link_click')->whereNotNull('session_id')
+            ->whereIn('session_id', $watcherSessions)->distinct()->count('session_id');
+        $engagedCtr = $watchers > 0 ? round($engagedClicks / $watchers * 100, 1) : 0;
+
         return [
             'plays'                  => $plays,
             'play_rate'              => $pageViews > 0 ? round($plays / $pageViews * 100, 1) : 0,
             'milestones'             => $milestones,
             'avg_watch_before_click' => $avgWatch ? round($avgWatch, 1) : null,
             'avg_time_on_page'       => $avgTime ? round($avgTime) : null,
+            // Fair VSL engagement: clicks among real video-watchers.
+            'watchers'               => $watchers,
+            'engaged_clicks'         => $engagedClicks,
+            'engaged_ctr'            => $engagedCtr,
         ];
     }
 
@@ -698,7 +714,7 @@ class AnalyticsController extends Controller
             'hourly'             => array_fill(0, 24, 0),
             'live'               => ['visitors_now' => 0, 'views_30m' => 0, 'clicks_30m' => 0, 'top_country' => null, 'events' => [], 'visitors' => []],
             'per_link'           => [],
-            'vsl'                => ['plays' => 0, 'play_rate' => 0, 'milestones' => [25 => 0, 50 => 0, 75 => 0, 100 => 0], 'avg_watch_before_click' => null, 'avg_time_on_page' => null],
+            'vsl'                => ['plays' => 0, 'play_rate' => 0, 'milestones' => [25 => 0, 50 => 0, 75 => 0, 100 => 0], 'avg_watch_before_click' => null, 'avg_time_on_page' => null, 'watchers' => 0, 'engaged_clicks' => 0, 'engaged_ctr' => 0],
             'is_paid'            => $isPaid,
             'retention'          => null,
             'pages'              => [],
