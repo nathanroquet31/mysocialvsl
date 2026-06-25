@@ -2,7 +2,7 @@
 
 # Frontend — MySocialVSL (Vue 3 SPA, frontend/src)
 
-Vue 3 + Pinia + vue-router + axios + Tailwind v4. Built to `public/app/` (served by Laravel). Dark-only V1. Icons: Bootstrap Icons (`bi bi-*`). Components use **inline `:style` objects** keyed on `theme.dark`, not utility classes.
+Vue 3 + Pinia + vue-router + axios + Tailwind v4. Built to `public/app/` (served by Laravel). Light mode is the default; a light/dark toggle drives theme-aware CSS vars (see `stores/theme.js`) — mockups/devices stay dark on purpose. Icons: Bootstrap Icons (`bi bi-*`). Components use **inline `:style` objects** keyed on theme refs/CSS vars, not utility classes. Unit tests: Vitest (`npm run test`).
 
 ## Router pages (src/pages)
 ```

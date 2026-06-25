@@ -7,8 +7,8 @@
 | Frontend | Vue 3 + Vite + Tailwind v4 + AOS |
 | Backend | Laravel 11 + Sanctum |
 | CSS | Inter (Google Fonts) + inline styles pour les spacings critiques |
-| Paiement | Stripe (à intégrer) |
-| Deploy | Netlify (frontend) / Hetzner VPS (prod) |
+| Paiement | Stripe (live, abos + addons à paliers) |
+| Deploy | Laravel Cloud (single-origin) + Cloudflare R2 (médias) |
 
 ---
 
@@ -157,8 +157,8 @@ Photo : `frontend/public/karine.JPG` (copiée depuis `ofm-video-lp/`)
 
 ## Design — Règles appliquées
 
-- **Couleur principale** : `#2563EB` (blue-600)
-- **Fond** : `#000` (landing) / `#f8f8f8` (dashboard/builder)
+- **Couleur principale** : `#6D4EE8` (violet de marque ; l'ancien `#2563EB` a été remplacé partout)
+- **Fond** : light mode par défaut (clair) ; thème sombre dispo via toggle. Les mockups/devices restent sombres exprès.
 - **Largeur max** : `1152px` centré avec `margin: 0 auto`
 - **Padding sections** : `96px` top/bottom
 - **Footer** : `flex-direction:column; align-items:center` — centré
@@ -167,7 +167,7 @@ Photo : `frontend/public/karine.JPG` (copiée depuis `ofm-video-lp/`)
 
 ---
 
-## Plans Stripe (à implémenter)
+## Plans Stripe (live)
 
 | Plan | Prix | Pages | Branding |
 |------|------|-------|----------|
