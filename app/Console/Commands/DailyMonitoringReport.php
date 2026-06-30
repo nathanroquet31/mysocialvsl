@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\MonitoringDigest;
+use App\Services\TelegramNotifier;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Throwable;
@@ -191,38 +192,14 @@ class DailyMonitoringReport extends Command
     /** Push the summary to the founder's own Telegram chat (config-driven). */
     private function sendTelegram(string $message): void
     {
-        $token  = (string) config('services.telegram.bot_token');
-        $chatId = (string) config('services.telegram.chat_id');
-
-        if ($token === '' || $chatId === '') {
+        if (! config('services.telegram.bot_token') || ! config('services.telegram.chat_id')) {
             $this->warn('Telegram not configured (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID) — report not sent.');
 
             return;
         }
 
-        try {
-            $ok = Http::timeout(15)
-                ->post("https://api.telegram.org/bot{$token}/sendMessage", [
-                    'chat_id' => $chatId,
-                    'text'    => $message,
-                ])
-                ->json('ok');
-
-            if ($ok !== true) {
-                // One retry — transient Telegram hiccups are common.
-                $ok = Http::timeout(15)
-                    ->post("https://api.telegram.org/bot{$token}/sendMessage", [
-                        'chat_id' => $chatId,
-                        'text'    => $message,
-                    ])
-                    ->json('ok');
-            }
-
-            $ok === true
-                ? $this->info('Telegram report sent.')
-                : $this->error('Telegram send failed (ok != true).');
-        } catch (Throwable $e) {
-            $this->error('Telegram send threw: ' . $e->getMessage());
-        }
+        app(TelegramNotifier::class)->send($message)
+            ? $this->info('Telegram report sent.')
+            : $this->error('Telegram send failed.');
     }
 }
