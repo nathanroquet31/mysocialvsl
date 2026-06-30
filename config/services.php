@@ -69,8 +69,17 @@ return [
     ],
 
     // Shared secret for the read-only /api/monitoring/digest endpoint (daily cron).
+    // 'slug' is the public page the daily report probes for the cloaking/API checks.
     'monitoring' => [
         'token' => env('MONITORING_TOKEN'),
+        'slug'  => env('MONITORING_SLUG', 'lillylou'),
+    ],
+
+    // Telegram bot used by the daily self-monitoring report (monitoring:report).
+    // The server cron sends the founder's own prod digest to his own private chat.
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id'   => env('TELEGRAM_CHAT_ID'),
     ],
 
     'slack' => [
