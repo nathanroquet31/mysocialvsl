@@ -832,7 +832,7 @@
                 <label :style="{display:'block',fontSize:'13px',fontWeight:600,color:C.text2,marginBottom:'4px'}">
                   Banner links
                 </label>
-                <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px'}">These links show up in the drawer that slides up from the bottom.</p>
+                <p :style="{fontSize:'12px',color:C.textDim,marginBottom:'12px'}">These links show up in the drawer that slides up from the bottom. Each one needs a URL, otherwise it won't appear.</p>
 
                 <!-- Quick-add platforms — iOS-style square icons -->
                 <div :style="{display:'flex',gap:'10px',flexWrap:'wrap',marginBottom:'16px'}">
@@ -867,10 +867,10 @@
                       :style="{...inputStyle,width:'130px',flex:'none',padding:'8px 10px',fontSize:'12px'}"
                       @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
                       @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
-                    <input v-model="link.url" type="url" placeholder="https://..."
-                      :style="{...inputStyle,flex:1,padding:'8px 10px',fontSize:'12px'}"
+                    <input v-model="link.url" type="url" placeholder="https://… (required)"
+                      :style="{...inputStyle,flex:1,padding:'8px 10px',fontSize:'12px',borderColor: (link.url && link.url.trim()) ? C.borderInput : '#F59E0B'}"
                       @focus="(e:any)=>e.target.style.borderColor='#6D4EE8'"
-                      @blur="(e:any)=>e.target.style.borderColor=C.borderInput" />
+                      @blur="(e:any)=>e.target.style.borderColor = (link.url && link.url.trim()) ? C.borderInput : '#F59E0B'" />
                     <button @click="form.extra_links.splice(i,1)"
                       :style="{background:'none',border:'none',cursor:'pointer',color:C.textFaint,padding:'4px',display:'flex',alignItems:'center',flexShrink:0}"
                       @mouseover="(e:any)=>e.currentTarget.style.color='#F87171'"
@@ -1416,6 +1416,17 @@ function prevStep() {
 }
 
 async function save() {
+  // A bandeau banner link with no URL is dropped when we build the payload below,
+  // which would leave the drawer empty with no feedback (the "drawer doesn't show"
+  // bug). Block the save and point the user to the incomplete rows instead.
+  if (form.value.template === 'vsl-bandeau') {
+    const missing = form.value.extra_links.filter(l => !l.url || !l.url.trim()).length
+    if (missing) {
+      error.value = `${missing} banner link${missing > 1 ? 's have' : ' has'} no URL — add a URL or remove ${missing > 1 ? 'them' : 'it'}, otherwise the drawer stays empty.`
+      return
+    }
+  }
+
   saving.value = true
   error.value = ''
   try {
