@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\PaymentFailed;
 use App\Notifications\PlanChanged;
+use App\Services\TelegramNotifier;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Customer;
@@ -394,6 +395,18 @@ class StripeController extends Controller
         $wasTrialing = $user->trial_ends_at !== null;
         $user->update($data);
         $user->notify(new PlanChanged($plan, $wasTrialing ? 'trial_converted' : 'upgraded'));
+
+        $caps = $plan === 'agency'
+            ? " ({$data['agency_pages']} pages / {$data['agency_links']} links)"
+            : '';
+        $amount = isset($session->amount_total) ? '$' . number_format($session->amount_total / 100, 2) : 'n/a';
+        $this->pingFounder(implode("\n", [
+            '💳 Nouveau client payant',
+            $this->userLabel($user),
+            "Plan: {$plan}{$caps}",
+            "Montant: {$amount}",
+            'Total payants: ' . User::whereNotNull('stripe_subscription_id')->count(),
+        ]));
     }
 
     private function handleSubscriptionUpdated(object $subscription): void
@@ -445,6 +458,11 @@ class StripeController extends Controller
             // capacity-only / billing-cycle updates).
             if ($plan !== $previousPlan) {
                 $user->notify(new PlanChanged($plan, 'upgraded'));
+
+                // Founder ping only for paid→paid moves (free→paid is covered by checkout).
+                if ($previousPlan !== 'free') {
+                    $this->pingFounder("⬆️ Upgrade {$previousPlan} → {$plan}\n" . $this->userLabel($user));
+                }
             }
         } elseif ($status === 'canceled') {
             // Ignore cancellation of a stale/orphan sub that isn't the user's current one.
@@ -487,6 +505,11 @@ class StripeController extends Controller
 
         if ($previousPlan !== 'free') {
             $user->notify(new PlanChanged('free', 'downgraded'));
+            $this->pingFounder(implode("\n", [
+                '💔 Client perdu (churn)',
+                $this->userLabel($user),
+                "Était: {$previousPlan}",
+            ]));
         }
     }
 
@@ -580,5 +603,16 @@ class StripeController extends Controller
                 'status'            => 'pending',
             ]
         );
+    }
+
+    /** Fire-and-forget Telegram ping to the founder; never affects the webhook response. */
+    private function pingFounder(string $message): void
+    {
+        app(TelegramNotifier::class)->send($message);
+    }
+
+    private function userLabel(User $user): string
+    {
+        return trim(($user->name ?: 'Sans nom') . ' (' . $user->email . ')');
     }
 }

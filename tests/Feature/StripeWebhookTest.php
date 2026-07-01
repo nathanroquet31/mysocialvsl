@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Http\Controllers\Api\StripeController;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
@@ -164,6 +165,47 @@ class StripeWebhookTest extends TestCase
         ])->assertOk();
 
         $this->assertSame('pro', $user->fresh()->plan);
+    }
+
+    public function test_new_paying_customer_pings_the_founder_on_telegram(): void
+    {
+        config(['services.telegram.bot_token' => 'tok', 'services.telegram.chat_id' => '123']);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true])]);
+
+        $user = User::factory()->create(['plan' => 'free']);
+
+        $this->postSignedEvent([
+            'id' => 'evt_paid',
+            'type' => 'checkout.session.completed',
+            'data' => ['object' => [
+                'subscription' => 'sub_pro_ping',
+                'amount_total' => 700,
+                'metadata' => ['user_id' => (string) $user->id, 'plan' => 'pro'],
+            ]],
+        ])->assertOk();
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'api.telegram.org')
+            && str_contains($request['text'], 'Nouveau client payant'));
+    }
+
+    public function test_churn_pings_the_founder_on_telegram(): void
+    {
+        config(['services.telegram.bot_token' => 'tok', 'services.telegram.chat_id' => '123']);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true])]);
+
+        $user = User::factory()->create(['plan' => 'agency', 'stripe_subscription_id' => 'sub_live']);
+
+        $this->postSignedEvent([
+            'id' => 'evt_churn',
+            'type' => 'customer.subscription.deleted',
+            'data' => ['object' => [
+                'id' => 'sub_live',
+                'metadata' => ['user_id' => (string) $user->id],
+            ]],
+        ])->assertOk();
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'api.telegram.org')
+            && str_contains($request['text'], 'Client perdu'));
     }
 
     public function test_unhandled_event_type_is_a_no_op_ok(): void
