@@ -14,6 +14,9 @@
       </div>
     </div>
 
+    <!-- Network-wide (cross-agency) analytics -->
+    <AdminNetworkAnalytics />
+
     <!-- Search -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div :style="{flex:1,maxWidth:'340px',display:'flex',alignItems:'center',gap:'8px',background:inputBg,border:`1px solid ${inputBorder}`,borderRadius:'10px',padding:'8px 12px'}">
@@ -167,6 +170,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useThemeStore } from '@/stores/theme'
 import api from '@/lib/axios'
 import DashboardLayout from '@/components/DashboardLayout.vue'
+import AdminNetworkAnalytics from '@/components/AdminNetworkAnalytics.vue'
 
 const theme = useThemeStore()
 
