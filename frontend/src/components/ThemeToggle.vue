@@ -8,11 +8,11 @@
       boxSizing:'border-box', alignItems:'center', justifyContent:'space-between',
       flexShrink: 0,
     }"
-    @click="theme.toggle()"
+    @click.stop="theme.toggle()"
     role="button"
     tabindex="0"
-    @keydown.enter="theme.toggle()"
-    @keydown.space.prevent="theme.toggle()"
+    @keydown.enter.stop="theme.toggle()"
+    @keydown.space.stop.prevent="theme.toggle()"
   >
     <!-- Moving thumb with active icon -->
     <div :style="{
