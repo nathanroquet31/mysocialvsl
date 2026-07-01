@@ -89,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin ops (founder only) — flag coaches as beta partners, see users/trials.
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/metrics', [AdminController::class, 'metrics']);
+        Route::get('/network', [AdminController::class, 'network']);
         Route::get('/users',   [AdminController::class, 'users']);
         Route::patch('/users/{user}/beta-partner', [AdminController::class, 'toggleBetaPartner']);
         Route::post('/users/{user}/grant-plan',    [AdminController::class, 'grantPlan']);

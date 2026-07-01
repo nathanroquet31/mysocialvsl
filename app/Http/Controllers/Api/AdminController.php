@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
 use App\Notifications\PlanChanged;
+use App\Services\NetworkAnalytics;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -18,6 +20,33 @@ use Illuminate\Support\Collection;
  */
 class AdminController extends Controller
 {
+    /**
+     * Network-wide (cross-agency) analytics for the founder: volume, benchmark
+     * percentiles, form → outcome, top pages, growth, feature adoption.
+     * Range via ?preset= (today/7d/30d/90d/12m/all).
+     */
+    public function network(Request $request, NetworkAnalytics $engine)
+    {
+        [$from, $to] = $this->networkRange((string) $request->query('preset', '30d'));
+
+        return response()->json($engine->snapshot($from, $to));
+    }
+
+    /** Resolve a preset key to a [from, to] window (null,null = all-time). */
+    private function networkRange(string $preset): array
+    {
+        $now = Carbon::now();
+        return match ($preset) {
+            'today' => [$now->copy()->startOfDay(), $now],
+            '7d'    => [$now->copy()->subDays(7)->startOfDay(), $now],
+            '30d'   => [$now->copy()->subDays(30)->startOfDay(), $now],
+            '90d'   => [$now->copy()->subDays(90)->startOfDay(), $now],
+            '12m'   => [$now->copy()->subMonths(12)->startOfDay(), $now],
+            'all'   => [null, null],
+            default => [$now->copy()->subDays(30)->startOfDay(), $now],
+        };
+    }
+
     /** Paginated user list with the fields that matter for beta ops, newest first. */
     public function users(Request $request)
     {

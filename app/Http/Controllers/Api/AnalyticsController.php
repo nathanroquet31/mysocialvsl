@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AnalyticsEvent;
 use App\Models\Page;
+use App\Support\AnalyticsSql;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,8 @@ use Stevebauman\Location\Facades\Location;
 
 class AnalyticsController extends Controller
 {
+    use AnalyticsSql;
+
     // POST /p/{slug}/event — records an event (public, called by the fan page)
     public function track(Request $request, string $slug)
     {
@@ -531,91 +534,8 @@ class AnalyticsController extends Controller
         return array_map(fn ($h) => $byHour[$h] ?? 0, range(0, 23));
     }
 
-    // ─── Cross-driver SQL helpers (SQLite local, Postgres prod, MySQL fallback) ──
-
-    private function dbDriver(): string
-    {
-        return DB::connection()->getDriverName();
-    }
-
-    /** SQL expression formatting created_at into a sortable period-bucket string. */
-    private function periodExpr(string $granularity): string
-    {
-        return match ($this->dbDriver()) {
-            'sqlite' => match ($granularity) {
-                'hour'  => "strftime('%Y-%m-%d %H:00', created_at)",
-                'day'   => "strftime('%Y-%m-%d', created_at)",
-                'week'  => "strftime('%Y-W%W', created_at)",
-                'month' => "strftime('%Y-%m', created_at)",
-            },
-            'pgsql' => match ($granularity) {
-                'hour'  => "to_char(created_at, 'YYYY-MM-DD HH24\":00\"')",
-                'day'   => "to_char(created_at, 'YYYY-MM-DD')",
-                'week'  => "to_char(created_at, 'IYYY\"-W\"IW')",
-                'month' => "to_char(created_at, 'YYYY-MM')",
-            },
-            default => match ($granularity) { // mysql / mariadb
-                'hour'  => "DATE_FORMAT(created_at, '%Y-%m-%d %H:00')",
-                'day'   => "DATE_FORMAT(created_at, '%Y-%m-%d')",
-                'week'  => "DATE_FORMAT(created_at, '%x-W%v')",
-                'month' => "DATE_FORMAT(created_at, '%Y-%m')",
-            },
-        };
-    }
-
-    /** SQL expression extracting the hour-of-day (0..23) from created_at. */
-    private function hourExpr(): string
-    {
-        return match ($this->dbDriver()) {
-            'sqlite' => "CAST(strftime('%H', created_at) AS INTEGER)",
-            'pgsql'  => 'EXTRACT(HOUR FROM created_at)',
-            default  => 'HOUR(created_at)',
-        };
-    }
-
-    /**
-     * SQL counting REAL visits, not raw events: dedupe by session_id so one
-     * visitor firing ~10 events (page_view, video_play, 4× progress, heartbeats,
-     * clicks…) counts ONCE. That's the whole difference between "1700 events" and
-     * "the ~45 real people who actually showed up". Legacy rows that predate
-     * session tracking have no session_id, so they fall back to their row id and
-     * still count once each — no data lost, just deduped where we can.
-     */
-    private function visitCountExpr(): string
-    {
-        $idAsText = in_array($this->dbDriver(), ['mysql', 'mariadb'], true)
-            ? 'CAST(id AS CHAR)'
-            : 'CAST(id AS TEXT)';
-        return "COUNT(DISTINCT COALESCE(session_id, $idAsText))";
-    }
-
-    /** Run the distinct-visit count over a query. Clone the query first if reused. */
-    private function countVisits($query): int
-    {
-        $row = $query->selectRaw($this->visitCountExpr() . ' as aggregate')->first();
-        return (int) ($row->aggregate ?? 0);
-    }
-
-    /**
-     * SQL counting unique PEOPLE, not visits: distinct visitor_id (a localStorage
-     * id that survives reloads + return visits), so the same person coming back
-     * 10× counts ONCE. Falls back to session_id then row id for legacy/no-storage
-     * rows, so the number degrades to visit-level instead of breaking.
-     */
-    private function personCountExpr(): string
-    {
-        $idAsText = in_array($this->dbDriver(), ['mysql', 'mariadb'], true)
-            ? 'CAST(id AS CHAR)'
-            : 'CAST(id AS TEXT)';
-        return "COUNT(DISTINCT COALESCE(visitor_id, session_id, $idAsText))";
-    }
-
-    /** Run the distinct-person count over a query. Clone the query first if reused. */
-    private function countPeople($query): int
-    {
-        $row = $query->selectRaw($this->personCountExpr() . ' as aggregate')->first();
-        return (int) ($row->aggregate ?? 0);
-    }
+    // Cross-driver SQL + visit/person counting live in the AnalyticsSql trait
+    // (shared with the network-wide NetworkAnalytics engine).
 
     private function buildLive($pageIds, bool $detailed = false): array
     {
