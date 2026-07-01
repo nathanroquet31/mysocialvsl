@@ -28,6 +28,8 @@ Route::post('/billing/webhook', [StripeController::class, 'webhook']);
 
 // Read-only business digest for the daily monitoring cron (token-guarded inside).
 Route::get('/monitoring/digest', [MonitoringController::class, 'digest'])->middleware('throttle:10,1');
+// Read-only cross-agency network analytics (token-guarded) — pulled into a Claude Code session for analysis.
+Route::get('/monitoring/network', [MonitoringController::class, 'network'])->middleware('throttle:10,1');
 
 // Public pages — seen by fans (public)
 Route::get('/p/{slug}',          [PageController::class, 'showPublic'])->middleware('custom.domain');

@@ -109,4 +109,20 @@ class NetworkAnalyticsTest extends TestCase
                 'overview', 'benchmarks', 'by_shape', 'top_pages', 'growth', 'feature_adoption',
             ]);
     }
+
+    public function test_monitoring_network_relay_is_token_gated(): void
+    {
+        config(['services.monitoring.token' => 'secret123']);
+
+        // No token / wrong token → 403 (no session auth needed — this is the machine-readable twin).
+        $this->getJson('/api/monitoring/network')->assertForbidden();
+        $this->getJson('/api/monitoring/network?token=nope')->assertForbidden();
+
+        // Correct token → 200 + the full network snapshot.
+        $this->getJson('/api/monitoring/network?token=secret123&preset=all')
+            ->assertOk()
+            ->assertJsonStructure([
+                'overview', 'benchmarks', 'by_shape', 'top_pages', 'growth', 'feature_adoption',
+            ]);
+    }
 }
